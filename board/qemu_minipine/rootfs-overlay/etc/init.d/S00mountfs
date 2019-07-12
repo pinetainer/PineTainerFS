@@ -1,0 +1,4 @@
+#!/bin/sh
+# Montar sistemas de ficheros y swap en fstab
+mount -a
+swapon -a

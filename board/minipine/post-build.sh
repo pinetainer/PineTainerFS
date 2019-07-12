@@ -1,0 +1,1 @@
+../qemu_minipine/post-build.sh

@@ -10,10 +10,11 @@ Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
 diff -pur linux.orig/tools/thermal/tmon/tmon.h linux/tools/thermal/tmon/tmon.h
 --- linux.orig/tools/thermal/tmon/tmon.h	2019-07-03 13:13:45.000000000 +0200
 +++ linux/tools/thermal/tmon/tmon.h	2019-07-12 23:08:28.407436432 +0200
-@@ -16,6 +16,8 @@
+@@ -16,6 +16,9 @@
   *
   */
- 
+
++#include <sys/types.h> 
 +#include <pthread.h>
 +
  #ifndef TMON_H

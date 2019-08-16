@@ -1,0 +1,409 @@
+From patchwork Fri Apr 12 12:07:29 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: =?utf-8?q?Ond=C5=99ej_Jirman?= <megous@megous.com>
+X-Patchwork-Id: 10898087
+Return-Path: 
+ <linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 47686922
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 2718C28E53
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 1AE5528E62; Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.4 required=2.0 tests=BAYES_00,DKIM_ADSP_DISCARD,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,RCVD_IN_DNSWL_MED autolearn=ham
+	version=3.3.1
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id 22A1128E53
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=gGP1kq6EIrKt40JQFYJWWP78lkRrkkXJCjjlAq8fyIU=; b=AKqvXHIn/lGOGs
+	gNbALQjqd4/nxjilx0hWe16dHE3P/fDko2YGBX6vGMxyKeW9Wj5ySu8BXu477hZV0k26DO7ZArIzr
+	UaxhBAB0H2xoF4KSkCXvs34heD/M8zgbLYBhg1+FH0eyGfOEdJDmhHOtQcOx6eAnbJJ5QxVRkWP+f
+	trdEQQhxWJDGyGyjUBRkxOpRAZyoMty+X0El/dgfVaPFedAH84Q+Lrqyeiyj6Pz/Ack6VtasJpCyd
+	ZvO6kmJ/4Ym3L8CxVLBCVF6UB14EZLiziCwJt6/hx5g8hBEPLUsGl1+QSwN6btSBxrPaKSF/RgVsk
+	y/rieET7UkHjz6UyDBkQ==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.90_1 #2 (Red Hat Linux))
+	id 1hEuyJ-0007Ml-Cf; Fri, 12 Apr 2019 12:07:55 +0000
+Received: from vps.xff.cz ([195.181.215.36])
+ by bombadil.infradead.org with esmtps (Exim 4.90_1 #2 (Red Hat Linux))
+ id 1hEuy0-0006za-22
+ for linux-arm-kernel@lists.infradead.org; Fri, 12 Apr 2019 12:07:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
+ t=1555070852; bh=WFbaY/ab3k+0ZHOWo2EasW7vJ3s0iDUZXCsIpwTIRIo=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=X3NG2gZ1tWyE43GGH18yEjSfpKSSgRFoCSpWHWzTMvGshVLlyBe9VEOhZTWP7GWUQ
+ ZpZ+H3mUGUQBLDNJGleTNbtI4jUNUekVq6s/gdHqD9dxtzTOiWnw4vAOVEUYOiqgvK
+ IE44NZuNRPRMrrCCaeNubsijIWxJbnX7qyaf+TOo=
+From: megous@megous.com
+To: Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Maxime Ripard <maxime.ripard@bootlin.com>, Chen-Yu Tsai <wens@csie.org>
+Subject: [PATCH 2/3] rtc: sun6i: Add support for H6 RTC
+Date: Fri, 12 Apr 2019 14:07:29 +0200
+Message-Id: <20190412120730.473-3-megous@megous.com>
+In-Reply-To: <20190412120730.473-1-megous@megous.com>
+References: <20190412120730.473-1-megous@megous.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20190412_050737_155021_4531F3D6 
+X-CRM114-Status: GOOD (  17.21  )
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.21
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: Ondrej Jirman <megous@megous.com>, linux-rtc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@googlegroups.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Ondrej Jirman <megous@megous.com>
+
+RTC on H6 is mostly the same as on H5 and H3. It has slight differences
+mostly in features that are not yet supported by this driver.
+
+Some differences are already stated in the comments in existing code.
+One other difference is that H6 has extra bit in LOSC_CTRL_REG, called
+EXT_LOSC_EN to enable/disable external low speed crystal oscillator.
+
+It also has bit EXT_LOSC_STA in LOSC_AUTO_SWT_STA_REG, to check whether
+external low speed oscillator is working correctly.
+
+This patch adds support for enabling LOSC when necessary:
+
+- during reparenting
+- when probing the clock
+
+H6 also has capacbility to automatically reparent RTC clock from
+external crystal oscillator, to internal RC oscillator, if external
+oscillator fails. This is enabled by default. Disable it during
+probe.
+
+Signed-off-by: Ondrej Jirman <megous@megous.com>
+Reviewed-by: Chen-Yu Tsai <wens@csie.org>
+---
+ drivers/rtc/rtc-sun6i.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/rtc/rtc-sun6i.c b/drivers/rtc/rtc-sun6i.c
+index 11f56de52179..7375a530c565 100644
+--- a/drivers/rtc/rtc-sun6i.c
++++ b/drivers/rtc/rtc-sun6i.c
+@@ -41,9 +41,11 @@
+ /* Control register */
+ #define SUN6I_LOSC_CTRL				0x0000
+ #define SUN6I_LOSC_CTRL_KEY			(0x16aa << 16)
++#define SUN6I_LOSC_CTRL_AUTO_SWT_BYPASS		BIT(15)
+ #define SUN6I_LOSC_CTRL_ALM_DHMS_ACC		BIT(9)
+ #define SUN6I_LOSC_CTRL_RTC_HMS_ACC		BIT(8)
+ #define SUN6I_LOSC_CTRL_RTC_YMD_ACC		BIT(7)
++#define SUN6I_LOSC_CTRL_EXT_LOSC_EN		BIT(4)
+ #define SUN6I_LOSC_CTRL_EXT_OSC			BIT(0)
+ #define SUN6I_LOSC_CTRL_ACC_MASK		GENMASK(9, 7)
+ 
+@@ -137,6 +139,8 @@ struct sun6i_rtc_clk_data {
+ 	unsigned int has_prescaler : 1;
+ 	unsigned int has_out_clk : 1;
+ 	unsigned int export_iosc : 1;
++	unsigned int has_losc_en : 1;
++	unsigned int has_auto_swt : 1;
+ };
+ 
+ struct sun6i_rtc_dev {
+@@ -199,6 +203,10 @@ static int sun6i_rtc_osc_set_parent(struct clk_hw *hw, u8 index)
+ 	val &= ~SUN6I_LOSC_CTRL_EXT_OSC;
+ 	val |= SUN6I_LOSC_CTRL_KEY;
+ 	val |= index ? SUN6I_LOSC_CTRL_EXT_OSC : 0;
++	if (rtc->data->has_losc_en) {
++		val &= ~SUN6I_LOSC_CTRL_EXT_LOSC_EN;
++		val |= index ? SUN6I_LOSC_CTRL_EXT_LOSC_EN : 0;
++	}
+ 	writel(val, rtc->base + SUN6I_LOSC_CTRL);
+ 	spin_unlock_irqrestore(&rtc->lock, flags);
+ 
+@@ -224,6 +232,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
+ 	const char *iosc_name = "rtc-int-osc";
+ 	const char *clkout_name = "osc32k-out";
+ 	const char *parents[2];
++	u32 reg;
+ 
+ 	rtc = kzalloc(sizeof(*rtc), GFP_KERNEL);
+ 	if (!rtc)
+@@ -244,9 +253,18 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
+ 		goto err;
+ 	}
+ 
++	reg = SUN6I_LOSC_CTRL_KEY;
++	if (rtc->data->has_auto_swt) {
++		/* Bypass auto-switch to int osc, on ext losc failure */
++		reg |= SUN6I_LOSC_CTRL_AUTO_SWT_BYPASS;
++		writel(reg, rtc->base + SUN6I_LOSC_CTRL);
++	}
++
+ 	/* Switch to the external, more precise, oscillator */
+-	writel(SUN6I_LOSC_CTRL_KEY | SUN6I_LOSC_CTRL_EXT_OSC,
+-	       rtc->base + SUN6I_LOSC_CTRL);
++	reg |= SUN6I_LOSC_CTRL_EXT_OSC;
++	if (rtc->data->has_losc_en)
++		reg |= SUN6I_LOSC_CTRL_EXT_LOSC_EN;
++	writel(reg, rtc->base + SUN6I_LOSC_CTRL);
+ 
+ 	/* Yes, I know, this is ugly. */
+ 	sun6i_rtc = rtc;
+@@ -354,6 +372,23 @@ CLK_OF_DECLARE_DRIVER(sun8i_h3_rtc_clk, "allwinner,sun8i-h3-rtc",
+ CLK_OF_DECLARE_DRIVER(sun50i_h5_rtc_clk, "allwinner,sun50i-h5-rtc",
+ 		      sun8i_h3_rtc_clk_init);
+ 
++static const struct sun6i_rtc_clk_data sun50i_h6_rtc_data = {
++	.rc_osc_rate = 16000000,
++	.fixed_prescaler = 32,
++	.has_prescaler = 1,
++	.has_out_clk = 1,
++	.export_iosc = 1,
++	.has_losc_en = 1,
++	.has_auto_swt = 1,
++};
++
++static void __init sun50i_h6_rtc_clk_init(struct device_node *node)
++{
++	sun6i_rtc_clk_init(node, &sun50i_h6_rtc_data);
++}
++CLK_OF_DECLARE_DRIVER(sun50i_h6_rtc_clk, "allwinner,sun50i-h6-rtc",
++		      sun50i_h6_rtc_clk_init);
++
+ static const struct sun6i_rtc_clk_data sun8i_v3_rtc_data = {
+ 	.rc_osc_rate = 32000,
+ 	.has_out_clk = 1,
+@@ -683,6 +718,7 @@ static const struct of_device_id sun6i_rtc_dt_ids[] = {
+ 	{ .compatible = "allwinner,sun8i-h3-rtc" },
+ 	{ .compatible = "allwinner,sun8i-v3-rtc" },
+ 	{ .compatible = "allwinner,sun50i-h5-rtc" },
++	{ .compatible = "allwinner,sun50i-h6-rtc" },
+ 	{ /* sentinel */ },
+ };
+ MODULE_DEVICE_TABLE(of, sun6i_rtc_dt_ids);
+
+From patchwork Fri Apr 12 12:07:30 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: =?utf-8?q?Ond=C5=99ej_Jirman?= <megous@megous.com>
+X-Patchwork-Id: 10898091
+Return-Path: 
+ <linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 7ECA2922
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5B3CE28E53
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 4E18828E62; Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.4 required=2.0 tests=BAYES_00,DKIM_ADSP_DISCARD,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,RCVD_IN_DNSWL_MED autolearn=ham
+	version=3.3.1
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id BE36528E53
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Fri, 12 Apr 2019 12:08:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=of4crIxgTulCOWI7WhBiwWRJoP3zKpvdr/0s/81unBc=; b=X4bqJerGiClQSE
+	VJazGgVr2TSj1dXzDDpz1m3SZmO1rTaAjtFTWDrGZ8uAqzyTPgl9ysq+5KHh90KJ146D4pMWi7tnm
+	CgquwEr0hMGaZrsmQF+PDbpbRai90IvX5T2N+yZ4mZWQQ61U7n10gvzHID6Riw2FS71PSIhLkG4Ry
+	qg8PawIbVQtNRfrXQ1OJsLMz5r+gj1J9TildRItFr2Ag61Ygjc2C1cGwJqlgVE5fAa+MLBlpjDM1o
+	MpZf8w/HXbDDdEgfx4hUWrFanyQ7tCVWGR6nLPDcqRYeMLYOuqmBvakqgcoVY54Ob74Lk2K70EJ/y
+	OJM8Tzu0nnldcNZLaQsw==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.90_1 #2 (Red Hat Linux))
+	id 1hEuyl-0007xg-Kk; Fri, 12 Apr 2019 12:08:23 +0000
+Received: from vps.xff.cz ([195.181.215.36])
+ by bombadil.infradead.org with esmtps (Exim 4.90_1 #2 (Red Hat Linux))
+ id 1hEuy0-0006zk-Eh
+ for linux-arm-kernel@lists.infradead.org; Fri, 12 Apr 2019 12:07:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
+ t=1555070852; bh=DlgRb649mljlYFMMyH4qWotJiy+ctlKPT9WxhNBfniE=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=tIs3Z8P4Iz3pZKxzAP7rxxh534VVXOaV6Ri8GMAPK9TK6i0ty5JJRz07GGVmasor3
+ v6593OJ/5dNlT9y7BHZgJFAuvessYnsZw9Z263SzAhumRvKy0pmj7ozdhC1mXjza0G
+ 6ZhI7LiQ5ZLEUdVoKVUZxVT3gbT+wvrDUd74aFE0=
+From: megous@megous.com
+To: Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Maxime Ripard <maxime.ripard@bootlin.com>, Chen-Yu Tsai <wens@csie.org>
+Subject: [PATCH 3/3] arm64: dts: sun50i-h6: Add support for RTC and fix the
+ clock tree
+Date: Fri, 12 Apr 2019 14:07:30 +0200
+Message-Id: <20190412120730.473-4-megous@megous.com>
+In-Reply-To: <20190412120730.473-1-megous@megous.com>
+References: <20190412120730.473-1-megous@megous.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20190412_050737_316210_0FAA617B 
+X-CRM114-Status: GOOD (  11.89  )
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.21
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: Ondrej Jirman <megous@megous.com>, linux-rtc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@googlegroups.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Ondrej Jirman <megous@megous.com>
+
+This patch adds RTC node and fixes the clock properties and nodes
+to reflect the real clock tree.
+
+The device nodes for the internal oscillator and osc32k are removed,
+as these clocks are now provided by the RTC device. Clock references
+are fixed accordingly, too.
+
+Signed-off-by: Ondrej Jirman <megous@megous.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 30 +++++++++++---------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index e0dc4a05c1ba..ba0f45b6f743 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -56,14 +56,6 @@
+ 		status = "disabled";
+ 	};
+ 
+-	iosc: internal-osc-clk {
+-		#clock-cells = <0>;
+-		compatible = "fixed-clock";
+-		clock-frequency = <16000000>;
+-		clock-accuracy = <300000000>;
+-		clock-output-names = "iosc";
+-	};
+-
+ 	osc24M: osc24M_clk {
+ 		#clock-cells = <0>;
+ 		compatible = "fixed-clock";
+@@ -71,11 +63,11 @@
+ 		clock-output-names = "osc24M";
+ 	};
+ 
+-	osc32k: osc32k_clk {
++	ext_osc32k: ext_osc32k_clk {
+ 		#clock-cells = <0>;
+ 		compatible = "fixed-clock";
+ 		clock-frequency = <32768>;
+-		clock-output-names = "osc32k";
++		clock-output-names = "ext_osc32k";
+ 	};
+ 
+ 	psci {
+@@ -197,7 +189,7 @@
+ 		ccu: clock@3001000 {
+ 			compatible = "allwinner,sun50i-h6-ccu";
+ 			reg = <0x03001000 0x1000>;
+-			clocks = <&osc24M>, <&osc32k>, <&iosc>;
++			clocks = <&osc24M>, <&rtc 0>, <&rtc 2>;
+ 			clock-names = "hosc", "losc", "iosc";
+ 			#clock-cells = <1>;
+ 			#reset-cells = <1>;
+@@ -215,7 +207,7 @@
+ 				     <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&ccu CLK_APB1>, <&osc24M>, <&osc32k>;
++			clocks = <&ccu CLK_APB1>, <&osc24M>, <&rtc 0>;
+ 			clock-names = "apb", "hosc", "losc";
+ 			gpio-controller;
+ 			#gpio-cells = <3>;
+@@ -603,10 +595,20 @@
+ 			};
+ 		};
+ 
++		rtc: rtc@7000000 {
++			compatible = "allwinner,sun50i-h6-rtc";
++			reg = <0x07000000 0x400>;
++			interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
++			clock-output-names = "osc32k", "osc32k-out", "iosc";
++			clocks = <&ext_osc32k>;
++			#clock-cells = <1>;
++		};
++
+ 		r_ccu: clock@7010000 {
+ 			compatible = "allwinner,sun50i-h6-r-ccu";
+ 			reg = <0x07010000 0x400>;
+-			clocks = <&osc24M>, <&osc32k>, <&iosc>,
++			clocks = <&osc24M>, <&rtc 0>, <&rtc 2>,
+ 				 <&ccu CLK_PLL_PERIPH0>;
+ 			clock-names = "hosc", "losc", "iosc", "pll-periph";
+ 			#clock-cells = <1>;
+@@ -627,7 +629,7 @@
+ 			reg = <0x07022000 0x400>;
+ 			interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&r_ccu CLK_R_APB1>, <&osc24M>, <&osc32k>;
++			clocks = <&r_ccu CLK_R_APB1>, <&osc24M>, <&rtc 0>;
+ 			clock-names = "apb", "hosc", "losc";
+ 			gpio-controller;
+ 			#gpio-cells = <3>;

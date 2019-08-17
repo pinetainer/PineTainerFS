@@ -1,0 +1,22 @@
+basic-ths-dt (parte 2)
+
+Basado en el parche original de Icenowy Zheng.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+diff -pur linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi linux/arch7arm64/boot/dts/allwinner/sun50i-h6.dtsi 
+--- linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 14:55:26.819655692 +0200
++++ linux/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 15:00:11.887646599 +0200
+@@ -274,6 +274,12 @@
+ 		sid: sid@3006000 {
+ 			compatible = "allwinner,sun50i-h6-sid";
+ 			reg = <0x03006000 0x400>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			ths_calib: calibration@14 {
++				reg = <0x14 0x6>;
++			};
+ 		};
+ 
+ 		watchdog: watchdog@30090a0 {

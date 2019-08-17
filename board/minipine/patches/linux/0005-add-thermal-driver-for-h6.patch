@@ -1,0 +1,3369 @@
+From patchwork Sat Aug 10 05:28:12 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088255
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 589B9746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:18 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 45A2020223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:18 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 38A5F22701; Sat, 10 Aug 2019 05:29:18 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 6C26720223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:14 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1725848AbfHJF3N (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:13 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:46807 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3N (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:13 -0400
+Received: by mail-pg1-f196.google.com with SMTP id w3so9647784pgt.13;
+        Fri, 09 Aug 2019 22:29:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=IPOCcHfrbNDB2MOJe9cqKyyUjyZ5pRfQq8MtzudHiFc=;
+        b=GaJpss17BuI7s+96fu99hOz4s2UGGncMvdG7GqAzknBQZZqy/RnbRZyyqc95Q9Y8Pg
+         rVNL9iI1Xo1FrfD9sPhs4tGNvjQ8QQZROguBQd9IhA7YuyD9X51UbyDTIUeLE3WllWBA
+         hoW1gg08ciZQKkdOpH+yZArpTIhKrRlNP18S4WBDmix16ZkCURXl5hZDP6TiWrUGzh5L
+         Q9s3kocTnDwsZwfIWlgzFbzPYWiW7QeCT/QPXWQeHUeWxwfyjGrKA2gFRCd0UklLzhvG
+         WaHWD7izvr3aJ3LUsdTRuSXTy/slXShoiFFYUdptRFZqD5NRlZI0nx0VxrTuMrR1y0Su
+         R2Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=IPOCcHfrbNDB2MOJe9cqKyyUjyZ5pRfQq8MtzudHiFc=;
+        b=f2WkmkerJQNoYwISEl3886wu6H6K/Ej5wRjruXx32HBUDxduye0Zl4YXv1UCh/RrJV
+         YnThU/TyxeC6lhUpgrPp+uT2Ho6jVDCxZ1+tz/ihK6jg2cr1T3tRjzUiEsJ2qceMiMOY
+         r8YHwvPbwjbXJ4DdX3VImKuCeswMnFK6mnuzd6oXTAlqg2ASs+IV20w7npyDKnDkY59K
+         YKtAVn0bo8QlucZjjYG6rolKXH3vlS7KkNWwDOEuVKei899/wAQYgB8HV4Xsz/fwQ346
+         B0eoAgmtkl8pH37UrwML+GTGc3v0UAzo48DQ2enBt/2CgvJhstAqmTiG8tiWrX2KQ3zR
+         lR3w==
+X-Gm-Message-State: APjAAAUnXSLO7oSl1Cj1Uyd8JWQrjox+V7V1k55Bw6gAgfAmcnzxH4Wb
+        pWkhwnR7de0eszURSI5LxiI=
+X-Google-Smtp-Source: 
+ APXvYqwhNyee7ZApyPih8tUXrRyjyMqDOrx4RG9DWBmr0OMJ5qKJx1haMnxt/GV67c1A9l8L+FmncA==
+X-Received: by 2002:a65:6891:: with SMTP id
+ e17mr21063200pgt.305.1565414952352;
+        Fri, 09 Aug 2019 22:29:12 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ x11sm4663873pfn.181.2019.08.09.22.29.11
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:11 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 01/18] thermal: sun8i: add thermal driver for h6
+Date: Sat, 10 Aug 2019 05:28:12 +0000
+Message-Id: <20190810052829.6032-2-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds the support for allwinner thermal sensor, within
+allwinner SoC. It will register sensors for thermal framework
+and use device tree to bind cooling device.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ MAINTAINERS                     |   7 +
+ drivers/thermal/Kconfig         |  14 ++
+ drivers/thermal/Makefile        |   1 +
+ drivers/thermal/sun8i_thermal.c | 399 ++++++++++++++++++++++++++++++++
+ 4 files changed, 421 insertions(+)
+ create mode 100644 drivers/thermal/sun8i_thermal.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 47800d32cfbc..89dc43f4064d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -682,6 +682,13 @@ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	drivers/crypto/sunxi-ss/
+ 
++ALLWINNER THERMAL DRIVER
++M:	Yangtao Li <tiny.windzz@gmail.com>
++L:	linux-pm@vger.kernel.org
++S:	Maintained
++F:	Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
++F:	drivers/thermal/sun8i_thermal.c
++
+ ALLWINNER VPU DRIVER
+ M:	Maxime Ripard <maxime.ripard@bootlin.com>
+ M:	Paul Kocialkowski <paul.kocialkowski@bootlin.com>
+diff --git a/drivers/thermal/Kconfig b/drivers/thermal/Kconfig
+index 9966364a6deb..f8b73b32b92d 100644
+--- a/drivers/thermal/Kconfig
++++ b/drivers/thermal/Kconfig
+@@ -262,6 +262,20 @@ config SPEAR_THERMAL
+ 	  Enable this to plug the SPEAr thermal sensor driver into the Linux
+ 	  thermal framework.
+ 
++config SUN8I_THERMAL
++	tristate "Allwinner sun8i thermal driver"
++	depends on ARCH_SUNXI || COMPILE_TEST
++	depends on HAS_IOMEM
++	depends on NVMEM
++	depends on OF
++	depends on RESET_CONTROLLER
++	help
++	  Support for the sun8i thermal sensor driver into the Linux thermal
++	  framework.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called sun8i-thermal.
++
+ config ROCKCHIP_THERMAL
+ 	tristate "Rockchip thermal driver"
+ 	depends on ARCH_ROCKCHIP || COMPILE_TEST
+diff --git a/drivers/thermal/Makefile b/drivers/thermal/Makefile
+index 74a37c7f847a..fa6f8b206281 100644
+--- a/drivers/thermal/Makefile
++++ b/drivers/thermal/Makefile
+@@ -31,6 +31,7 @@ thermal_sys-$(CONFIG_DEVFREQ_THERMAL) += devfreq_cooling.o
+ obj-y				+= broadcom/
+ obj-$(CONFIG_THERMAL_MMIO)		+= thermal_mmio.o
+ obj-$(CONFIG_SPEAR_THERMAL)	+= spear_thermal.o
++obj-$(CONFIG_SUN8I_THERMAL)     += sun8i_thermal.o
+ obj-$(CONFIG_ROCKCHIP_THERMAL)	+= rockchip_thermal.o
+ obj-$(CONFIG_RCAR_THERMAL)	+= rcar_thermal.o
+ obj-$(CONFIG_RCAR_GEN3_THERMAL)	+= rcar_gen3_thermal.o
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+new file mode 100644
+index 000000000000..2ce36fa3fec3
+--- /dev/null
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -0,0 +1,399 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Thermal sensor driver for Allwinner SOC
++ * Copyright (C) 2019 Yangtao Li
++ *
++ * Based on the work of Icenowy Zheng <icenowy@aosc.io>
++ * Based on the work of Ondrej Jirman <megous@megous.com>
++ * Based on the work of Josef Gajdusek <atx@atx.name>
++ */
++
++#include <linux/clk.h>
++#include <linux/device.h>
++#include <linux/interrupt.h>
++#include <linux/module.h>
++#include <linux/nvmem-consumer.h>
++#include <linux/of_device.h>
++#include <linux/platform_device.h>
++#include <linux/regmap.h>
++#include <linux/reset.h>
++#include <linux/slab.h>
++#include <linux/thermal.h>
++
++#define MAX_SENSOR_NUM	4
++
++#define SUN50I_H6_SENSOR_NUM	2
++#define SUN50I_H6_OFFSET	-2794
++#define SUN50I_H6_SCALE		-67
++
++#define FT_TEMP_MASK				GENMASK(11, 0)
++#define TEMP_CALIB_MASK				GENMASK(11, 0)
++#define TEMP_TO_REG				672
++#define CALIBRATE_DEFAULT			0x800
++
++#define SUN50I_THS_CTRL0			0x00
++#define SUN50I_H6_THS_ENABLE			0x04
++#define SUN50I_H6_THS_PC			0x08
++#define SUN50I_H6_THS_DIC			0x10
++#define SUN50I_H6_THS_DIS			0x20
++#define SUN50I_H6_THS_MFC			0x30
++#define SUN50I_H6_THS_TEMP_CALIB		0xa0
++#define SUN50I_H6_THS_TEMP_DATA			0xc0
++
++#define SUN50I_THS_CTRL0_T_ACQ(x)		((GENMASK(15, 0) & (x)) << 16)
++#define SUN50I_THS_FILTER_EN			BIT(2)
++#define SUN50I_THS_FILTER_TYPE(x)		(GENMASK(1, 0) & (x))
++#define SUN50I_H6_THS_PC_TEMP_PERIOD(x)		((GENMASK(19, 0) & (x)) << 12)
++#define SUN50I_H6_THS_DATA_IRQ_STS(x)		BIT(x)
++
++/* millidegree celsius */
++#define SUN50I_H6_FT_DEVIATION			7000
++
++struct ths_device;
++
++struct tsensor {
++	struct ths_device		*tmdev;
++	struct thermal_zone_device	*tzd;
++	int				id;
++};
++
++struct ths_device {
++	struct device				*dev;
++	struct regmap				*regmap;
++	struct reset_control			*reset;
++	struct clk				*bus_clk;
++	struct tsensor				sensor[MAX_SENSOR_NUM];
++};
++
++/* Temp Unit: millidegree Celsius */
++static int sun8i_ths_reg2temp(struct ths_device *tmdev,
++			      int reg)
++{
++	return (reg + SUN50I_H6_OFFSET) * SUN50I_H6_SCALE;
++}
++
++static int sun8i_ths_get_temp(void *data, int *temp)
++{
++	struct tsensor *s = data;
++	struct ths_device *tmdev = s->tmdev;
++	int val;
++
++	regmap_read(tmdev->regmap, SUN50I_H6_THS_TEMP_DATA +
++		    0x4 * s->id, &val);
++
++	/* ths have no data yet */
++	if (!val)
++		return -EAGAIN;
++
++	*temp = sun8i_ths_reg2temp(tmdev, val);
++	/*
++	 * XX - According to the original sdk, there are some platforms(rarely)
++	 * that add a fixed offset value after calculating the temperature
++	 * value. We can't simply put it on the formula for calculating the
++	 * temperature above, because the formula for calculating the
++	 * temperature above is also used when the sensor is calibrated. If
++	 * do this, the correct calibration formula is hard to know.
++	 */
++	*temp += SUN50I_H6_FT_DEVIATION;
++
++	return 0;
++}
++
++static const struct thermal_zone_of_device_ops ths_ops = {
++	.get_temp = sun8i_ths_get_temp,
++};
++
++static const struct regmap_config config = {
++	.reg_bits = 32,
++	.val_bits = 32,
++	.reg_stride = 4,
++	.fast_io = true,
++};
++
++static irqreturn_t sun50i_h6_irq_thread(int irq, void *data)
++{
++	struct ths_device *tmdev = data;
++	int i, state;
++
++	regmap_read(tmdev->regmap, SUN50I_H6_THS_DIS, &state);
++
++	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++
++		if (state & SUN50I_H6_THS_DATA_IRQ_STS(i)) {
++			/* clear data irq pending */
++			regmap_write(tmdev->regmap, SUN50I_H6_THS_DIS,
++				     SUN50I_H6_THS_DATA_IRQ_STS(i));
++
++			thermal_zone_device_update(tmdev->sensor[i].tzd,
++						   THERMAL_EVENT_UNSPECIFIED);
++		}
++	}
++
++	return IRQ_HANDLED;
++}
++
++static int sun50i_ths_calibrate(struct ths_device *tmdev)
++{
++	struct nvmem_cell *calcell;
++	struct device *dev = tmdev->dev;
++	u16 *caldata;
++	size_t callen;
++	int ft_temp;
++	int i, ret = 0;
++
++	calcell = devm_nvmem_cell_get(dev, "calib");
++	if (IS_ERR(calcell)) {
++		if (PTR_ERR(calcell) == -EPROBE_DEFER)
++			return -EPROBE_DEFER;
++		/*
++		 * Even if the external calibration data stored in sid is
++		 * not accessible, the THS hardware can still work, although
++		 * the data won't be so accurate.
++		 *
++		 * The default value of calibration register is 0x800 for
++		 * every sensor, and the calibration value is usually 0x7xx
++		 * or 0x8xx, so they won't be away from the default value
++		 * for a lot.
++		 *
++		 * So here we do not return error if the calibartion data is
++		 * not available, except the probe needs deferring.
++		 */
++		goto out;
++	}
++
++	caldata = nvmem_cell_read(calcell, &callen);
++	if (IS_ERR(caldata)) {
++		ret = PTR_ERR(caldata);
++		goto out;
++	}
++
++	if (!caldata[0] || callen < 2 + 2 * SUN50I_H6_SENSOR_NUM) {
++		ret = -EINVAL;
++		goto out_free;
++	}
++
++	/*
++	 * efuse layout:
++	 *
++	 *	0   11  16	 32
++	 *	+-------+-------+-------+
++	 *	|temp|  |sensor0|sensor1|
++	 *	+-------+-------+-------+
++	 *
++	 * The calibration data on the H6 is the ambient temperature and
++	 * sensor values that are filled during the factory test stage.
++	 *
++	 * The unit of stored FT temperature is 0.1 degreee celusis.
++	 * Through the stored ambient temperature and the data read
++	 * by the sensor, after a certain calculation, the calibration
++	 * value to be compensated can be obtained.
++	 */
++	ft_temp = caldata[0] & FT_TEMP_MASK;
++
++	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++		int reg = (int)caldata[i + 1];
++		int sensor_temp = sun8i_ths_reg2temp(tmdev, reg);
++		int delta, cdata, offset;
++
++		/*
++		 * To calculate the calibration value:
++		 *
++		 * X(in Celsius) = Ts - ft_temp
++		 * delta = X * 10000 / TEMP_TO_REG
++		 * cdata = CALIBRATE_DEFAULT - delta
++		 *
++		 * cdata: calibration value
++		 */
++		delta = (sensor_temp - ft_temp * 100) * 10 / TEMP_TO_REG;
++		cdata = CALIBRATE_DEFAULT - delta;
++		if (cdata & ~TEMP_CALIB_MASK) {
++			/*
++			 * Calibration value more than 12-bit, but calibration
++			 * register is 12-bit. In this case, ths hardware can
++			 * still work without calibration, although the data
++			 * won't be so accurate.
++			 */
++			dev_warn(dev, "sensor%d is not calibrated.\n", i);
++
++			continue;
++		}
++
++		offset = (i % 2) << 4;
++		regmap_update_bits(tmdev->regmap,
++				   SUN50I_H6_THS_TEMP_CALIB + ((i >> 1) * 4),
++				   0xfff << offset,
++				   cdata << offset);
++	}
++
++out_free:
++	kfree(caldata);
++out:
++	return ret;
++}
++
++static int sun8i_ths_resource_init(struct ths_device *tmdev)
++{
++	struct device *dev = tmdev->dev;
++	struct platform_device *pdev = to_platform_device(dev);
++	struct resource *mem;
++	void __iomem *base;
++	int ret;
++
++	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	base = devm_ioremap_resource(dev, mem);
++	if (IS_ERR(base))
++		return PTR_ERR(base);
++
++	tmdev->regmap = devm_regmap_init_mmio(dev, base, &config);
++	if (IS_ERR(tmdev->regmap))
++		return PTR_ERR(tmdev->regmap);
++
++	tmdev->reset = devm_reset_control_get(dev, 0);
++	if (IS_ERR(tmdev->reset))
++		return PTR_ERR(tmdev->reset);
++
++	tmdev->bus_clk = devm_clk_get(&pdev->dev, "bus");
++	if (IS_ERR(tmdev->bus_clk))
++		return PTR_ERR(tmdev->bus_clk);
++
++	ret = reset_control_deassert(tmdev->reset);
++	if (ret)
++		return ret;
++
++	ret = clk_prepare_enable(tmdev->bus_clk);
++	if (ret)
++		goto assert_reset;
++
++	ret = sun50i_ths_calibrate(tmdev);
++	if (ret)
++		goto bus_disable;
++
++	return 0;
++
++bus_disable:
++	clk_disable_unprepare(tmdev->bus_clk);
++assert_reset:
++	reset_control_assert(tmdev->reset);
++
++	return ret;
++}
++
++static int sun50i_h6_thermal_init(struct ths_device *tmdev)
++{
++	int val;
++
++	/*
++	 * clkin = 24MHz
++	 * T acquire = clkin / (x + 1)
++	 *           = 20us
++	 */
++	regmap_write(tmdev->regmap, SUN50I_THS_CTRL0,
++		     SUN50I_THS_CTRL0_T_ACQ(479));
++	/* average over 4 samples */
++	regmap_write(tmdev->regmap, SUN50I_H6_THS_MFC,
++		     SUN50I_THS_FILTER_EN |
++		     SUN50I_THS_FILTER_TYPE(1));
++	/* period = (x + 1) * 4096 / clkin; ~10ms */
++	regmap_write(tmdev->regmap, SUN50I_H6_THS_PC,
++		     SUN50I_H6_THS_PC_TEMP_PERIOD(58));
++	/* enable sensor */
++	val = GENMASK(SUN50I_H6_SENSOR_NUM - 1, 0);
++	regmap_write(tmdev->regmap, SUN50I_H6_THS_ENABLE, val);
++	/* thermal data interrupt enable */
++	val = GENMASK(SUN50I_H6_SENSOR_NUM - 1, 0);
++	regmap_write(tmdev->regmap, SUN50I_H6_THS_DIC, val);
++
++	return 0;
++}
++
++static int sun8i_ths_register(struct ths_device *tmdev)
++{
++	struct thermal_zone_device *tzd;
++	int i;
++
++	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++		tmdev->sensor[i].tmdev = tmdev;
++		tmdev->sensor[i].id = i;
++		tmdev->sensor[i].tzd =
++			devm_thermal_zone_of_sensor_register(tmdev->dev,
++							     i,
++							     &tmdev->sensor[i],
++							     &ths_ops);
++		if (IS_ERR(tmdev->sensor[i].tzd))
++			return PTR_ERR(tzd);
++	}
++
++	return 0;
++}
++
++static int sun8i_ths_probe(struct platform_device *pdev)
++{
++	struct ths_device *tmdev;
++	struct device *dev = &pdev->dev;
++	int ret, irq;
++
++	tmdev = devm_kzalloc(dev, sizeof(*tmdev), GFP_KERNEL);
++	if (!tmdev)
++		return -ENOMEM;
++
++	tmdev->dev = dev;
++	platform_set_drvdata(pdev, tmdev);
++
++	ret = sun8i_ths_resource_init(tmdev);
++	if (ret)
++		return ret;
++
++	irq = platform_get_irq(pdev, 0);
++	if (irq < 0)
++		return irq;
++
++	ret = sun50i_h6_thermal_init(tmdev);
++	if (ret)
++		return ret;
++
++	ret = sun8i_ths_register(tmdev);
++	if (ret)
++		return ret;
++
++	/*
++	 * Avoid entering the interrupt handler, the thermal device is not
++	 * registered yet, we deffer the registration of the interrupt to
++	 * the end.
++	 */
++	ret = devm_request_threaded_irq(dev, irq, NULL,
++					sun50i_h6_irq_thread,
++					IRQF_ONESHOT, "ths", tmdev);
++	if (ret)
++		return ret;
++
++	return ret;
++}
++
++static int sun8i_ths_remove(struct platform_device *pdev)
++{
++	struct ths_device *tmdev = platform_get_drvdata(pdev);
++
++	clk_disable_unprepare(tmdev->bus_clk);
++	reset_control_assert(tmdev->reset);
++
++	return 0;
++}
++
++static const struct of_device_id of_ths_match[] = {
++	{ .compatible = "allwinner,sun50i-h6-ths"},
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, of_ths_match);
++
++static struct platform_driver ths_driver = {
++	.probe = sun8i_ths_probe,
++	.remove = sun8i_ths_remove,
++	.driver = {
++		.name = "sun8i-thermal",
++		.of_match_table = of_ths_match,
++	},
++};
++module_platform_driver(ths_driver);
++
++MODULE_DESCRIPTION("Thermal sensor driver for Allwinner SOC");
++MODULE_LICENSE("GPL v2");
+
+From patchwork Sat Aug 10 05:28:13 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088257
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id F0A5114E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:22 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id E061E20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:22 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id D3FC722701; Sat, 10 Aug 2019 05:29:22 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 7A3F720223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:22 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726155AbfHJF3R (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:17 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:37401 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3R (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:17 -0400
+Received: by mail-pg1-f196.google.com with SMTP id d1so14035611pgp.4;
+        Fri, 09 Aug 2019 22:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=WD7K8OdpREzm1d+Yp/Bs4WvDvu3iqySNq1hJesChH3M=;
+        b=ZjZzeIglNii9MVXF4P8OwuiKgvJ2AHN60l4wGAcONk09u1ivPdMkqI43JqxPDri+QV
+         PB7H0lw2f709GHYwg8FyAv7TLYfOtBcTEAHgEXmuJGAtb/pGf948Gw/pq5z+ObqEqiXB
+         +b8C7S2ZilSzoKFdc98s2LsPtBS31O5PClOucmS+EebLVEBlcsvNFm9JH2WM/Nunka5I
+         qutMLMsCHQ9F5bGjneCFosdCy0NTeuj61nsSVehEjP+jf9VzKBnOwEXj4ErcqdbK82gx
+         cs09OuO4nIZkTGqUeR3Il7kHmrEAKg6/d++iHP2zpXtSH7PUTO03SfQSZfakvFpXnndq
+         lk5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=WD7K8OdpREzm1d+Yp/Bs4WvDvu3iqySNq1hJesChH3M=;
+        b=VbNJUamJmHFCBVbJaaqifoDmnP70H2cX3sSumDdKPIICA28L2sA2RxxVR738vXlPfO
+         ilBCfAMoczRe4Lrn3v9Sh20DYMwXwLG86jzg7157EJno/cAGK08D97cP1CqRsEcJZu2j
+         uRMMROjkHcl6wTk0gaZcSRCd71yLbADNvYGM/mCyaOpyLoFf8L/eqTeUW2j4d1eFX+tI
+         mjbn7HgZKSGELSCThPuYZq7oTg1YfuhmNzSurw3rBnvp0vmJkg2sMJ3dekwMaRsfubdY
+         yor3U1/mowzBZrpcFNIvaGYKHsXiZKRrct5Kc4z3fdPrzC0oFvZjbarlPln/YOggVcMz
+         0TRQ==
+X-Gm-Message-State: APjAAAVlB40y2oVTaWdI/8nnAeCfP4sVlPdRPGMKOaZeXH66HoL3hy33
+        r8LSuza/jILkdBjHL4U0FlM=
+X-Google-Smtp-Source: 
+ APXvYqxOuJTk2SD/x1hTFhYbreUKUwvlmtGBd51QcJppuCmzl0G9FTfJ2bbK6b1tELoE8SPSEf8lcg==
+X-Received: by 2002:aa7:818b:: with SMTP id
+ g11mr25731541pfi.122.1565414956974;
+        Fri, 09 Aug 2019 22:29:16 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ k5sm6083835pjl.32.2019.08.09.22.29.16
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:16 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 02/18] dt-bindings: thermal: add binding document for h6
+ thermal controller
+Date: Sat, 10 Aug 2019 05:28:13 +0000
+Message-Id: <20190810052829.6032-3-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds binding document for allwinner h6 thermal controller.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ .../bindings/thermal/sun8i-thermal.yaml       | 79 +++++++++++++++++++
+ 1 file changed, 79 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+
+diff --git a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+new file mode 100644
+index 000000000000..e0973199ba3c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+@@ -0,0 +1,79 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/thermal/sun8i-thermal.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Allwinner SUN8I Thermal Controller Device Tree Bindings
++
++maintainers:
++  - Yangtao Li <tiny.windzz@gmail.com>
++
++description: |-
++  This describes the device tree binding for the Allwinner thermal
++  controller which measures the on-SoC temperatures.
++
++properties:
++  compatible:
++    enum:
++      - allwinner,sun50i-h6-ths
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    const: bus
++
++  "#thermal-sensor-cells":
++    const: 1
++
++  nvmem-cells:
++    description: ths calibrate data
++
++  nvmem-cell-names:
++    const: calib
++
++required:
++  - compatible
++  - reg
++  - reset
++  - clocks
++  - clock-names
++  - interrupts
++  - "#thermal-sensor-cells"
++
++additionalProperties: false
++
++examples:
++  - |
++    ths: ths@5070400 {
++        compatible = "allwinner,sun50i-h6-ths";
++        reg = <0x05070400 0x100>;
++        clocks = <&ccu CLK_BUS_THS>;
++        clock-names = "bus";
++        resets = <&ccu RST_BUS_THS>;
++        interrupts = <GIC_SPI 15 IRQ_TYPE_LEVEL_HIGH>;
++        nvmem-cells = <&tsen_calib>;
++        nvmem-cell-names = "calib";
++        #thermal-sensor-cells = <1>;
++    };
++
++    sid: sid@3006000 {
++        compatible = "allwinner,sun50i-h6-sid";
++        reg = <0x03006000 0x400>;
++        #address-cells = <1>;
++        #size-cells = <1>;
++        tsen_calib: calib@14 {
++                reg = <0x14 6>;
++        };
++    };
++...
+
+From patchwork Sat Aug 10 05:28:14 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088261
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id DECA9746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:27 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id CD3B120223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:27 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id C17EA22A68; Sat, 10 Aug 2019 05:29:27 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 6D84820223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:27 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726200AbfHJF3V (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:21 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37920 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3V (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:21 -0400
+Received: by mail-pl1-f193.google.com with SMTP id m12so7152834plt.5;
+        Fri, 09 Aug 2019 22:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=l52fWtW3aoPkxwNQa5fIqgZrHE13Sc/TSQJ/idB7mO0=;
+        b=SM0O7cIBHumsQ4jcRMA3jRfbG/8uHpdHyKP1/m9OqUsDitUK6fDmwbyMStdXWaYfeb
+         uwG4TwQJwGkbIZDm+/oa/wTjePH1DL0w5Wa0fBWTZGkbVfmMq1dCXkazSjE9p+PXvxsC
+         cb17n22QlHUjEYGxUKggT+zpvIIh5pgLmPF9m718SkEYNp9Wz9kpusTVC7yaiDIMBbrZ
+         FZdMFDQYPzzXaDaUfe/5xb6CtgXTL2no5kW4FdG0AVJWimrLP6wOM+kFfTSjnGbCxLTO
+         fn1pwE8bZtWUqWoege1KQLdDZvYMIZ+XB366MeBVsV3hSOuEf2q7HiMJQ24K7H+j5NX/
+         QS4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=l52fWtW3aoPkxwNQa5fIqgZrHE13Sc/TSQJ/idB7mO0=;
+        b=lBhHbrSgCF5Zb591F8ChGUJnug84AF69Ceka1QEBUKknCH4pLtpDKgFaGVeE0y1MfR
+         obxKQZxeW8u5f6mkbKXx9DxHfMu1F+zt9DpVQkQA3b8KhBn1xDent2AhQx9oEOPgU6Um
+         3yYS2qKhh2IT8/mrKirPw9C6Vl7Z9t02m1/l9ztqwAZpA9aQg6QROAhc2zFuiVQiRCVi
+         +i0lHk9ATmrJC4oub616lrg38Dbk3ymnkWBJSfB4J8TjS+Fgmh2YyVEw2hik+hiqP/kJ
+         lvcIS7s6DhQhIKRRaQWmDCg1QouRJ9hoRFiospdlK6dd4fxJc2Azr0ks4VNZPX9/A5eu
+         6pag==
+X-Gm-Message-State: APjAAAUPt2TdtdM4QsgFU3JOAmAztqMX//A+2ixpno9aXYIxWBTXpOiI
+        hWlX53UyQb+qn3goAN9f5a0=
+X-Google-Smtp-Source: 
+ APXvYqwUY/gyosJ94ferIscuoGwHXFjy46dluwnpWU7klQFptAP8nSXiVk8T0B+sedSgs2wC6IUWXg==
+X-Received: by 2002:a17:902:ac86:: with SMTP id
+ h6mr16333345plr.79.1565414960902;
+        Fri, 09 Aug 2019 22:29:20 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ 67sm81943594pfd.177.2019.08.09.22.29.19
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:20 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 03/18] thermal: fix indentation in makefile
+Date: Sat, 10 Aug 2019 05:28:14 +0000
+Message-Id: <20190810052829.6032-4-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+To unify code style.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/thermal/Makefile b/drivers/thermal/Makefile
+index fa6f8b206281..d7eafb5ef8ef 100644
+--- a/drivers/thermal/Makefile
++++ b/drivers/thermal/Makefile
+@@ -5,7 +5,7 @@
+ 
+ obj-$(CONFIG_THERMAL)		+= thermal_sys.o
+ thermal_sys-y			+= thermal_core.o thermal_sysfs.o \
+-					thermal_helpers.o
++				   thermal_helpers.o
+ 
+ # interface to/from other layers providing sensors
+ thermal_sys-$(CONFIG_THERMAL_HWMON)		+= thermal_hwmon.o
+@@ -25,11 +25,11 @@ thermal_sys-$(CONFIG_CPU_THERMAL)	+= cpu_cooling.o
+ thermal_sys-$(CONFIG_CLOCK_THERMAL)	+= clock_cooling.o
+ 
+ # devfreq cooling
+-thermal_sys-$(CONFIG_DEVFREQ_THERMAL) += devfreq_cooling.o
++thermal_sys-$(CONFIG_DEVFREQ_THERMAL) 	+= devfreq_cooling.o
+ 
+ # platform thermal drivers
+ obj-y				+= broadcom/
+-obj-$(CONFIG_THERMAL_MMIO)		+= thermal_mmio.o
++obj-$(CONFIG_THERMAL_MMIO)	+= thermal_mmio.o
+ obj-$(CONFIG_SPEAR_THERMAL)	+= spear_thermal.o
+ obj-$(CONFIG_SUN8I_THERMAL)     += sun8i_thermal.o
+ obj-$(CONFIG_ROCKCHIP_THERMAL)	+= rockchip_thermal.o
+@@ -50,7 +50,7 @@ obj-$(CONFIG_TI_SOC_THERMAL)	+= ti-soc-thermal/
+ obj-y				+= st/
+ obj-$(CONFIG_QCOM_TSENS)	+= qcom/
+ obj-y				+= tegra/
+-obj-$(CONFIG_HISI_THERMAL)     += hisi_thermal.o
++obj-$(CONFIG_HISI_THERMAL)     	+= hisi_thermal.o
+ obj-$(CONFIG_MTK_THERMAL)	+= mtk_thermal.o
+ obj-$(CONFIG_GENERIC_ADC_THERMAL)	+= thermal-generic-adc.o
+ obj-$(CONFIG_ZX2967_THERMAL)	+= zx2967_thermal.o
+
+From patchwork Sat Aug 10 05:28:15 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088263
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 66171746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:32 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5572720223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:32 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 4913022A68; Sat, 10 Aug 2019 05:29:32 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id CDBCB20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:31 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726236AbfHJF30 (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:26 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:46342 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF30 (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:26 -0400
+Received: by mail-pl1-f196.google.com with SMTP id c2so45751055plz.13;
+        Fri, 09 Aug 2019 22:29:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=m+FeoUxxKT842NGkzufNDhEKbfyCpMTH+IlMbjC5ho0=;
+        b=pU5BLjCRcTZ/VPToncNLJ17hv0w7PjaSu2tdFCtXRP8nxKDCrIcNTCwadd2D0xijyo
+         eAmL5d7fM9Bqj5JMO0bWuRDqTzt6T5w94dx0Rvd5yB8QkKcUkD7wwEMgvuypDPGI2DbN
+         Lp5BaEh1H/UzVwo4EPqJ6VDogz1FntOqINDk3/7VQH7a2gfaLodoFbBM8WEKlOpgC3aT
+         bXylqnlatMGFvTyNTKD4K5zES0dlkjWV+Zm/hyeoCdpdSJPnT6pU3OGUAgjnG8cHD0/3
+         9fNLGFMwdfYY4BDCX1PQM0arHQ+6GkypQd/MPOtgfyvt3/v0pTk9B9t+sgVh0brl7XjX
+         S58A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=m+FeoUxxKT842NGkzufNDhEKbfyCpMTH+IlMbjC5ho0=;
+        b=AC7tuFLh2MMUTosNsf+tYTIOiFY3/sNogNiF9JWLcuGa7+q825rVDTo4oYC6PlFvOL
+         b9Q/bfA4xlJhV+PICJwXS0vwSsG+PDOQWlyXSoHsE9xKUamBIezxgiVwMftB5Na8TLTD
+         S9GS1ECvXgUl2+kH9+ciKn9jPzlRyZIeqzZlKHL/INas3nfC9TqhgEt8A4of6X08pt7t
+         8TKFYDxzDN8uFAeAKzFQyeHO10M7uMmR7aEZMunHtxpRZ2ZGlSJB48x6/LK27gGosarJ
+         PXnYQGSVQqEAYOHdmOE0OGztJCXJB5GOymdfAVp9gCDwB3i+0aJZpLX7PCogf8JHmeYE
+         Uqaw==
+X-Gm-Message-State: APjAAAXRi+R/YHB8+xLD3p2Au49Sjtem+9e+GvhxfUtT+o7PFSNavikS
+        DTgc7OtU+Ws82BJ/D0dnQ80=
+X-Google-Smtp-Source: 
+ APXvYqxNEyT0QTjr6XVkWXmgzgtE9iVa3pELQsprz/kPLk9VCe/zWE/jEywdQraspTO4ZVuGa/X+oA==
+X-Received: by 2002:a17:902:e30d:: with SMTP id
+ cg13mr22644366plb.173.1565414965732;
+        Fri, 09 Aug 2019 22:29:25 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ h20sm1062446pfq.156.2019.08.09.22.29.24
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:25 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 04/18] thermal: sun8i: get ths sensor number from device
+ compatible
+Date: Sat, 10 Aug 2019 05:28:15 +0000
+Message-Id: <20190810052829.6032-5-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+For different socs, the number of ths sensors is different.
+So we need to do some work in order to support more soc.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 2ce36fa3fec3..e9c2acbaac74 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -22,7 +22,6 @@
+ 
+ #define MAX_SENSOR_NUM	4
+ 
+-#define SUN50I_H6_SENSOR_NUM	2
+ #define SUN50I_H6_OFFSET	-2794
+ #define SUN50I_H6_SCALE		-67
+ 
+@@ -57,7 +56,12 @@ struct tsensor {
+ 	int				id;
+ };
+ 
++struct ths_thermal_chip {
++	int		sensor_num;
++};
++
+ struct ths_device {
++	const struct ths_thermal_chip		*chip;
+ 	struct device				*dev;
+ 	struct regmap				*regmap;
+ 	struct reset_control			*reset;
+@@ -117,7 +121,7 @@ static irqreturn_t sun50i_h6_irq_thread(int irq, void *data)
+ 
+ 	regmap_read(tmdev->regmap, SUN50I_H6_THS_DIS, &state);
+ 
+-	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
+ 
+ 		if (state & SUN50I_H6_THS_DATA_IRQ_STS(i)) {
+ 			/* clear data irq pending */
+@@ -167,7 +171,7 @@ static int sun50i_ths_calibrate(struct ths_device *tmdev)
+ 		goto out;
+ 	}
+ 
+-	if (!caldata[0] || callen < 2 + 2 * SUN50I_H6_SENSOR_NUM) {
++	if (!caldata[0] || callen < 2 + 2 * tmdev->chip->sensor_num) {
+ 		ret = -EINVAL;
+ 		goto out_free;
+ 	}
+@@ -190,7 +194,7 @@ static int sun50i_ths_calibrate(struct ths_device *tmdev)
+ 	 */
+ 	ft_temp = caldata[0] & FT_TEMP_MASK;
+ 
+-	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
+ 		int reg = (int)caldata[i + 1];
+ 		int sensor_temp = sun8i_ths_reg2temp(tmdev, reg);
+ 		int delta, cdata, offset;
+@@ -297,10 +301,10 @@ static int sun50i_h6_thermal_init(struct ths_device *tmdev)
+ 	regmap_write(tmdev->regmap, SUN50I_H6_THS_PC,
+ 		     SUN50I_H6_THS_PC_TEMP_PERIOD(58));
+ 	/* enable sensor */
+-	val = GENMASK(SUN50I_H6_SENSOR_NUM - 1, 0);
++	val = GENMASK(tmdev->chip->sensor_num - 1, 0);
+ 	regmap_write(tmdev->regmap, SUN50I_H6_THS_ENABLE, val);
+ 	/* thermal data interrupt enable */
+-	val = GENMASK(SUN50I_H6_SENSOR_NUM - 1, 0);
++	val = GENMASK(tmdev->chip->sensor_num - 1, 0);
+ 	regmap_write(tmdev->regmap, SUN50I_H6_THS_DIC, val);
+ 
+ 	return 0;
+@@ -311,7 +315,7 @@ static int sun8i_ths_register(struct ths_device *tmdev)
+ 	struct thermal_zone_device *tzd;
+ 	int i;
+ 
+-	for (i = 0; i < SUN50I_H6_SENSOR_NUM; i++) {
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
+ 		tmdev->sensor[i].tmdev = tmdev;
+ 		tmdev->sensor[i].id = i;
+ 		tmdev->sensor[i].tzd =
+@@ -337,6 +341,10 @@ static int sun8i_ths_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	tmdev->dev = dev;
++	tmdev->chip = of_device_get_match_data(&pdev->dev);
++	if (!tmdev->chip)
++		return -EINVAL;
++
+ 	platform_set_drvdata(pdev, tmdev);
+ 
+ 	ret = sun8i_ths_resource_init(tmdev);
+@@ -379,8 +387,12 @@ static int sun8i_ths_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static const struct ths_thermal_chip sun50i_h6_ths = {
++	.sensor_num = 2,
++};
++
+ static const struct of_device_id of_ths_match[] = {
+-	{ .compatible = "allwinner,sun50i-h6-ths"},
++	{ .compatible = "allwinner,sun50i-h6-ths", .data = &sun50i_h6_ths },
+ 	{ /* sentinel */ },
+ };
+ MODULE_DEVICE_TABLE(of, of_ths_match);
+
+From patchwork Sat Aug 10 05:28:16 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088265
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id D1554746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:37 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BDEFF20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:37 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id AD84322A68; Sat, 10 Aug 2019 05:29:37 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 524E220223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:37 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726275AbfHJF3c (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:32 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45178 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3b (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:31 -0400
+Received: by mail-pg1-f196.google.com with SMTP id o13so46835465pgp.12;
+        Fri, 09 Aug 2019 22:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=p+GfeX4Ueh4qeynfnY+nHD9xlpPk1TsHoPAB9+k1TQY=;
+        b=k+aheYMTnj5mlzWzq1ilxhyRi5juqsvNPyrBOubgRPgTrctQUunUxavZ+AlHE8J1a6
+         ZlQhaRmaaQWfA67IUltiIi96nWydnGnVsJZMJExGzLMaJwnJBrKFBqeK/ghEg5tBkfd2
+         rhXRgo6+8lYV/CTa7YgKdI6GuNg8nzDD1fnxiniCsOV6k3RawXRpzph0dDBhFnEX2Wq2
+         jG//G+mNdwhTLRq8ygt2iqFNae2jbFnD94ykXL9A67w3pada5OETSmXo1Cx2C4xi4n0i
+         qtY7utQEumhIfl9v+xmmsVUdF4gbq0AQnLre/QVU7OqkpN9FWvBkVXhApGYw1uDx1MdN
+         I8hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=p+GfeX4Ueh4qeynfnY+nHD9xlpPk1TsHoPAB9+k1TQY=;
+        b=daqlNq3d2rYYYJF2azGGy3dEl5UwjpvbO5B1u/IKdo0+hVbZiBGYnoXRpJmDRUCE5Q
+         mnsyBmXVj4MKL0pgcymPgO8Xd0vBOco0Dq1zAGFrIoLEQUEPtMikaKhz6rnUePXLe7Pe
+         x77egoz4cWJmP0btOjvxSSSnd0bZEYWgxXeEXVER9UDItML//ZdjZCwMqwGRNRBSXh+8
+         VnKVTXvWs3fvsh0kgK9puiyDNv8KnhCJHlqY3X4ZBv0IH/7l+OTo35pZarrq0ysEYdp9
+         POAh2mfKvs9qxdniYok/zOUI/Wmfyx5+7E5AbYEsTGOzQIpCQmiimZDknjy8r8oR5gIi
+         eh/Q==
+X-Gm-Message-State: APjAAAUjMwJQihaPHNpj/MgwJLdtEUi96YVtEOwN1TzJ4wxymL6B5jRk
+        yIx2InjF1kPs6yU0D2Ko/pQ=
+X-Google-Smtp-Source: 
+ APXvYqxxpWtEqoQhAm3ka4Zp+gt5YbokpRaK82eECedhofkwnz5TtrsipKnUkmCv/rhm//nnApa9bA==
+X-Received: by 2002:aa7:8d98:: with SMTP id
+ i24mr25669455pfr.199.1565414970942;
+        Fri, 09 Aug 2019 22:29:30 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ r6sm17958624pjb.22.2019.08.09.22.29.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:30 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 05/18] thermal: sun8i: rework for sun8i_ths_get_temp()
+Date: Sat, 10 Aug 2019 05:28:16 +0000
+Message-Id: <20190810052829.6032-6-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+For different socs, the way they get and calculate the
+temperature is roughly the same. So get the difference
+from device compatible.
+
+Difference point:
+  1) temperature calculation formula parameters
+  2) ths data register start address
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index e9c2acbaac74..f338fa25b98e 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -22,9 +22,6 @@
+ 
+ #define MAX_SENSOR_NUM	4
+ 
+-#define SUN50I_H6_OFFSET	-2794
+-#define SUN50I_H6_SCALE		-67
+-
+ #define FT_TEMP_MASK				GENMASK(11, 0)
+ #define TEMP_CALIB_MASK				GENMASK(11, 0)
+ #define TEMP_TO_REG				672
+@@ -58,6 +55,10 @@ struct tsensor {
+ 
+ struct ths_thermal_chip {
+ 	int		sensor_num;
++	int		offset;
++	int		scale;
++	int		ft_deviation;
++	int		temp_data_base;
+ };
+ 
+ struct ths_device {
+@@ -73,7 +74,7 @@ struct ths_device {
+ static int sun8i_ths_reg2temp(struct ths_device *tmdev,
+ 			      int reg)
+ {
+-	return (reg + SUN50I_H6_OFFSET) * SUN50I_H6_SCALE;
++	return (reg + tmdev->chip->offset) * tmdev->chip->scale;
+ }
+ 
+ static int sun8i_ths_get_temp(void *data, int *temp)
+@@ -82,7 +83,7 @@ static int sun8i_ths_get_temp(void *data, int *temp)
+ 	struct ths_device *tmdev = s->tmdev;
+ 	int val;
+ 
+-	regmap_read(tmdev->regmap, SUN50I_H6_THS_TEMP_DATA +
++	regmap_read(tmdev->regmap, tmdev->chip->temp_data_base +
+ 		    0x4 * s->id, &val);
+ 
+ 	/* ths have no data yet */
+@@ -98,7 +99,7 @@ static int sun8i_ths_get_temp(void *data, int *temp)
+ 	 * temperature above is also used when the sensor is calibrated. If
+ 	 * do this, the correct calibration formula is hard to know.
+ 	 */
+-	*temp += SUN50I_H6_FT_DEVIATION;
++	*temp += tmdev->chip->ft_deviation;
+ 
+ 	return 0;
+ }
+@@ -389,6 +390,10 @@ static int sun8i_ths_remove(struct platform_device *pdev)
+ 
+ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.sensor_num = 2,
++	.offset = -2794,
++	.scale = -67,
++	.ft_deviation = SUN50I_H6_FT_DEVIATION,
++	.temp_data_base = SUN50I_H6_THS_TEMP_DATA,
+ };
+ 
+ static const struct of_device_id of_ths_match[] = {
+
+From patchwork Sat Aug 10 05:28:17 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088267
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 94108746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:40 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 82CAF20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:40 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 76EC022A68; Sat, 10 Aug 2019 05:29:40 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 9960920223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:38 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726307AbfHJF3i (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:38 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37417 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3h (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:37 -0400
+Received: by mail-pg1-f194.google.com with SMTP id d1so14035867pgp.4;
+        Fri, 09 Aug 2019 22:29:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=H2tnHPalIp9fh2DhSzr0mzewVRlNnFoVrBrcA4HDoA0=;
+        b=osEaRM/awWZ4WLe5JMXKzOCsoTrczswa5Bo5mnVciwewqdioAOOsH0ycz5lcmtSG8f
+         8iUp+HhGi6e2ec+73M0lfnzwpuJ/NBfRoXwTcOrxd7y+lgkMqxdrKI2uVd+nzaErnxUk
+         iCue7pUwPCkdjFrXVijMnLUcQVP5lv0AZLd4uf36YjJrBuPlU7zH4uPTnbdFC0EnHc23
+         UV6pbAxQxIpeQt1KB4AN3p9eWLw4/lQ8Ychsbx9r1t4Kcz4yQmOtd3v8Ngnr+7SYl8xz
+         RyAAYI2pbE3Dp78iZHSiAaD4AGhwoyDhG7eLGGqOVgIchH6N2G2njfryjnrjXDh4/9Gz
+         OhOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=H2tnHPalIp9fh2DhSzr0mzewVRlNnFoVrBrcA4HDoA0=;
+        b=BnLJ7Dqtt36bJWDI8qZTJVrDu4qQviIq0T75xP4jJnsZ6j7eqvJ+qsRw5Ym7gtx6Pb
+         ++yLbzw0NftMSbb7oEzG1istQvgKux1Jw7iUS+yg7s1bjbb4F/9s+CdEj4j1UNycrh1T
+         HYC/le5i7ebSPTroMW03skGyzQvqblLDD12SmqgL17YaNK+UvG7jy0axEn1vd+/7vlyq
+         0w+nleO6PhL9kXFFX2spSbn+C5jupeUInjW6ZdrxZMluxLLt6xc3CX3arg/NHy/vABLq
+         BJsCZjSI25j8XE0czRvK1zJqg2tpvYI4zuQLVh1cDCE39c7OsPZYQskIRSj/Sei5RMvr
+         P0oQ==
+X-Gm-Message-State: APjAAAXyOWXJcEL8KP3IM4YCa+BYWeK4I1KOfYLqpaRaiJdXS5P6OsdR
+        TJJkN96XC+AJR/eXpLc1FsE=
+X-Google-Smtp-Source: 
+ APXvYqyCyAszXCVppy900Pfp410ttd5Apzw/e8hURBIejOOVEiT7DU9J+hYVzPCVmknr0H7fMYIsiA==
+X-Received: by 2002:a17:90a:fb98:: with SMTP id
+ cp24mr2640494pjb.48.1565414977200;
+        Fri, 09 Aug 2019 22:29:37 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ v14sm106463565pfm.164.2019.08.09.22.29.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:36 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 06/18] thermal: sun8i: get ths init func from device
+ compatible
+Date: Sat, 10 Aug 2019 05:28:17 +0000
+Message-Id: <20190810052829.6032-7-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+There are some differences in register initialization for
+different socs. So we get different initialization functions
+from device compatible.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index f338fa25b98e..ad877b54f58e 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -59,6 +59,7 @@ struct ths_thermal_chip {
+ 	int		scale;
+ 	int		ft_deviation;
+ 	int		temp_data_base;
++	int		(*init)(struct ths_device *tmdev);
+ };
+ 
+ struct ths_device {
+@@ -356,7 +357,7 @@ static int sun8i_ths_probe(struct platform_device *pdev)
+ 	if (irq < 0)
+ 		return irq;
+ 
+-	ret = sun50i_h6_thermal_init(tmdev);
++	ret = tmdev->chip->init(tmdev);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -394,6 +395,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.scale = -67,
+ 	.ft_deviation = SUN50I_H6_FT_DEVIATION,
+ 	.temp_data_base = SUN50I_H6_THS_TEMP_DATA,
++	.init = sun50i_h6_thermal_init,
+ };
+ 
+ static const struct of_device_id of_ths_match[] = {
+
+From patchwork Sat Aug 10 05:28:18 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088269
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id B2AB4746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A193620223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 951C022B1F; Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 39B6820223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726358AbfHJF3m (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:42 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:45458 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3m (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:42 -0400
+Received: by mail-pl1-f194.google.com with SMTP id y8so3659598plr.12;
+        Fri, 09 Aug 2019 22:29:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=9CD9LJDj5saAwmZmvd1ahBknyBpZymFtazDBAWPuA/w=;
+        b=fDUlzBke9GKEgLeJdcJPCjtMbl9SDaWLS9gqlKxufaa4DWNk2ua2icR1P5zQFlBho+
+         ltQ7fP0946RuhfAiOuQiaMqNG+yF/XU5uPLMl5Yn4TF83zaz7slUN7Nh66x3m2RP4xFg
+         JKM9RWrzuXpuVa2RKbk29FOvRXQtq1VuL5gkHiqsBS9lVwaL2TS6aaYUqVfe7IctIffN
+         i5kRinHbJAIp+f9qWntf+hhLlPOU0CbA+aAYxoAR3cRxchVYapHiWGzIDWg6vaVKCafR
+         mSY11weuX6dcfki1ENoMoiPtR0ptyVUPwlgq1Q/6Dgb3FTo9J7IQEZIyrVWXDWVDEDBA
+         I/sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=9CD9LJDj5saAwmZmvd1ahBknyBpZymFtazDBAWPuA/w=;
+        b=QmyMMmgDHLdeIjx9QXQgIR7ml08kZ5sqbq+kGelmb5oz36a01NzvZZHiuBgUzX9SYu
+         KkiDcNgZFYt2WNXCbME6mXvK7uC+eWRaTzQLYqPfz6ioPVrYAqE77/yLRtn2tDTNYWVt
+         nQ+Et4ido0SKGqt931tYoRgEc5lYs6YnAOy6ZHeJTmN3ORs3oYM6eJmXQbE0CfTNC8H8
+         d4CreUUBxjjGlU2AbzvCP+uYp0EPnnQnmNBSHkR/Dn6Mbda9yLaOPMg01DbQ0PzjYU4z
+         K1FdECeTbGxTKeTBE50t4oofC/0c5T/vz0n1ZfqB+GSu6x+9YQwQm0zanbdBbHXpvdfh
+         E5TA==
+X-Gm-Message-State: APjAAAVNdgMCfYcMCj+jfe0/y/TqRbbmHTmnOq0Ks8LNlLqTn5jRIOjZ
+        jxZiI9hs3DeLRuhmXshVzLU=
+X-Google-Smtp-Source: 
+ APXvYqwcMDp1wIDPEfH9ZNziCnr+sazmApAC7Z15OOCFSDzNfuB/vRjfDqfeFnQK4y8GQZPZto9DDw==
+X-Received: by 2002:a17:902:ba8e:: with SMTP id
+ k14mr1402329pls.10.1565414981650;
+        Fri, 09 Aug 2019 22:29:41 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ 185sm100125591pfd.125.2019.08.09.22.29.40
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:41 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 07/18] thermal: sun8i: rework for ths irq handler func
+Date: Sat, 10 Aug 2019 05:28:18 +0000
+Message-Id: <20190810052829.6032-8-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+Here, we do something to prepare for the subsequent
+support of multiple platforms.
+
+1) rename sun50i_h6_irq_thread to sun8i_irq_thread, because
+   this function should be suitable for all platforms.
+
+2) introduce irq_ack callback to mask interrupt register
+   differences.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index ad877b54f58e..b934bc81eba7 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -60,6 +60,7 @@ struct ths_thermal_chip {
+ 	int		ft_deviation;
+ 	int		temp_data_base;
+ 	int		(*init)(struct ths_device *tmdev);
++	int             (*irq_ack)(struct ths_device *tmdev);
+ };
+ 
+ struct ths_device {
+@@ -116,23 +117,34 @@ static const struct regmap_config config = {
+ 	.fast_io = true,
+ };
+ 
+-static irqreturn_t sun50i_h6_irq_thread(int irq, void *data)
++static int sun50i_h6_irq_ack(struct ths_device *tmdev)
+ {
+-	struct ths_device *tmdev = data;
+-	int i, state;
++	int i, state, ret = 0;
+ 
+ 	regmap_read(tmdev->regmap, SUN50I_H6_THS_DIS, &state);
+ 
+ 	for (i = 0; i < tmdev->chip->sensor_num; i++) {
+-
+ 		if (state & SUN50I_H6_THS_DATA_IRQ_STS(i)) {
+-			/* clear data irq pending */
+ 			regmap_write(tmdev->regmap, SUN50I_H6_THS_DIS,
+ 				     SUN50I_H6_THS_DATA_IRQ_STS(i));
++			ret |= BIT(i);
++		}
++	}
++
++	return ret;
++}
+ 
++static irqreturn_t sun8i_irq_thread(int irq, void *data)
++{
++	struct ths_device *tmdev = data;
++	int i, state;
++
++	state = tmdev->chip->irq_ack(tmdev);
++
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
++		if (state & BIT(i))
+ 			thermal_zone_device_update(tmdev->sensor[i].tzd,
+ 						   THERMAL_EVENT_UNSPECIFIED);
+-		}
+ 	}
+ 
+ 	return IRQ_HANDLED;
+@@ -371,7 +383,7 @@ static int sun8i_ths_probe(struct platform_device *pdev)
+ 	 * the end.
+ 	 */
+ 	ret = devm_request_threaded_irq(dev, irq, NULL,
+-					sun50i_h6_irq_thread,
++					sun8i_irq_thread,
+ 					IRQF_ONESHOT, "ths", tmdev);
+ 	if (ret)
+ 		return ret;
+@@ -396,6 +408,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.ft_deviation = SUN50I_H6_FT_DEVIATION,
+ 	.temp_data_base = SUN50I_H6_THS_TEMP_DATA,
+ 	.init = sun50i_h6_thermal_init,
++	.irq_ack = sun50i_h6_irq_ack,
+ };
+ 
+ static const struct of_device_id of_ths_match[] = {
+
+From patchwork Sat Aug 10 05:28:19 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088271
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id EE60F1580
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id DB7C320223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id CFA6E22A68; Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 7501D223A6
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:47 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1725845AbfHJF3q (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:46 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:37426 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3q (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:46 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d1so14035993pgp.4;
+        Fri, 09 Aug 2019 22:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=SZBPS8zX1lZ/DonV5C3komhokQ/V7ug4it4W/EoGy10=;
+        b=Z1VAV24vg4CQO/RAn7VbwJQFpjru/ocEIBsBk0qmfgVAcVSZPT/FcVCmkdU9IlZ1Ka
+         Oc/1YloYmzzKO0Db83AB6D5gnVGah40VCwhk3qBijk6A7R2FFZdcxyNCgJNjVgFjSQ89
+         gS9dqvB8OILKpmhDVKj95toNNPOYSwf4tGM9xEg6ae5IO3c06X+1FQXXNjccX6LDIEfp
+         GIp1nvLiSooojE5mPj406ljHLub9v1/y5aIPEYVf8JIgpacJPn06cLCj9AqNFapdofGP
+         9qN97TZ6HHo2VHwCIvaiEQIpCE8+hvg+SrXi969f020vIZ+IFlMtD/cEBAMmi9hX9uei
+         9g8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=SZBPS8zX1lZ/DonV5C3komhokQ/V7ug4it4W/EoGy10=;
+        b=MCVvz2X/dV/q2SF/YInC6jO8M75G+B3zXOMxkn+kcimrMcGk5V9HOqU+15H8paD027
+         EC7PP0Iob7i+xHuoTr7PxyjiAM6EBX4Wo+lqscLNrisw9en2SEs2v4nZ8TFan4bY5rCV
+         rDa62qE/teQcl1eEA9loXpAdsWFvpwf1IjlkS067q4/X1pUZTNAIQ4NXgAqrYVg9Ko9o
+         C5Xc2taWIm8lQ4Y8d+Lk1XHiW2MCFVxc996NAAV2spZCOVihTvxCor4/gb+UThK8ZRjB
+         r3StGRhxuid3Tfe0j4YBYvjlkQdPAcUNyH+SrIla7dbPYoLUL3r37udMYLrs2AySg143
+         OgYw==
+X-Gm-Message-State: APjAAAWZufk19URbnrvwUKzsDQaOHXuBf8tXiSJEWAqkLvIH6D8ghkC/
+        USyBes1yU2WZLDnSbyH5zoA=
+X-Google-Smtp-Source: 
+ APXvYqxslAn91+Gj9uqWPdAgQd4zH50Cp4kKggNShpSaPtsQosYJo1BWGkVX8KozpR9h/90K+ktYjA==
+X-Received: by 2002:a62:1d8f:: with SMTP id
+ d137mr25970077pfd.207.1565414985703;
+        Fri, 09 Aug 2019 22:29:45 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ j20sm95375157pfr.113.2019.08.09.22.29.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:45 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 08/18] thermal: sun8i: support mod clocks
+Date: Sat, 10 Aug 2019 05:28:19 +0000
+Message-Id: <20190810052829.6032-9-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+H3 has extra clock, so introduce something in ths_thermal_chip/ths_device
+and adds the process of the clock.
+
+This is pre-work for supprt it.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index b934bc81eba7..6f4294c2aba7 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -54,6 +54,7 @@ struct tsensor {
+ };
+ 
+ struct ths_thermal_chip {
++	bool            has_mod_clk;
+ 	int		sensor_num;
+ 	int		offset;
+ 	int		scale;
+@@ -69,6 +70,7 @@ struct ths_device {
+ 	struct regmap				*regmap;
+ 	struct reset_control			*reset;
+ 	struct clk				*bus_clk;
++	struct clk                              *mod_clk;
+ 	struct tsensor				sensor[MAX_SENSOR_NUM];
+ };
+ 
+@@ -274,6 +276,12 @@ static int sun8i_ths_resource_init(struct ths_device *tmdev)
+ 	if (IS_ERR(tmdev->bus_clk))
+ 		return PTR_ERR(tmdev->bus_clk);
+ 
++	if (tmdev->chip->has_mod_clk) {
++		tmdev->mod_clk = devm_clk_get(&pdev->dev, "mod");
++		if (IS_ERR(tmdev->mod_clk))
++			return PTR_ERR(tmdev->mod_clk);
++	}
++
+ 	ret = reset_control_deassert(tmdev->reset);
+ 	if (ret)
+ 		return ret;
+@@ -282,12 +290,18 @@ static int sun8i_ths_resource_init(struct ths_device *tmdev)
+ 	if (ret)
+ 		goto assert_reset;
+ 
+-	ret = sun50i_ths_calibrate(tmdev);
++	ret = clk_prepare_enable(tmdev->mod_clk);
+ 	if (ret)
+ 		goto bus_disable;
+ 
++	ret = sun50i_ths_calibrate(tmdev);
++	if (ret)
++		goto mod_disable;
++
+ 	return 0;
+ 
++mod_disable:
++	clk_disable_unprepare(tmdev->mod_clk);
+ bus_disable:
+ 	clk_disable_unprepare(tmdev->bus_clk);
+ assert_reset:
+@@ -395,6 +409,7 @@ static int sun8i_ths_remove(struct platform_device *pdev)
+ {
+ 	struct ths_device *tmdev = platform_get_drvdata(pdev);
+ 
++	clk_disable_unprepare(tmdev->mod_clk);
+ 	clk_disable_unprepare(tmdev->bus_clk);
+ 	reset_control_assert(tmdev->reset);
+ 
+
+From patchwork Sat Aug 10 05:28:20 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088277
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 9D6301580
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 8BA6D20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 7FBFB22A68; Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0EB2E223A6
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726426AbfHJF3v (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:51 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37212 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3v (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:51 -0400
+Received: by mail-pf1-f195.google.com with SMTP id 129so203231pfa.4;
+        Fri, 09 Aug 2019 22:29:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=OgfjFUuoODNFVR0ZkvXZDxeFbZPjLqSi2JIeoavOMgw=;
+        b=MJc3rDZPoveXjHTdN7LEH2hpFio/XloP5QHsQGg4GMD0LCzGAz+jZSCHG50z1LvXaH
+         WxRdKkPluVG8Rxm1vvFvttyqFiEBhh5iRxJiPn9BLstbW9LTuN8jej5YcGRl4UOxHmYJ
+         CX3mjXj4KVcB5IdyZuVkEEuPe6fBn4rPvPGLj13Ezl08ch19+EJ9IE5oRzoBIK27S2t9
+         dtJm9b+iXCbqWT/gZTmPLnyiP/9+fsV/jVGgSXGXNf5x4pe+aQ9Xft6UHuP61Qvha0/O
+         1hzCp82QsTbhbZMdC+vEBCCy2BcyldfSQqjIm9dCp0i7OtoPysbMIBLTdXskwuUdhB23
+         Oq/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=OgfjFUuoODNFVR0ZkvXZDxeFbZPjLqSi2JIeoavOMgw=;
+        b=GYIpb6kiuh0RKIzSJSYTZfZ31mgNQbbvjfVqf7KkGOoW8EX2DL2z4TveyrFMlAAR/e
+         evAErIqswK5oCXR6d/kJUSaTeef8qFyKpSJ7vZ883oRr401lDufsHhsiLkKlLd0rGEXt
+         f1RovSSR9YgeWwslyCe5+xlSzwPDimlhL7VUaB9tIDg4KDt8qouXAg95lfWSn9+R7E00
+         IBCHcYuBpcbx/bTrS7NrJHKjTRTWiVDPiLgyPUIXcQbUspvsxV9PH3OCTURB6V58nuOT
+         khHRzP9FKOMQVtRyluI/0N8Rd4Bn1nGac73ld5L8ph2CUnEQRW/3SlP/eBpxEG7WkqGw
+         QDAg==
+X-Gm-Message-State: APjAAAWSllk6cP+BX+kWp6ygC9qOt6YFHThs/wgI7OcqzEDGJGc6F9hX
+        eRgDYGQ+SlOXMKN6jmYdXmc=
+X-Google-Smtp-Source: 
+ APXvYqwC4638wzZl+8v+psyBs+EeT0oA2gS/8mge82pBrAdHJeehqHQxiVbpjzKmAwzQqbXgrXp7+Q==
+X-Received: by 2002:a17:90a:1785:: with SMTP id
+ q5mr12858514pja.106.1565414990372;
+        Fri, 09 Aug 2019 22:29:50 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ i7sm8395873pjk.24.2019.08.09.22.29.49
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:49 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 09/18] thermal: sun8i: rework for ths calibrate func
+Date: Sat, 10 Aug 2019 05:28:20 +0000
+Message-Id: <20190810052829.6032-10-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+Here, we do something to prepare for the subsequent
+support of multiple platforms.
+
+1) rename sun50i_ths_calibrate to sun8i_ths_calibrate, because
+   this function should be suitable for all platforms now.
+
+2) introduce calibrate callback to mask calibration method
+   differences.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 86 ++++++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 38 deletions(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 6f4294c2aba7..47c20c4c69e7 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -60,6 +60,8 @@ struct ths_thermal_chip {
+ 	int		scale;
+ 	int		ft_deviation;
+ 	int		temp_data_base;
++	int		(*calibrate)(struct ths_device *tmdev,
++				     u16 *caldata, int callen);
+ 	int		(*init)(struct ths_device *tmdev);
+ 	int             (*irq_ack)(struct ths_device *tmdev);
+ };
+@@ -152,45 +154,14 @@ static irqreturn_t sun8i_irq_thread(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static int sun50i_ths_calibrate(struct ths_device *tmdev)
++static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
++				   u16 *caldata, int callen)
+ {
+-	struct nvmem_cell *calcell;
+ 	struct device *dev = tmdev->dev;
+-	u16 *caldata;
+-	size_t callen;
+-	int ft_temp;
+-	int i, ret = 0;
+-
+-	calcell = devm_nvmem_cell_get(dev, "calib");
+-	if (IS_ERR(calcell)) {
+-		if (PTR_ERR(calcell) == -EPROBE_DEFER)
+-			return -EPROBE_DEFER;
+-		/*
+-		 * Even if the external calibration data stored in sid is
+-		 * not accessible, the THS hardware can still work, although
+-		 * the data won't be so accurate.
+-		 *
+-		 * The default value of calibration register is 0x800 for
+-		 * every sensor, and the calibration value is usually 0x7xx
+-		 * or 0x8xx, so they won't be away from the default value
+-		 * for a lot.
+-		 *
+-		 * So here we do not return error if the calibartion data is
+-		 * not available, except the probe needs deferring.
+-		 */
+-		goto out;
+-	}
++	int i, ft_temp;
+ 
+-	caldata = nvmem_cell_read(calcell, &callen);
+-	if (IS_ERR(caldata)) {
+-		ret = PTR_ERR(caldata);
+-		goto out;
+-	}
+-
+-	if (!caldata[0] || callen < 2 + 2 * tmdev->chip->sensor_num) {
+-		ret = -EINVAL;
+-		goto out_free;
+-	}
++	if (!caldata[0] || callen < 2 + 2 * tmdev->chip->sensor_num)
++		return -EINVAL;
+ 
+ 	/*
+ 	 * efuse layout:
+@@ -245,7 +216,45 @@ static int sun50i_ths_calibrate(struct ths_device *tmdev)
+ 				   cdata << offset);
+ 	}
+ 
+-out_free:
++	return 0;
++}
++
++static int sun8i_ths_calibrate(struct ths_device *tmdev)
++{
++	struct nvmem_cell *calcell;
++	struct device *dev = tmdev->dev;
++	u16 *caldata;
++	size_t callen;
++	int ret = 0;
++
++	calcell = devm_nvmem_cell_get(dev, "calib");
++	if (IS_ERR(calcell)) {
++		if (PTR_ERR(calcell) == -EPROBE_DEFER)
++			return -EPROBE_DEFER;
++		/*
++		 * Even if the external calibration data stored in sid is
++		 * not accessible, the THS hardware can still work, although
++		 * the data won't be so accurate.
++		 *
++		 * The default value of calibration register is 0x800 for
++		 * every sensor, and the calibration value is usually 0x7xx
++		 * or 0x8xx, so they won't be away from the default value
++		 * for a lot.
++		 *
++		 * So here we do not return error if the calibartion data is
++		 * not available, except the probe needs deferring.
++		 */
++		goto out;
++	}
++
++	caldata = nvmem_cell_read(calcell, &callen);
++	if (IS_ERR(caldata)) {
++		ret = PTR_ERR(caldata);
++		goto out;
++	}
++
++	tmdev->chip->calibrate(tmdev, caldata, callen);
++
+ 	kfree(caldata);
+ out:
+ 	return ret;
+@@ -294,7 +303,7 @@ static int sun8i_ths_resource_init(struct ths_device *tmdev)
+ 	if (ret)
+ 		goto bus_disable;
+ 
+-	ret = sun50i_ths_calibrate(tmdev);
++	ret = sun8i_ths_calibrate(tmdev);
+ 	if (ret)
+ 		goto mod_disable;
+ 
+@@ -422,6 +431,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.scale = -67,
+ 	.ft_deviation = SUN50I_H6_FT_DEVIATION,
+ 	.temp_data_base = SUN50I_H6_THS_TEMP_DATA,
++	.calibrate = sun50i_h6_ths_calibrate,
+ 	.init = sun50i_h6_thermal_init,
+ 	.irq_ack = sun50i_h6_irq_ack,
+ };
+
+From patchwork Sat Aug 10 05:28:21 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088275
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 6A452746
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 58DC620223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 4AF2122B1F; Sat, 10 Aug 2019 05:29:57 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id E270520223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:29:56 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726011AbfHJF34 (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:29:56 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42223 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfHJF3z (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:55 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q10so47103397pff.9;
+        Fri, 09 Aug 2019 22:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=wjQ5RBMUscwhPovbCKs/X+MccsfEX8ouNnM/eU9tQdY=;
+        b=owjCa9lXzv2/DwkfhVrhXGPfLgD8hjoGMaHzNtHK8q9nZFQLhg0aAuY2svLpXwtORD
+         NcaMD7Xoi1eTrqSTeWXAdJTm6w7xsh3+ekzHVnQlUd6evrD1UaF0V5jA0xR0susVtGqK
+         0E9Dqep2V9kZz9TJplT0xU6lPOE608vmJZCkcy4tFplb4Pr+b7RWp8661wdtUQBuYhmT
+         cSlJV9R/IpJ8+PGtAooQJrVzgnoV9ux306PKcqD/2x4HLWnw4Om/JHW2XKA+lY2y+sYZ
+         WNIQvi0mzQCMkjOUGMYYLFBoz6oocY6mck/do2zFdCcA3JJcNwATwqlbhtQ8u6d2A155
+         hUQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=wjQ5RBMUscwhPovbCKs/X+MccsfEX8ouNnM/eU9tQdY=;
+        b=TpSQmjJ6ggjppnvP7QaQ2/oD2Mgcowh5lS2qbFWJcjXldpKM7DR16aaXv9EC2sQ1+E
+         OvxcZ7hhTtZbPCeMXvv5mLfawF6MwvrtzVSfNsma4NUI2YWBNCdgJOTGLWCkMbPwEXGt
+         /BFMdCytbe1OXX1Xoo/uFpxgKa3BhGf6vZnqi83U2t8LmZ53dc86dzdGKPHuq533r1KG
+         kKTDCpzHaqI43jTJRbVbLgUKd2Hfa7ISuNMNbHE1F9fr/rrs3P4dKXHQkupBRJ4SqSAF
+         0oMNb6xoGgwViBoEJxWwzCf0rxO7ra5tUqWtkqqFefqTIXBnT5QjfiWeZjBN3mzHmLtm
+         P1rA==
+X-Gm-Message-State: APjAAAUiAsKL828edJSCtDJ1/JErOPzyES+vBh6Xj5qKcPBURB1XqHVi
+        21vschDtzJpdOJFEmW/qYWY=
+X-Google-Smtp-Source: 
+ APXvYqw8vs8pLZBSxmUAg7iqaM6hn9kfidzUufWlKeYMFwYYXWPhKeZ2pwcEdEyO8GNSSc0MtJ7W1w==
+X-Received: by 2002:a62:7a0f:: with SMTP id v15mr6362442pfc.35.1565414994464;
+        Fri, 09 Aug 2019 22:29:54 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ s24sm62023523pgm.3.2019.08.09.22.29.53
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:53 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 10/18] dt-bindings: thermal: add binding document for h3
+ thermal controller
+Date: Sat, 10 Aug 2019 05:28:21 +0000
+Message-Id: <20190810052829.6032-11-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds binding document for allwinner h3 thermal controller.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ .../bindings/thermal/sun8i-thermal.yaml       | 81 ++++++++++++++++++-
+ 1 file changed, 78 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+index e0973199ba3c..6624cf6b1ce8 100644
+--- a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+@@ -16,6 +16,7 @@ description: |-
+ properties:
+   compatible:
+     enum:
++      - allwinner,sun8i-h3-ths
+       - allwinner,sun50i-h6-ths
+ 
+   reg:
+@@ -28,13 +29,21 @@ properties:
+     maxItems: 1
+ 
+   clocks:
+-    maxItems: 1
++    minItems: 1
++    maxItems: 2
++    items:
++      - description: ths bus clock
++      - description: ths mod clock
+ 
+   clock-names:
+-    const: bus
++    minItems: 1
++    maxItems: 2
++    items:
++      - const: bus
++      - const: mod
+ 
+   "#thermal-sensor-cells":
+-    const: 1
++    enum: [ 0, 1 ]
+ 
+   nvmem-cells:
+     description: ths calibrate data
+@@ -51,9 +60,75 @@ required:
+   - interrupts
+   - "#thermal-sensor-cells"
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: allwinner,sun50i-h6-ths
++
++    then:
++      properties:
++        clocks:
++          minItems: 1
++          maxItems: 1
++
++        clock-names:
++          minItems: 1
++          maxItems: 1
++
++    else:
++      properties:
++        clocks:
++          minItems: 2
++          maxItems: 2
++
++        clock-names:
++          minItems: 2
++          maxItems: 2
++
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: allwinner,sun8i-h3-ths
++
++    then:
++      properties:
++        "#thermal-sensor-cells":
++          const: 0
++
++    else:
++      properties:
++        "#thermal-sensor-cells":
++          const: 1
++
+ additionalProperties: false
+ 
+ examples:
++  - |
++    ths: ths@1c25000 {
++        compatible = "allwinner,sun8i-h3-ths";
++        reg = <0x01c25000 0x400>;
++        clocks = <&ccu CLK_BUS_THS>, <&ccu CLK_THS>;
++        clock-names = "bus", "mod";
++        resets = <&ccu RST_BUS_THS>;
++        interrupts = <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
++        nvmem-cells = <&tsen_calib>;
++        nvmem-cell-names = "calib";
++        #thermal-sensor-cells = <0>;
++    };
++
++    sid: sid@1c14000 {
++        compatible = "allwinner,sun8i-h3-sid";
++        reg = <0x1c14000 0x400>;
++        #address-cells = <1>;
++        #size-cells = <1>;
++        tsen_calib: calib@34 {
++                reg = <0x34 2>;
++        };
++    };
++
+   - |
+     ths: ths@5070400 {
+         compatible = "allwinner,sun50i-h6-ths";
+
+From patchwork Sat Aug 10 05:28:22 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088279
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id D306714E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:01 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BEF9120223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:01 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id AF49222A68; Sat, 10 Aug 2019 05:30:01 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 3792420223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:01 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1725730AbfHJFaA (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:00 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:43437 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbfHJF37 (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:29:59 -0400
+Received: by mail-pg1-f194.google.com with SMTP id r26so10903559pgl.10;
+        Fri, 09 Aug 2019 22:29:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=/+Vypp949GcHqEyKcL0IQIX2nnfIDii+9qZvEhV9QRs=;
+        b=qb2+3+aAvlwnHlCP2Xkzp0vO5+lpxhwIt29tHwACLZjiEaWeHHtOy+k5OqeJSM82EK
+         A/wNHR5BcT5mi7UnUkyrNAfHfBJcnY86ecuF2XbOfQ15gvfjKCrcUBfQrUS1tXiRNXV1
+         jclQDEOR4yiDZVGPB69eqFnKhXa2vvBkmc91uLH5SFcApz9Fl7rQ1wchvH7ZJP3rBFr5
+         Oob/8kSekXKJKsqc04pZKMdXzGqgfG79cV93WFjdUs6qAw08HOwNZyX4eq0xPMrbhrAN
+         kTLoqPepxUoopH4KbYyYfodNfrRczjDlqKv20DxJuxJJR1o043mSIl72yDUZuIEqP5LG
+         RUZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=/+Vypp949GcHqEyKcL0IQIX2nnfIDii+9qZvEhV9QRs=;
+        b=FN3qMfDH6fywyeki5Nj7Y4JqLAHyL8Af78iI5F5iON7taW+NtbTbHcXAgYWwYHX4vt
+         ABHVENCId6UBzHcy3zax9qSs3g/0YJ7cvWTtPG3md6YLTALmT90V7DD0AHjs32OpxV3q
+         xild8Uidv0zZZ+xfii9ieujEtj12MiNtFqQKEOzGRBcl5KdSeofjUCackUL27OyamDZ0
+         x/y2+uUbknUTpgyd1PKKAjzPP2HYAjr68x/rPna/XexAvpbv4XO9ArFYEZFv9iMZ1Lfx
+         4OlQhOGcnRV5IrYp4cUZPsvfiqfxXuwPRnM+taEeRpCf8cOK8qwvzD8gjv3avm7aDkgL
+         XNNQ==
+X-Gm-Message-State: APjAAAWT+alJa7w68R5foV6q9H4btXw90FZG2hkQQNcLfMeStwq/OMC+
+        iXSaVmPb9tm+kJtWga6P9VQ=
+X-Google-Smtp-Source: 
+ APXvYqwCZdkfHsbnXnHBnBca8U9pGcrxvUpyCmRvFdcutvKvt/oH+EgoT1C/Ajn6NWK2up6ZUgbiFQ==
+X-Received: by 2002:a65:614a:: with SMTP id
+ o10mr20265723pgv.407.1565414998644;
+        Fri, 09 Aug 2019 22:29:58 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ c12sm7848842pfc.22.2019.08.09.22.29.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:29:57 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 11/18] thermal: sun8i: add thermal driver for h3
+Date: Sat, 10 Aug 2019 05:28:22 +0000
+Message-Id: <20190810052829.6032-12-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds the support for allwinner h3 thermal sensor.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 91 +++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 47c20c4c69e7..41ce8cdc0546 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -27,6 +27,14 @@
+ #define TEMP_TO_REG				672
+ #define CALIBRATE_DEFAULT			0x800
+ 
++#define SUN8I_THS_CTRL0				0x00
++#define SUN8I_THS_CTRL2				0x40
++#define SUN8I_THS_IC				0x44
++#define SUN8I_THS_IS				0x48
++#define SUN8I_THS_MFC				0x70
++#define SUN8I_THS_TEMP_CALIB			0x74
++#define SUN8I_THS_TEMP_DATA			0x80
++
+ #define SUN50I_THS_CTRL0			0x00
+ #define SUN50I_H6_THS_ENABLE			0x04
+ #define SUN50I_H6_THS_PC			0x08
+@@ -36,6 +44,10 @@
+ #define SUN50I_H6_THS_TEMP_CALIB		0xa0
+ #define SUN50I_H6_THS_TEMP_DATA			0xc0
+ 
++#define SUN8I_THS_CTRL0_T_ACQ0(x)		(GENMASK(15, 0) & (x))
++#define SUN8I_THS_CTRL2_T_ACQ1(x)		((GENMASK(15, 0) & (x)) << 16)
++#define SUN8I_THS_DATA_IRQ_STS(x)		BIT(x + 8)
++
+ #define SUN50I_THS_CTRL0_T_ACQ(x)		((GENMASK(15, 0) & (x)) << 16)
+ #define SUN50I_THS_FILTER_EN			BIT(2)
+ #define SUN50I_THS_FILTER_TYPE(x)		(GENMASK(1, 0) & (x))
+@@ -121,6 +133,23 @@ static const struct regmap_config config = {
+ 	.fast_io = true,
+ };
+ 
++static int sun8i_h3_irq_ack(struct ths_device *tmdev)
++{
++	int i, state, ret = 0;
++
++	regmap_read(tmdev->regmap, SUN8I_THS_IS, &state);
++
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
++		if (state & SUN8I_THS_DATA_IRQ_STS(i)) {
++			regmap_write(tmdev->regmap, SUN8I_THS_IS,
++				     SUN8I_THS_DATA_IRQ_STS(i));
++			ret |= BIT(i);
++		}
++	}
++
++	return ret;
++}
++
+ static int sun50i_h6_irq_ack(struct ths_device *tmdev)
+ {
+ 	int i, state, ret = 0;
+@@ -154,6 +183,26 @@ static irqreturn_t sun8i_irq_thread(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
++static int sun8i_h3_ths_calibrate(struct ths_device *tmdev,
++				  u16 *caldata, int callen)
++{
++	int i;
++
++	if (!caldata[0] || callen < 2 * tmdev->chip->sensor_num)
++		return -EINVAL;
++
++	for (i = 0; i < tmdev->chip->sensor_num; i++) {
++		int offset = (i % 2) << 4;
++
++		regmap_update_bits(tmdev->regmap,
++				   SUN8I_THS_TEMP_CALIB + (4 * (i >> 1)),
++				   0xfff << offset,
++				   caldata[i] << offset);
++	}
++
++	return 0;
++}
++
+ static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
+ 				   u16 *caldata, int callen)
+ {
+@@ -319,6 +368,36 @@ static int sun8i_ths_resource_init(struct ths_device *tmdev)
+ 	return ret;
+ }
+ 
++static int sun8i_h3_thermal_init(struct ths_device *tmdev)
++{
++	int val;
++
++	/* average over 4 samples */
++	regmap_write(tmdev->regmap, SUN8I_THS_MFC,
++		     SUN50I_THS_FILTER_EN |
++		     SUN50I_THS_FILTER_TYPE(1));
++	/*
++	 * period = (x + 1) * 4096 / clkin; ~10ms
++	 * enable data interrupt
++	 */
++	val = GENMASK(7 + tmdev->chip->sensor_num, 8);
++	regmap_write(tmdev->regmap, SUN8I_THS_IC,
++		     SUN50I_H6_THS_PC_TEMP_PERIOD(58) | val);
++	/*
++	 * clkin = 24MHz
++	 * T acquire = clkin / (x + 1)
++	 *           = 20us
++	 * enable sensor
++	 */
++	regmap_write(tmdev->regmap, SUN8I_THS_CTRL0,
++		     SUN8I_THS_CTRL0_T_ACQ0(479));
++	val = GENMASK(tmdev->chip->sensor_num - 1, 0);
++	regmap_write(tmdev->regmap, SUN8I_THS_CTRL2,
++		     SUN8I_THS_CTRL2_T_ACQ1(479) | val);
++
++	return 0;
++}
++
+ static int sun50i_h6_thermal_init(struct ths_device *tmdev)
+ {
+ 	int val;
+@@ -425,6 +504,17 @@ static int sun8i_ths_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static const struct ths_thermal_chip sun8i_h3_ths = {
++	.sensor_num = 1,
++	.offset = -1794,
++	.scale = -121,
++	.has_mod_clk = true,
++	.temp_data_base = SUN8I_THS_TEMP_DATA,
++	.calibrate = sun8i_h3_ths_calibrate,
++	.init = sun8i_h3_thermal_init,
++	.irq_ack = sun8i_h3_irq_ack,
++};
++
+ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.sensor_num = 2,
+ 	.offset = -2794,
+@@ -437,6 +527,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ };
+ 
+ static const struct of_device_id of_ths_match[] = {
++	{ .compatible = "allwinner,sun8i-h3-ths", .data = &sun8i_h3_ths },
+ 	{ .compatible = "allwinner,sun50i-h6-ths", .data = &sun50i_h6_ths },
+ 	{ /* sentinel */ },
+ };
+
+From patchwork Sat Aug 10 05:28:23 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088281
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 43992112C
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:10 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 3096220223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:10 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 2431B22A68; Sat, 10 Aug 2019 05:30:10 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id D0E9B20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:09 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726495AbfHJFaE (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:04 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45088 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbfHJFaD (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:03 -0400
+Received: by mail-pf1-f195.google.com with SMTP id w26so1848440pfq.12;
+        Fri, 09 Aug 2019 22:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=mDKOJXA/ys1npDjXBTQ2s0rGwBbMEHrF7ffvpNaphqY=;
+        b=rsarVL0KdYe7Il/Tpaw1MIVKtFiR0Y2kuIrFSMBz5fojZCq1sgccTdo1ozHTVdD8y1
+         mfMc9r955mHTdwEeKcbiyCugDa6k7IC3GoTyvxUqkEeEl+h0unaFWnC+QjvpLgxHtXX0
+         99C42B+QCDpqqwwQcgn1jBc3UlwLB/KAqVTJS4THZPjKa2fQPzGa/yhfjwxb9LngoAkc
+         4JGi4JCJ1jdb2+2+oCMlrs1LOc66trOuznPVR4bE0EoM9TGXilRjQ0yG1KcSR1qBrG8B
+         ra+er8sAtFIPxl6HNIoKJq42HGwRe6rFx8silSqCqs+OoiOZA7TixdSAPDum+RgMN1Uo
+         EcEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=mDKOJXA/ys1npDjXBTQ2s0rGwBbMEHrF7ffvpNaphqY=;
+        b=r3skL4ms+p4slcK6xxKVk7jawnaW1WD8a3GAryfgnPfbhbeH/TpY+sD43/wljHQUBo
+         7fL/NzPTHTzh8cg3iFoCVMQdr7Z/vciFEa9IOQwCdNPfqa336bXuH75baFgUkXu+nrQF
+         1dMczxeyvG4IfGFCDqu0dswY7yfXBEVBNARMvSA9IyMG+L0goZyPT6r+jhJ1DdbR6M2M
+         NSreMHx8R+L/5Cp+aWxeXAU3TaZ+LNTi4p2PDZyFQe9kwH9o93ty4f/EBiaUbJ2cG6w0
+         vslffvSHegVr6EIDxjKHjg31NGQOHf8dLz9bJMgq3nbZEene/EGg/EstdcLPliwB2H4w
+         wCNQ==
+X-Gm-Message-State: APjAAAW8Bqy+Igi7DENPwhfRidr9Sk3Z1JS+pLb0JFHtOPWr0ZIe5mmu
+        lsf2Yt5u6GRGFmz1SzaSU4Q=
+X-Google-Smtp-Source: 
+ APXvYqwAkVuLdow5oO8itFrdem+xM/Zhwse/76vid6q2uk8MGOkz2hXbK0XNT0eZiUWzl0KdwWjjtw==
+X-Received: by 2002:a63:7b18:: with SMTP id
+ w24mr20690940pgc.328.1565415002991;
+        Fri, 09 Aug 2019 22:30:02 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ n128sm55019042pfn.46.2019.08.09.22.30.01
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:02 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 12/18] dt-bindings: thermal: add binding document for a64
+ thermal controller
+Date: Sat, 10 Aug 2019 05:28:23 +0000
+Message-Id: <20190810052829.6032-13-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds binding document for allwinner a64 thermal controller.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+index 6624cf6b1ce8..f935b4fab8ec 100644
+--- a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+@@ -17,6 +17,7 @@ properties:
+   compatible:
+     enum:
+       - allwinner,sun8i-h3-ths
++      - allwinner,sun50i-a64-ths
+       - allwinner,sun50i-h6-ths
+ 
+   reg:
+
+From patchwork Sat Aug 10 05:28:24 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088285
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 61B5614E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:14 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 4FD3320223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:14 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 43E2222A68; Sat, 10 Aug 2019 05:30:14 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id E599A20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:13 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726519AbfHJFaJ (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:09 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35838 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbfHJFaI (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:08 -0400
+Received: by mail-pg1-f193.google.com with SMTP id n4so5123079pgv.2;
+        Fri, 09 Aug 2019 22:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=71DUVtj5Cvg/Wok9dZsUDEqRY7qzU/CKNT9zSocN+ao=;
+        b=AHZ5OqTYDdsovC5n1BNsaS8kgOU6oa6y2cAM5Wbguuqk5X5JFfCB99NyHGj1db+4X6
+         MdEl7N+AOMFOoTs6oYVoU/1LtNcBNYKSFh/+dcZryJAp6056TKQKoZKWgELUPsA/t+RU
+         7mZeZnDlpJoV8qs/Fekb/eNC5INfy6h3z9PXVNwktXZjAtaIRvOAuFQTodDeVeyRTMMI
+         c9sYeO6khNfyyoCr0gwVC/M6JZvyLAbXKVKzHnkA7bJSqXHlBS3k7WTu0XfCnBu1tJ5J
+         dGASctZiWvoOEgrrTdIyvM1NBcDFX4TzCg75DRXDb7lYZiGB2YcX6EfvWA9XSIXjpFD0
+         r70A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=71DUVtj5Cvg/Wok9dZsUDEqRY7qzU/CKNT9zSocN+ao=;
+        b=B3Ws9koyjE3QbWyyGIoz3oPb6x1YvEYpl6jzwIk799Ej/qPZQP2x63CPvpYMCUHRKC
+         amKnKi5hf0nkvQ4Sf1JAi5AN5BmvgU69DduriCjKi1cz8FNDU9RR9AKmZkRc+ekMzY4E
+         zo3op/p4zEbg8wspBSAEqZdFvET38qG47+OEYiAPAlKv8Xx0sAn4NzGv9ZHhPX1mOGkm
+         ehgKbOvSZDbQYsk5/ZfCEM+9vtoVDzppsri9lGg+Z8SOr/+SsRrL991DN4I/QaNd7nSk
+         Jtx/x4SEYS1wHOS7FuBltpHnaWjHNUwS2EKVenHvapzYdJX0UD5OLQGei+ZlHtrHmLIe
+         2tAA==
+X-Gm-Message-State: APjAAAUh6TyeWsuIQqdWS+i0+frIh9bm8MxnW/oKduEuWkcIc/vrPd5B
+        3ZxiTXq6a4LnpJJJaxEufCA=
+X-Google-Smtp-Source: 
+ APXvYqy0SbXHrw7PFXc5NqzKKuYBZBqpPz4Kx438X2kv6H5qephacghobTnQMk+4EBLFALhrbhee5Q==
+X-Received: by 2002:aa7:8d98:: with SMTP id
+ i24mr25671345pfr.199.1565415007779;
+        Fri, 09 Aug 2019 22:30:07 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ o12sm6113304pjr.22.2019.08.09.22.30.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:07 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Vasily Khoruzhick <anarsoul@gmail.com>
+Subject: [PATCH v5 13/18] thermal: sun8i: add thermal driver for A64
+Date: Sat, 10 Aug 2019 05:28:24 +0000
+Message-Id: <20190810052829.6032-14-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Vasily Khoruzhick <anarsoul@gmail.com>
+
+Thermal sensor controller in A64 is similar to H3, but it has 3 sensors.
+Extend H3 functions to add support for multiple sensors.
+
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+---
+ drivers/thermal/sun8i_thermal.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 41ce8cdc0546..3259081da841 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -515,6 +515,17 @@ static const struct ths_thermal_chip sun8i_h3_ths = {
+ 	.irq_ack = sun8i_h3_irq_ack,
+ };
+ 
++static const struct ths_thermal_chip sun50i_a64_ths = {
++	.sensor_num = 3,
++	.offset = -2170,
++	.scale = -117,
++	.has_mod_clk = true,
++	.temp_data_base = SUN8I_THS_TEMP_DATA,
++	.calibrate = sun8i_h3_ths_calibrate,
++	.init = sun8i_h3_thermal_init,
++	.irq_ack = sun8i_h3_irq_ack,
++};
++
+ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.sensor_num = 2,
+ 	.offset = -2794,
+@@ -528,6 +539,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 
+ static const struct of_device_id of_ths_match[] = {
+ 	{ .compatible = "allwinner,sun8i-h3-ths", .data = &sun8i_h3_ths },
++	{ .compatible = "allwinner,sun50i-a64-ths", .data = &sun50i_a64_ths },
+ 	{ .compatible = "allwinner,sun50i-h6-ths", .data = &sun50i_h6_ths },
+ 	{ /* sentinel */ },
+ };
+
+From patchwork Sat Aug 10 05:28:25 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088287
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 156F914E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:20 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 04E9F20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:20 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id EC5A322B26; Sat, 10 Aug 2019 05:30:19 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1D44820223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:18 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726548AbfHJFaN (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:13 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:34775 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfHJFaN (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:13 -0400
+Received: by mail-pf1-f196.google.com with SMTP id b13so47118037pfo.1;
+        Fri, 09 Aug 2019 22:30:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=UosgfXx4rXCpr6ibQdnwjU3IwPluehmRT7Dfu14EBL8=;
+        b=cnd6S+DBub3Od7fbxAslNjlYDsv5ue3V/132Q7Xf5VEoqcGO/DFlOhgzdxc1VaXJ96
+         2PgeD2F10SWJaBt6QchPdzKipe28KCDHn7XEueb2a1Qmmn7b0rYA3pxnvd+MlRxLpK9S
+         TyT1uhKHI7DwDTPH+EK09luy6RrTrsPoswDsPfOnoHH9BTFOG/zAp+kePk2ZFZB4nQJ6
+         UlCaKIpk2um+gw3jipGxtsaJTly/AxqEDb+hPv+V9GMV56EzLzQBZTyBMP3aS0lgNXhr
+         UAhG0lm88oyH85kLR0QmMPKTpdo+cW9JxDcL2fSw30jI1n6BRmnPx+f1Ur3DZz74F04U
+         UX2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=UosgfXx4rXCpr6ibQdnwjU3IwPluehmRT7Dfu14EBL8=;
+        b=WtNQiVxmToNkJJ39dzo/85Xj7wjhiG2dxo7Xu7nlWRJNWRCz9iDlYCwn0BIm9NyBtL
+         ASuX2uad0KHdvQWqV31ak2fcGTzy2QlVgdlNOsQ/WlsQQdRvZaeQZXxfNHJNYnRGzdZk
+         75Ay+jPChHqMQgOhB66X4JtBHA55C9auOe76c2vWIqE2PJ+WI2m7ZpefIczuG1t4QCoD
+         xG5RHIlgjk+TcitFH8axGki8qL7wzLuOmjtArsTzhwmzW+DpPsTgQF6YcGVMP8rPcTLQ
+         pD0x9/uQdVf2H7YksMa19vk0qOPrM1p9PIlv7oQ0ZVYyGCXCadfUraEkxx2nphrmj76u
+         7Rww==
+X-Gm-Message-State: APjAAAWN+7LQ9XjAyqT/83IF1hBJuqMwoZSYPAWnDapQJEib10UdsLj7
+        B6mqwQhnFBmkBooDroldAQw=
+X-Google-Smtp-Source: 
+ APXvYqzNvo1OGTUF4/A2gNYiIgcr+dkAqN2eFc1rbhbt9UgJhZ10auqHQ+8MqNVMZkpLbNDrfDMG1A==
+X-Received: by 2002:a63:d84e:: with SMTP id
+ k14mr20737624pgj.234.1565415012208;
+        Fri, 09 Aug 2019 22:30:12 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ f7sm96704339pfd.43.2019.08.09.22.30.11
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:11 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 14/18] dt-bindings: thermal: add binding document for h5
+ thermal controller
+Date: Sat, 10 Aug 2019 05:28:25 +0000
+Message-Id: <20190810052829.6032-15-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds binding document for allwinner h5 thermal controller.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+index f935b4fab8ec..2e28f5b33d33 100644
+--- a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+@@ -18,6 +18,7 @@ properties:
+     enum:
+       - allwinner,sun8i-h3-ths
+       - allwinner,sun50i-a64-ths
++      - allwinner,sun50i-h5-ths
+       - allwinner,sun50i-h6-ths
+ 
+   reg:
+
+From patchwork Sat Aug 10 05:28:26 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088289
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 67982112C
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:20 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 54C0020223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:20 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 48CE9223A6; Sat, 10 Aug 2019 05:30:20 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 6907A223A6
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:18 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726579AbfHJFaR (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:17 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37979 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfHJFaR (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:17 -0400
+Received: by mail-pl1-f193.google.com with SMTP id m12so7153522plt.5;
+        Fri, 09 Aug 2019 22:30:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=iiVQJk9D8CfuggMoVj1p+aqwNp2abkAIMeZ4iA8Pj/0=;
+        b=ZPRFOqHEq7Cw2ufw3Mm2fY9Oaz3hac0l3Xu5PsEOGPLF7COULFq05vg+XsWinezM2a
+         DZ0T6vL1hWwTe2xwQZll89TldlAUZRYW405qeLdMQcjU3/IGu+ZWJJew0nSuWonus/zJ
+         3JLaJenIBmaVCH5FZrduNe0PsSup6K0UKslPlWsK8BA/E8H8JA9+iYl6ErJ8ZnZ29/fe
+         OZOCVbAzbxScW9VeRy7Gh84k7HOBfX5j1DeoW/PqwkCJtokhft4JzptwnZPYRzsKe0PT
+         0A4y/DS2aRJJGlOsoMiG5W01lR8r2O5CEj7S5GST3f7YsPykvQ1a66hOE3UM1BDrjdfZ
+         UZtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=iiVQJk9D8CfuggMoVj1p+aqwNp2abkAIMeZ4iA8Pj/0=;
+        b=hsJqKWs5UtEtlh0XqhGaOS23R5Da3C3+CuhtwuP2Sicfqn28odCnO5CMgFpm7NrhLy
+         QjVTgEjDHFNINuYMVf3CNrdT2dSati7h/vD1UWhGILayE8YKSOE1ArgFNuG2SOhfA7QA
+         6zc3YflToE3YHZ+hJIUD7qxU6pzOV/8GlqWZWiYu0kpfHRssCjpFd1xkzgbKkMrhArWu
+         g0qQBJyn5ItN4BH/TITAVvaI3T9CMJiE0NKj6kTUURj5DLul3xEGB2w+AQId/FB3EfR1
+         c0riZ6+Iwj1yKVKOat7YqHneWjUwpn8x8LSaDGtAjOHSWn0tP4Zpz+B131nBkggzehYS
+         kbVA==
+X-Gm-Message-State: APjAAAV9f91J1HfmnUPlQDyqTaPyUMm0CgTEwEQa5mszfOwpdJyqHDNR
+        ob8tpVPnuM0uIYiZU41ZnGc=
+X-Google-Smtp-Source: 
+ APXvYqyJvqnqpxM/3lHUXCDIW0XlM04lSny/PBrutlyVaXbNaFDXGDzHAnGo7L7W6ut3mw/ucA2TpA==
+X-Received: by 2002:a17:902:1101:: with SMTP id
+ d1mr22881836pla.212.1565415016564;
+        Fri, 09 Aug 2019 22:30:16 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ z4sm86286175pgp.80.2019.08.09.22.30.15
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:16 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Icenowy Zheng <icenowy@aosc.io>
+Subject: [PATCH v5 15/18] thermal: sun8i: allow to use custom temperature
+ calculation function
+Date: Sat, 10 Aug 2019 05:28:26 +0000
+Message-Id: <20190810052829.6032-16-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Icenowy Zheng <icenowy@aosc.io>
+
+The H5 temperature calculation function is strange. Firstly, it's
+segmented. Secondly, the formula of two sensors are different in the
+second segment.
+
+Allow to use a custom temperature calculation function, in case of
+the function is complex.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ drivers/thermal/sun8i_thermal.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 3259081da841..a761e2afda08 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -76,6 +76,7 @@ struct ths_thermal_chip {
+ 				     u16 *caldata, int callen);
+ 	int		(*init)(struct ths_device *tmdev);
+ 	int             (*irq_ack)(struct ths_device *tmdev);
++	int		(*calc_temp)(int id, int reg);
+ };
+ 
+ struct ths_device {
+@@ -90,9 +91,12 @@ struct ths_device {
+ 
+ /* Temp Unit: millidegree Celsius */
+ static int sun8i_ths_reg2temp(struct ths_device *tmdev,
+-			      int reg)
++			      int id, int reg)
+ {
+-	return (reg + tmdev->chip->offset) * tmdev->chip->scale;
++	if (tmdev->chip->calc_temp)
++		return tmdev->chip->calc_temp(id, reg);
++	else
++		return (reg + tmdev->chip->offset) * tmdev->chip->scale;
+ }
+ 
+ static int sun8i_ths_get_temp(void *data, int *temp)
+@@ -108,7 +112,7 @@ static int sun8i_ths_get_temp(void *data, int *temp)
+ 	if (!val)
+ 		return -EAGAIN;
+ 
+-	*temp = sun8i_ths_reg2temp(tmdev, val);
++	*temp = sun8i_ths_reg2temp(tmdev, s->id, val);
+ 	/*
+ 	 * XX - According to the original sdk, there are some platforms(rarely)
+ 	 * that add a fixed offset value after calculating the temperature
+@@ -232,7 +236,7 @@ static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
+ 
+ 	for (i = 0; i < tmdev->chip->sensor_num; i++) {
+ 		int reg = (int)caldata[i + 1];
+-		int sensor_temp = sun8i_ths_reg2temp(tmdev, reg);
++		int sensor_temp = sun8i_ths_reg2temp(tmdev, i, reg);
+ 		int delta, cdata, offset;
+ 
+ 		/*
+
+From patchwork Sat Aug 10 05:28:27 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088293
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 3756114E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:30 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 260CF20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:30 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 1A66422A68; Sat, 10 Aug 2019 05:30:30 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BA26E20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:29 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726595AbfHJFaV (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:21 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:43321 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfHJFaU (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:20 -0400
+Received: by mail-pf1-f193.google.com with SMTP id i189so47121674pfg.10;
+        Fri, 09 Aug 2019 22:30:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=jx9rIdpPyDLrhQcjiIIVEfnMNx20+ROJhWSfoScLHXY=;
+        b=peecNcquOPiuM7iIKtsSfIA1I0Dxu7JsVnKQotHt1q+Qce3IacmQ6yTeBvqDkBGzFK
+         LzS43cgpuHmXz4JUUzyyjL28zKH05Hc+2tWuKxa9+XG17jDecW7H3y/Yukd5Eun3pzjD
+         Y1nMgLP4jLja2J7JfsK372ktppt4/glNQQnBM5n8jaLqHYkXYD4u0zPgqEExCMGBMsge
+         9uRL/Ql1tMDwoxOL8+uY5G+vOfKhNxuYmZCf7sV3CNvy60MB/wZ3He2UICmbP4y7bUKq
+         E3lfGBjaax6Hk+MJNiUR3wLCAOGmM7G5LihcqWEEp3kS26SR+bvwS3pEAX+z9pAF80BD
+         n3Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=jx9rIdpPyDLrhQcjiIIVEfnMNx20+ROJhWSfoScLHXY=;
+        b=oZotaZCzb4z2z/cEhITykMK0nP+oPBZxOG7yP/r+WAld7KReab+ZMOQ0hX9LagBMof
+         JoC5KNQ9CbfFY8V4z0o7lAfbxgBdDQuEYcAqDRzSjczesI/YwNxs387ITpoMvSMnytaV
+         l9hdY2sjDTskwp0T8ST/v5e9d97J4eblPiYONofhkUMvQF5IONGzJmoQwHATi8uUZWO4
+         yMlxsjNUI6yk9XJhLW3LbkhcNptAAwS7TX6gKVAQOBW2fICAC1RT7XZgoCJ5rM2ntTDI
+         RtbydK9I9Y+kL64dTY40psBSBWv0oE+aNYnMCj1++/QoW/NAg+iTLd0ImnaQIU5DXu9x
+         XJ6w==
+X-Gm-Message-State: APjAAAVIXW57Swsca8Iesy9IoysbD8cyak43TUZU+jqRAv3IgXM63ItA
+        DsX0PArLYIhCQxchRubTMHw=
+X-Google-Smtp-Source: 
+ APXvYqyWKOzcWX7HwlY+V4ut7VgR7PSWiZa3XTBvcf7JoCfOdZzsBeq8k/QGs9LtRDC5/kVc58/k9g==
+X-Received: by 2002:a63:5945:: with SMTP id j5mr20501987pgm.452.1565415019890;
+        Fri, 09 Aug 2019 22:30:19 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ e189sm86883416pgc.15.2019.08.09.22.30.19
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:19 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Icenowy Zheng <icenowy@aosc.io>
+Subject: [PATCH v5 16/18] thermal: sun8i: add support for Allwinner H5 thermal
+ sensor
+Date: Sat, 10 Aug 2019 05:28:27 +0000
+Message-Id: <20190810052829.6032-17-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Icenowy Zheng <icenowy@aosc.io>
+
+The thermal sensor in Allwinner H5 has 2 sensors, and they have a
+special segmented temperature calculation formula.
+
+Add support for this thermal sensor.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ drivers/thermal/sun8i_thermal.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index a761e2afda08..78a888d85cba 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -99,6 +99,16 @@ static int sun8i_ths_reg2temp(struct ths_device *tmdev,
+ 		return (reg + tmdev->chip->offset) * tmdev->chip->scale;
+ }
+ 
++static int sun50i_h5_calc_temp(int id, int reg)
++{
++	if (reg >= 0x500)
++		return -1191 * reg / 10 + 223000;
++	else if (!id)
++		return -1452 * reg / 10 + 259000;
++	else
++		return -1590 * reg / 10 + 276000;
++}
++
+ static int sun8i_ths_get_temp(void *data, int *temp)
+ {
+ 	struct tsensor *s = data;
+@@ -530,6 +540,16 @@ static const struct ths_thermal_chip sun50i_a64_ths = {
+ 	.irq_ack = sun8i_h3_irq_ack,
+ };
+ 
++static const struct ths_thermal_chip sun50i_h5_ths = {
++	.sensor_num = 2,
++	.has_mod_clk = true,
++	.temp_data_base = SUN8I_THS_TEMP_DATA,
++	.calibrate = sun8i_h3_ths_calibrate,
++	.init = sun8i_h3_thermal_init,
++	.irq_ack = sun8i_h3_irq_ack,
++	.calc_temp = sun50i_h5_calc_temp,
++};
++
+ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 	.sensor_num = 2,
+ 	.offset = -2794,
+@@ -544,6 +564,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ static const struct of_device_id of_ths_match[] = {
+ 	{ .compatible = "allwinner,sun8i-h3-ths", .data = &sun8i_h3_ths },
+ 	{ .compatible = "allwinner,sun50i-a64-ths", .data = &sun50i_a64_ths },
++	{ .compatible = "allwinner,sun50i-h5-ths", .data = &sun50i_h5_ths },
+ 	{ .compatible = "allwinner,sun50i-h6-ths", .data = &sun50i_h6_ths },
+ 	{ /* sentinel */ },
+ };
+
+From patchwork Sat Aug 10 05:28:28 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088291
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 2DD2014E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:29 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1D8FE20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:29 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 11BFE22A68; Sat, 10 Aug 2019 05:30:29 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BDBAC20223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:28 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1725837AbfHJFaY (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:24 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:42418 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbfHJFaY (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:24 -0400
+Received: by mail-pg1-f194.google.com with SMTP id t132so46849180pgb.9;
+        Fri, 09 Aug 2019 22:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=hwZTuXR1RQwweZBHdOcMrMag4gKUpB96/RLkAJHYs6E=;
+        b=iT05HnTWCRVNX3VU2btAQTjum2T+H9ULSXrJJd/2QrK9AKvJeXrvnxM8TyNOPU14rm
+         E1GHGLJgMoUZrLrm4iOekEcYzmBbG11qAPmrtCUQoia0mVsrMWI/PxnfwM5ed4OlB2ip
+         4uqyj+cqtpqGg1gzRwK2Y/BdxqgF7kMc+dLxKQNblnDrIUZUfnRJtd3Ir8l9ara8AQ4+
+         BgsRHPG1sehtgh86UHXL5li5nvBiEPxNaFLCcf7ah+NhWcrnbthtihKz08RDZ1FKNykI
+         jH/Q+cXLV0h5we2av3QOQMJ4iTF9weqw6TmMRPbXIKFliH0wy+rBeeIzYLqKiwq1CX9Q
+         M1FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=hwZTuXR1RQwweZBHdOcMrMag4gKUpB96/RLkAJHYs6E=;
+        b=YxNhaPv/PK1PX2ESy4XsNnYqCKPQX4fDOi6hB6V9Lt3lVN3hgR+ibE2uuNjg+7g9w9
+         2PFr2/tdFOmknS6oW/6kaSP3Chw3R0q+kZ3V2tNDvRo4asFnuGC+OGezU4+GCwRP/QbI
+         /sU8t++EjWqelQ0FnCmnSOjKMuXSnJICl6/aY/0WvsBeTyhatotzT366jh1QKgju/Vcm
+         ejue7zk3KklIMkPGOiFrTrBmXZREcj3Q+7GSrzr+yLEsK0E/UlUsKJlLzA2VWVRnUgz8
+         Q+4v79SI+LOv0n4ne89sYc4BdyCdLF82AlyY2mPh21Cz3Zhk5/2a2Q2TvOZxJb+fUp+Q
+         EqqA==
+X-Gm-Message-State: APjAAAXNeVyiKU/gMLKO9/SHQ716ouvB7t8caCTCEogEzupQ6YnNCh3X
+        rXf48jc1TuGhthU57/kE7yc=
+X-Google-Smtp-Source: 
+ APXvYqw4s2jvP5CyZ7Z78O0x5bAHOAkoJ+5b1iaaYMbNLO9REx5WqGP6UNJ+iBWk2V4PX1g9bg983w==
+X-Received: by 2002:a63:e807:: with SMTP id s7mr20041477pgh.194.1565415023202;
+        Fri, 09 Aug 2019 22:30:23 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ k70sm6641708pje.14.2019.08.09.22.30.22
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:22 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH v5 17/18] dt-bindings: thermal: add binding document for r40
+ thermal controller
+Date: Sat, 10 Aug 2019 05:28:28 +0000
+Message-Id: <20190810052829.6032-18-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+This patch adds binding document for allwinner r40 thermal controller.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+index 2e28f5b33d33..28c438d3bfea 100644
+--- a/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/sun8i-thermal.yaml
+@@ -17,6 +17,7 @@ properties:
+   compatible:
+     enum:
+       - allwinner,sun8i-h3-ths
++      - allwinner,sun8i-r40-ths
+       - allwinner,sun50i-a64-ths
+       - allwinner,sun50i-h5-ths
+       - allwinner,sun50i-h6-ths
+
+From patchwork Sat Aug 10 05:28:29 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Frank Lee <tiny.windzz@gmail.com>
+X-Patchwork-Id: 11088297
+X-Patchwork-Delegate: eduardo.valentin@ti.com
+Return-Path: <linux-pm-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 1C2DD14E5
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:32 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0AC8720223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:32 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id F364B22A68; Sat, 10 Aug 2019 05:30:31 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.0 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A069520223
+	for <patchwork-linux-pm@patchwork.kernel.org>;
+ Sat, 10 Aug 2019 05:30:31 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726047AbfHJFaa (ORCPT
+        <rfc822;patchwork-linux-pm@patchwork.kernel.org>);
+        Sat, 10 Aug 2019 01:30:30 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41530 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbfHJFaa (ORCPT
+        <rfc822;linux-pm@vger.kernel.org>); Sat, 10 Aug 2019 01:30:30 -0400
+Received: by mail-pf1-f195.google.com with SMTP id m30so47130797pff.8;
+        Fri, 09 Aug 2019 22:30:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=N97E8/sjLzhDk5t0PaLYKP9s4xc14haiY7F1jTT8rvA=;
+        b=ZRbyXiUF6gmLzn1OgJc7h/Hf+DW3O8LRQKGyeBgbf6cqioGR47ZdLTH5+11AfvdCyw
+         LKGQlCR3NKbdJNpn0FF82vptUjuhz65HyJEUwbSyswVoS7XeEMR9BBewfeZ5YihKwcR0
+         dyTwCU8PO3jfRvxduaepqLwpC8rv3pxjzlTECubkKfxGhMDxhWgFulkJcbki9tbr/x+Q
+         1i1D6xhTKJK4sqe/TzvhCLOgmdy6cf9YUhRbidBKHpn+pSD3x/rsNfvtjPnyY93A6eg2
+         heBRqnvyzd304Vgkt1CKz6HpVF1wmxDQ3zm0mVfsaVMZ210ACYsWhKp7p02Wz40JhgNV
+         A/SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=N97E8/sjLzhDk5t0PaLYKP9s4xc14haiY7F1jTT8rvA=;
+        b=qRUd5lCzZm4EhuWNuMg3apDsFiy4AqcSZI7xXWHoEDTgKZ+rhxZXoUPaZDvSHSQtcf
+         XsoP8mPw7n1EVVTS6E60KhZhQjNyFb7cnE1DA0M+ellBGDFKs+WJWT6zyRsFSAU3XtCE
+         08H0z6M/S+K/ZaYEQAe1LdGVEef8yTbJA20KFhr7h0sNIrBbt6IHo0XM8Bja0C3FDH3r
+         jiJhYYZMOUFN9dEd/nAZt0skZNKQ3+LmFSk3BFdkPtBsnGCci7iYAUhw30Lxe69/SE9v
+         lUDRVPv0fRMEqIgnE4KG0jwgtRX4z1up1INcHMcKw3hum442X9EGpYt9RIkprjYC5AHu
+         NX2A==
+X-Gm-Message-State: APjAAAX/9G+rGsFeCBme0bgmr/JVMTpHb0Yx1SAxIbjN8ZdP6ez/MFk8
+        y5qfxH9gs9mMou8oLz7OEEQ=
+X-Google-Smtp-Source: 
+ APXvYqxQJC2cov0AZI9Zc6L1PoOKHIqa7mOVzuvWNzU+GwSLSgVq2r0q65Ii4MJWgZcDi6gXhannTw==
+X-Received: by 2002:a62:e315:: with SMTP id
+ g21mr26135824pfh.225.1565415029673;
+        Fri, 09 Aug 2019 22:30:29 -0700 (PDT)
+Received: from localhost ([202.182.106.211])
+        by smtp.gmail.com with ESMTPSA id
+ z13sm6999252pjn.32.2019.08.09.22.30.28
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 09 Aug 2019 22:30:29 -0700 (PDT)
+From: Yangtao Li <tiny.windzz@gmail.com>
+To: rui.zhang@intel.com, edubezval@gmail.com,
+        daniel.lezcano@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, maxime.ripard@bootlin.com, wens@csie.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jonathan.Cameron@huawei.com,
+        nicolas.ferre@microchip.com
+Cc: linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Icenowy Zheng <icenowy@aosc.io>
+Subject: [PATCH v5 18/18] thermal: sun8i: add support for Allwinner R40
+ thermal sensor
+Date: Sat, 10 Aug 2019 05:28:29 +0000
+Message-Id: <20190810052829.6032-19-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190810052829.6032-1-tiny.windzz@gmail.com>
+References: <20190810052829.6032-1-tiny.windzz@gmail.com>
+Sender: linux-pm-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-pm.vger.kernel.org>
+X-Mailing-List: linux-pm@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Icenowy Zheng <icenowy@aosc.io>
+
+The thermal sensor in Allwinner R40 SoC is quite similar to the one in
+Allwinner A64 SoC, with only slightly different temperature calculation
+formula.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ drivers/thermal/sun8i_thermal.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
+index 78a888d85cba..0de9a56c3775 100644
+--- a/drivers/thermal/sun8i_thermal.c
++++ b/drivers/thermal/sun8i_thermal.c
+@@ -529,6 +529,17 @@ static const struct ths_thermal_chip sun8i_h3_ths = {
+ 	.irq_ack = sun8i_h3_irq_ack,
+ };
+ 
++static const struct ths_thermal_chip sun8i_r40_ths = {
++	.sensor_num = 3,
++	.offset = -2222,
++	.scale = -113,
++	.has_mod_clk = true,
++	.temp_data_base = SUN8I_THS_TEMP_DATA,
++	.calibrate = sun8i_h3_ths_calibrate,
++	.init = sun8i_h3_thermal_init,
++	.irq_ack = sun8i_h3_irq_ack,
++};
++
+ static const struct ths_thermal_chip sun50i_a64_ths = {
+ 	.sensor_num = 3,
+ 	.offset = -2170,
+@@ -563,6 +574,7 @@ static const struct ths_thermal_chip sun50i_h6_ths = {
+ 
+ static const struct of_device_id of_ths_match[] = {
+ 	{ .compatible = "allwinner,sun8i-h3-ths", .data = &sun8i_h3_ths },
++	{ .compatible = "allwinner,sun8i-r40-ths", .data = &sun8i_r40_ths },
+ 	{ .compatible = "allwinner,sun50i-a64-ths", .data = &sun50i_a64_ths },
+ 	{ .compatible = "allwinner,sun50i-h5-ths", .data = &sun50i_h5_ths },
+ 	{ .compatible = "allwinner,sun50i-h6-ths", .data = &sun50i_h6_ths },

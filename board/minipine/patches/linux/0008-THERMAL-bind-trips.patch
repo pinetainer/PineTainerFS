@@ -3,12 +3,6 @@ From: Icenowy Zheng <icenowy@aosc.io>
 Date: Fri, 27 Jul 2018 19:28:31 +0800
 Subject: [PATCH 072/147] bind trips
 
-AlexTMjugador: originalmente, la temperatura del primer trip era 75ºC.
-La rebajo a 70ºC para que la Pine funcione a menores temperaturas, y
-alargar su vida útil, a costa de una reducción del rendimiento. Mejor
-ser demasiado precavido en un principio e ir subiendo la temperatura que
-empezar con una temperatura alta y que se fría algo.
-
 Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
 ---
  arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 35 ++++++++++++++++++++
@@ -38,7 +32,7 @@ index b571a7663ea1..212ace4c0cea 100644
 +			trips {
 +				cpu_alert0: cpu_alert0 {
 +					/* milliCelsius */
-+					temperature = <70000>;
++					temperature = <75000>;
 +					hysteresis = <2000>;
 +					type = "passive";
 +				};

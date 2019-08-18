@@ -12,7 +12,7 @@ diff -pur linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi linux/arch7arm
  		sid: sid@3006000 {
  			compatible = "allwinner,sun50i-h6-sid";
 -			reg = <0x03006000 0x400>;
-+			reg = <0x03006000 0x1000>; /** Los parches de Icenowy tienen la dirección 0x1000, mientras que mainline tiene 0x400. Ambas parecen funcionar bien. */
++			reg = <0x03006000 0x1000>; /* Los parches de Icenowy tienen la dirección 0x1000, mientras que mainline tiene 0x400. Ambas parecen funcionar bien. */
 +			#address-cells = <1>;
 +			#size-cells = <1>;
 +

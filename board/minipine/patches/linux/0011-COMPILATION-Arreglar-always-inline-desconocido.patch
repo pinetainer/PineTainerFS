@@ -1,0 +1,32 @@
+Arreglar __always_inline desconocido
+
+El fichero de cabecera byteorder.h hace referencia al macro __always_inline, que no está definido.
+
+Definirlo para permitir la compilación.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+diff -pur linux.orig/tools/include/uapi/linux/perf_event.h linux/tools/include/uapi/linux/perf_event.h
+--- linux.orig/tools/include/uapi/linux/perf_event.h	2019-08-19 13:33:54.763773049 +0200
++++ linux/tools/include/uapi/linux/perf_event.h	2019-08-19 13:35:35.507769835 +0200
+@@ -17,8 +17,20 @@
+ 
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
++
++/* Arreglar compilación con musl, que no define __always_inline */
++#ifndef __always_inline
++#define HACK_ALWAYS_INLINE
++#define __always_inline inline
++#endif
++
+ #include <asm/byteorder.h>
+ 
++#ifdef HACK_ALWAYS_INLINE
++#undef __always_inline
++#undef HACK_ALWAYS_INLINE
++#endif
++
+ /*
+  * User-space ABI bits:
+  */

@@ -4,6 +4,3 @@ printf "NAME=\"Linux\"\nVERSION=\"5.3-rc4\"\nID=linux\nID_LIKE=\"buildroot\"\nHO
 
 # Eliminar servicio no útil, ignorando errores si ya fue borrado
 rm "$1/etc/init.d/S20urandom" || true
-
-# Eliminar archivos de firmware innecesarios
-find "$1/firmware/rtlwifi" -type f -name '*.bin' \! -name 'rtl8723bs_nic.bin' -exec rm {} \;

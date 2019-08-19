@@ -4,9 +4,10 @@ Basado en el parche original de Icenowy Zheng.
 
 Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
 ---
-diff -pur linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi linux/arch7arm64/boot/dts/allwinner/sun50i-h6.dtsi 
---- linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 14:55:26.819655692 +0200
-+++ linux/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 15:00:11.887646599 +0200
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index dbda0e8fb0c9..daff7de56d1f 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 14:55:26.819655692 +0200
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-08-17 15:00:11.887646599 +0200
 @@ -273,7 +273,13 @@
 
  		sid: sid@3006000 {

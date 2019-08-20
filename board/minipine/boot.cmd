@@ -1,4 +1,4 @@
-setenv bootargs console=ttyS0,115200n8 root=/dev/mmcblk0p2 rootwait earlycon=uart,mmio32,0x05000000
+setenv bootargs console=ttyS0,115200n8 earlycon=uart,mmio32,0x05000000 root=/dev/mmcblk0p2 rootwait sunxi_wdt.timeout=10 test_suspend=mem
 
 load mmc $mmc_bootdev:1 40080000 Image
 load mmc $mmc_bootdev:1 4fa00000 sun50i-h6-pine-h64.dtb

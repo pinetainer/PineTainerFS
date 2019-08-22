@@ -16,6 +16,16 @@ config PINETAINERFS_PAQUETES_FIABILIDAD
 	  Instala paquetes útiles para probar la fiabilidad de la
 	  Pine H64 en la imagen final, así como su rendimiento.
 
+config PINETAINERFS_PAQUETES_MEM_SECUNDARIA
+	bool "Paquetes de prueba de memoria secundaria"
+	select BR2_PACKAGE_MMC_UTILS
+	select BR2_PACKAGE_HDPARM
+	default n
+	help
+	  Instala paquetes necesarios para obtener información
+	  técnica de las MMC conectadas a la Pine, y medir su
+	  rendimiento.
+
 config PINETAINERFS_PAQUETES_CRIPTOGRAFIA
 	bool "Paquetes de prueba de criptografía"
 	select BR2_PACKAGE_OPENSSL

@@ -1,0 +1,43 @@
+Desactivar modo de transferencia DDR para el controlador de eMMC
+
+Nuestra Pine H64 modelo B tiene problemas para operar con la eMMC Foresee que utilizamos, utilizando el controlador
+asociado disponible en Linux.
+
+El uso del macro DEBUG en el fichero sunxi-mmc.c (el controlador para MMC que utiliza Linux con el SoC Allwinner H6),
+además del paquete mmc-utils, revelaron que el controlador intentaba operar a 52 MHz, en modo DDR, el más rápido
+soportado por las partes involucradas. No obstante, al operar en este modo, los comandos de lectura de datos
+extendidos específicos de la tarjeta (CSD, card specific data) no se completaban a tiempo, y los de lectura de bloques
+tenían una suma de comprobación incorrecta. En general, todo apuntaba a un problema de sincronización.
+
+Al desactivar el uso del modo DDR para el controlador, la tarjeta opera a 52 MHz sin DDR, lo que significa que es la
+mitad de rápida. Sin embargo, esto arregla el problema comentado anteriormente, y hace que se pueda usar el hardware.
+Aunque la eMMC soporta transferencias SDR a 200 MHz, el controlador tampoco negocia tal velocidad. De todas formas, los resultados
+obtenidos parecen indicar que, si la negociase, tampoco funcionaría bien la eMMC (pues 200 MHz SDR son equivalentes a 100
+MHz DDR, y ya hay problemas de precisión de sincronismo con 52 MHz DDR).
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+diff -pur linux.orig/drivers/mmc/host/sunxi-mmc.c linux/drivers/mmc/host/sunxi-mmc.c
+--- linux.orig/drivers/mmc/host/sunxi-mmc.c	2019-08-22 20:06:32.487082136 +0200
++++ linux/drivers/mmc/host/sunxi-mmc.c	2019-08-22 20:08:20.415078693 +0200
+@@ -1394,15 +1394,17 @@ static int sunxi_mmc_probe(struct platfo
+ 				  MMC_CAP_ERASE | MMC_CAP_SDIO_IRQ;
+ 
+ 	/*
+-	 * Some H5 devices do not have signal traces precise enough to
+-	 * use HS DDR mode for their eMMC chips.
++	 * Some H5 and H6 devices do not have signal traces precise
++	 * enough to use HS DDR mode for their eMMC chips.
+ 	 *
+ 	 * We still enable HS DDR modes for all the other controller
+ 	 * variants that support them.
+ 	 */
+ 	if ((host->cfg->clk_delays || host->use_new_timings) &&
+ 	    !of_device_is_compatible(pdev->dev.of_node,
+-				     "allwinner,sun50i-h5-emmc"))
++				     "allwinner,sun50i-h5-emmc") &&
++	    !of_device_is_compatible(pdev->dev.of_node,
++				     "allwinner,sun50i-h6-emmc"))
+ 		mmc->caps      |= MMC_CAP_1_8V_DDR | MMC_CAP_3_3V_DDR;
+ 
+ 	ret = mmc_of_parse(mmc);

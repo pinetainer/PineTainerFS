@@ -2,13 +2,16 @@ config MINIPINE_PAQUETES_RED
 	bool "Paquetes de prueba de red inalámbrica"
 	select BR2_PACKAGE_WIRELESS_TOOLS
 	select BR2_PACKAGE_WPA_SUPPLICANT
+	default n
 	help
 	  Instala paquetes útiles para probar la conectividad de red
 	  inalámbrica en la imagen final.
 
 config MINIPINE_PAQUETES_FIABILIDAD
-	bool "Paquetes de prueba de fiabilidad"
+	bool "Paquetes de prueba de fiabilidad y rendimiento"
 	select BR2_PACKAGE_STRESS
+	select BR2_PACKAGE_DHRYSTONE
+	default n
 	help
 	  Instala paquetes útiles para probar la fiabilidad de la
-	  Pine H64 en la imagen final.
+	  Pine H64 en la imagen final, así como su rendimiento.

@@ -1,4 +1,4 @@
-config MINIPINE_PAQUETES_RED
+config PINETAINERFS_PAQUETES_RED
 	bool "Paquetes de prueba de red inalámbrica"
 	select BR2_PACKAGE_WIRELESS_TOOLS
 	select BR2_PACKAGE_WPA_SUPPLICANT
@@ -7,7 +7,7 @@ config MINIPINE_PAQUETES_RED
 	  Instala paquetes útiles para probar la conectividad de red
 	  inalámbrica en la imagen final.
 
-config MINIPINE_PAQUETES_FIABILIDAD
+config PINETAINERFS_PAQUETES_FIABILIDAD
 	bool "Paquetes de prueba de fiabilidad y rendimiento"
 	select BR2_PACKAGE_STRESS
 	select BR2_PACKAGE_DHRYSTONE
@@ -15,3 +15,24 @@ config MINIPINE_PAQUETES_FIABILIDAD
 	help
 	  Instala paquetes útiles para probar la fiabilidad de la
 	  Pine H64 en la imagen final, así como su rendimiento.
+
+config PINETAINERFS_PAQUETES_CRIPTOGRAFIA
+	bool "Paquetes de prueba de criptografía"
+	select BR2_PACKAGE_OPENSSL
+	select BR2_PACKAGE_LIBOPENSSL_BIN
+	select BR2_PACKAGE_GNUTLS
+	select BR2_PACKAGE_GNUTLS_TOOLS
+	default n
+	help
+	  Instala paquetes útiles para realizar operaciones
+	  criptográficas en la Pine H64.
+
+config PINETAINERFS_PAQUETES_CRIPTOGRAFIA_ACEL
+	bool "Aceleración por cryptodev"
+	depends on PINETAINERFS_PAQUETES_CRIPTOGRAFIA
+	select BR2_PACKAGE_CRYPTODEV
+	default n
+	help
+	  Permite probar el rendimiento de operaciones
+	  criptográficas aceleradas por el Crypto Engine de la
+	  Pine H64.

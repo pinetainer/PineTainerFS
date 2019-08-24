@@ -1,76 +1,92 @@
-From patchwork Fri Apr 12 12:07:29 2019
+From patchwork Tue Aug 20 15:19:32 2019
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Patchwork-Submitter: =?utf-8?q?Ond=C5=99ej_Jirman?= <megous@megous.com>
-X-Patchwork-Id: 10898087
+X-Patchwork-Id: 11104047
 Return-Path: 
- <linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org>
-Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
- [172.30.200.125])
-	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 47686922
+ <SRS0=T644=WQ=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 6B4521395
 	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 2718C28E53
-	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-	id 1AE5528E62; Fri, 12 Apr 2019 12:08:05 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-	pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=2.0 tests=BAYES_00,DKIM_ADSP_DISCARD,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,RCVD_IN_DNSWL_MED autolearn=ham
-	version=3.3.1
+ Tue, 20 Aug 2019 15:19:42 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org
  [198.137.202.133])
-	(using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id 22A1128E53
+	by mail.kernel.org (Postfix) with ESMTPS id 48D5D216F4
 	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:01 +0000 (UTC)
+ Tue, 20 Aug 2019 15:19:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="fBAAYJKW";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=megous.com header.i=@megous.com header.b="BF2RGwVa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D5D216F4
+Authentication-Results: mail.kernel.org;
+ dmarc=fail (p=none dis=none) header.from=megous.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
 	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
 	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
 	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
 	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Owner; bh=gGP1kq6EIrKt40JQFYJWWP78lkRrkkXJCjjlAq8fyIU=; b=AKqvXHIn/lGOGs
-	gNbALQjqd4/nxjilx0hWe16dHE3P/fDko2YGBX6vGMxyKeW9Wj5ySu8BXu477hZV0k26DO7ZArIzr
-	UaxhBAB0H2xoF4KSkCXvs34heD/M8zgbLYBhg1+FH0eyGfOEdJDmhHOtQcOx6eAnbJJ5QxVRkWP+f
-	trdEQQhxWJDGyGyjUBRkxOpRAZyoMty+X0El/dgfVaPFedAH84Q+Lrqyeiyj6Pz/Ack6VtasJpCyd
-	ZvO6kmJ/4Ym3L8CxVLBCVF6UB14EZLiziCwJt6/hx5g8hBEPLUsGl1+QSwN6btSBxrPaKSF/RgVsk
-	y/rieET7UkHjz6UyDBkQ==;
+	List-Owner; bh=ieyKjl1DTbe/EKaKJ9mOe+FbVeDvxK6tETqEDvfqHDA=; b=fBAAYJKWVueORX
+	Xnr66HglNXdjFhh/1AgL9Z6zjE7UgQlWKvDE2xkHWUaoEZNobTXId8qUd6f/EQAH+Gjf96FIGJkv1
+	KOZYXJxnBTynrcISvDn8a/MSBvv6bDbFGx2Ed/VtvVL0ubm8fdC0YIpIZxtxTQS3wRPeIs3tXu/hI
+	ViHZAJYy44wvIGC3iD36WA/i2sQ4dEDwUsgpwXQ08v2aE4lUGNo2X3K7O6FJqk3/fkHOKV2Bycxzo
+	dRYEERAe/uASrVyuThOvut1CelTlV0bzhdau0AClI5YF1zIRaqfFhLN8wpjZXzEb1ze0P89AaBQ+L
+	PMOKfF4Omk4425/yttcQ==;
 Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtp (Exim 4.90_1 #2 (Red Hat Linux))
-	id 1hEuyJ-0007Ml-Cf; Fri, 12 Apr 2019 12:07:55 +0000
+	by bombadil.infradead.org with esmtp (Exim 4.92 #3 (Red Hat Linux))
+	id 1i05vB-0007uT-IQ; Tue, 20 Aug 2019 15:19:41 +0000
 Received: from vps.xff.cz ([195.181.215.36])
- by bombadil.infradead.org with esmtps (Exim 4.90_1 #2 (Red Hat Linux))
- id 1hEuy0-0006za-22
- for linux-arm-kernel@lists.infradead.org; Fri, 12 Apr 2019 12:07:44 +0000
+ by bombadil.infradead.org with esmtps (Exim 4.92 #3 (Red Hat Linux))
+ id 1i05v7-0007so-Cg
+ for linux-arm-kernel@lists.infradead.org; Tue, 20 Aug 2019 15:19:38 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
- t=1555070852; bh=WFbaY/ab3k+0ZHOWo2EasW7vJ3s0iDUZXCsIpwTIRIo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=X3NG2gZ1tWyE43GGH18yEjSfpKSSgRFoCSpWHWzTMvGshVLlyBe9VEOhZTWP7GWUQ
- ZpZ+H3mUGUQBLDNJGleTNbtI4jUNUekVq6s/gdHqD9dxtzTOiWnw4vAOVEUYOiqgvK
- IE44NZuNRPRMrrCCaeNubsijIWxJbnX7qyaf+TOo=
+ t=1566314375; bh=ceJ7uYMyGuXnT+8w0JVBGUx4Cp8f10wjRMxOExNSRQo=;
+ h=From:To:Cc:Subject:Date:References:From;
+ b=BF2RGwVaIWjpS8lPMXdkn8hgNaIQ+mrzt5UHgcpqPhS+djX9Bx/ysx64+K0Ob3/vI
+ xYCMBm6u47YOW9gP05BTXewRC6oYEGY23xF0r9+uNmlX9O5SyMIo7l7LTPrvkUeQKd
+ sAsJBmMPvjAc8BkNp1fvwLL+6zW7c1Iy4j4cAyyA=
 From: megous@megous.com
 To: Alessandro Zummo <a.zummo@towertech.it>,
  Alexandre Belloni <alexandre.belloni@bootlin.com>,
  Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
  Maxime Ripard <maxime.ripard@bootlin.com>, Chen-Yu Tsai <wens@csie.org>
-Subject: [PATCH 2/3] rtc: sun6i: Add support for H6 RTC
-Date: Fri, 12 Apr 2019 14:07:29 +0200
-Message-Id: <20190412120730.473-3-megous@megous.com>
-In-Reply-To: <20190412120730.473-1-megous@megous.com>
-References: <20190412120730.473-1-megous@megous.com>
+Subject: [PATCH v2 1/3] dt-bindings: Add compatible for H6 RTC
+Date: Tue, 20 Aug 2019 17:19:32 +0200
+Message-Id: <20190820151934.3860-2-megous@megous.com>
+In-Reply-To: <20190820151934.3860-1-megous@megous.com>
+References: <20190820151934.3860-1-megous@megous.com>
 MIME-Version: 1.0
 X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20190412_050737_155021_4531F3D6 
-X-CRM114-Status: GOOD (  17.21  )
+X-CRM114-CacheID: sfid-20190820_081937_594887_57F01A00 
+X-CRM114-Status: UNSURE (   8.19  )
+X-CRM114-Notice: Please train this message.
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
 X-BeenThere: linux-arm-kernel@lists.infradead.org
-X-Mailman-Version: 2.1.21
+X-Mailman-Version: 2.1.29
 Precedence: list
 List-Id: <linux-arm-kernel.lists.infradead.org>
 List-Unsubscribe: 
@@ -89,7 +105,157 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: 
  linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
-X-Virus-Scanned: ClamAV using ClamSMTP
+
+From: Ondrej Jirman <megous@megous.com>
+
+RTC on H6 is similar to the one on H5 SoC, but incompatible in small
+details. See the driver for description of differences. For example
+H6 RTC needs to enable the external low speed oscillator. Add new
+compatible for this RTC.
+
+Signed-off-by: Ondrej Jirman <megous@megous.com>
+---
+ .../bindings/rtc/allwinner,sun6i-a31-rtc.yaml       | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml b/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml
+index 924622f39c44..d7a57ec4a640 100644
+--- a/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml
++++ b/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml
+@@ -25,6 +25,7 @@ properties:
+       - items:
+           - const: allwinner,sun50i-a64-rtc
+           - const: allwinner,sun8i-h3-rtc
++      - const: allwinner,sun50i-h6-rtc
+ 
+   reg:
+     maxItems: 1
+@@ -92,6 +93,18 @@ allOf:
+           minItems: 3
+           maxItems: 3
+ 
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: allwinner,sun50i-h6-rtc
++
++    then:
++      properties:
++        clock-output-names:
++          minItems: 3
++          maxItems: 3
++
+   - if:
+       properties:
+         compatible:
+
+From patchwork Tue Aug 20 15:19:33 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: =?utf-8?q?Ond=C5=99ej_Jirman?= <megous@megous.com>
+X-Patchwork-Id: 11104051
+Return-Path: 
+ <SRS0=T644=WQ=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 1877B912
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Tue, 20 Aug 2019 15:20:14 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id EA9F720578
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Tue, 20 Aug 2019 15:20:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="OieTz+II";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=megous.com header.i=@megous.com header.b="SMGaAyxp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9F720578
+Authentication-Results: mail.kernel.org;
+ dmarc=fail (p=none dis=none) header.from=megous.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=bT/VIYzDgLqq6OtWxjXNp5a//EYMq5hXd9GspXCL//o=; b=OieTz+IIHYNlut
+	zf/16JhXN18VvhoxdZcJpmMYCUfmBNsD9lmcBI6yFvKVYOGge0eVFvNGb8YjlzUlKeEP4IhZapatS
+	x/oQQLjHhVPIxufIsjfuEwaF5I1dkLi29sRDSgIF7lsRtm+2jWoAruMGvl/6UA+hH7wzervuEfFDw
+	Yc1xIuZJe71wnql6cMB97xgclQmW9ZXNHKMoQRAW5KdZPmB8O6NAOIZzx91OZHvZCJ3mOWYgxOmEU
+	P2hRYjB2qSSMA8ODZDr4cHq80qtSdDemEgS/BDBysg60+1O0eDttqd82DHXggRCuLS9nZhbwZyy4m
+	iNvS30NBBxP2W/3F3jQQ==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92 #3 (Red Hat Linux))
+	id 1i05vh-0000eH-9y; Tue, 20 Aug 2019 15:20:13 +0000
+Received: from vps.xff.cz ([195.181.215.36])
+ by bombadil.infradead.org with esmtps (Exim 4.92 #3 (Red Hat Linux))
+ id 1i05v7-0007sp-Jz
+ for linux-arm-kernel@lists.infradead.org; Tue, 20 Aug 2019 15:19:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
+ t=1566314376; bh=9Bu3I/MHKVFLzcyKmY5PFKEAWplV+hj5AiRwPhNXy18=;
+ h=From:To:Cc:Subject:Date:References:From;
+ b=SMGaAyxpdu5QWmCjcwcx+YRShBYwGguwWZyv0b5+jRl38S939zdFmrCJfNAAbQ2iY
+ w70t8bzvUTGXqwYtteDbcgznmlvCO771ChE8QbXY5tWN8iouEgWUtKsRP1YH0TwqS3
+ K16IWoRvv79fGJlAznCCKUsHIvnnJhOgq/x4xuLk=
+From: megous@megous.com
+To: Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Maxime Ripard <maxime.ripard@bootlin.com>, Chen-Yu Tsai <wens@csie.org>
+Subject: [PATCH v2 2/3] rtc: sun6i: Add support for H6 RTC
+Date: Tue, 20 Aug 2019 17:19:33 +0200
+Message-Id: <20190820151934.3860-3-megous@megous.com>
+In-Reply-To: <20190820151934.3860-1-megous@megous.com>
+References: <20190820151934.3860-1-megous@megous.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20190820_081937_989318_8088112A 
+X-CRM114-Status: GOOD (  16.86  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: Ondrej Jirman <megous@megous.com>, linux-rtc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@googlegroups.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
 
 From: Ondrej Jirman <megous@megous.com>
 
@@ -120,10 +286,10 @@ Reviewed-by: Chen-Yu Tsai <wens@csie.org>
  1 file changed, 38 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/rtc/rtc-sun6i.c b/drivers/rtc/rtc-sun6i.c
-index 11f56de52179..7375a530c565 100644
+index d50ee023b559..b0c3752bed3f 100644
 --- a/drivers/rtc/rtc-sun6i.c
 +++ b/drivers/rtc/rtc-sun6i.c
-@@ -41,9 +41,11 @@
+@@ -32,9 +32,11 @@
  /* Control register */
  #define SUN6I_LOSC_CTRL				0x0000
  #define SUN6I_LOSC_CTRL_KEY			(0x16aa << 16)
@@ -135,7 +301,7 @@ index 11f56de52179..7375a530c565 100644
  #define SUN6I_LOSC_CTRL_EXT_OSC			BIT(0)
  #define SUN6I_LOSC_CTRL_ACC_MASK		GENMASK(9, 7)
  
-@@ -137,6 +139,8 @@ struct sun6i_rtc_clk_data {
+@@ -128,6 +130,8 @@ struct sun6i_rtc_clk_data {
  	unsigned int has_prescaler : 1;
  	unsigned int has_out_clk : 1;
  	unsigned int export_iosc : 1;
@@ -144,7 +310,7 @@ index 11f56de52179..7375a530c565 100644
  };
  
  struct sun6i_rtc_dev {
-@@ -199,6 +203,10 @@ static int sun6i_rtc_osc_set_parent(struct clk_hw *hw, u8 index)
+@@ -190,6 +194,10 @@ static int sun6i_rtc_osc_set_parent(struct clk_hw *hw, u8 index)
  	val &= ~SUN6I_LOSC_CTRL_EXT_OSC;
  	val |= SUN6I_LOSC_CTRL_KEY;
  	val |= index ? SUN6I_LOSC_CTRL_EXT_OSC : 0;
@@ -155,7 +321,7 @@ index 11f56de52179..7375a530c565 100644
  	writel(val, rtc->base + SUN6I_LOSC_CTRL);
  	spin_unlock_irqrestore(&rtc->lock, flags);
  
-@@ -224,6 +232,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
+@@ -215,6 +223,7 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
  	const char *iosc_name = "rtc-int-osc";
  	const char *clkout_name = "osc32k-out";
  	const char *parents[2];
@@ -163,7 +329,7 @@ index 11f56de52179..7375a530c565 100644
  
  	rtc = kzalloc(sizeof(*rtc), GFP_KERNEL);
  	if (!rtc)
-@@ -244,9 +253,18 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
+@@ -235,9 +244,18 @@ static void __init sun6i_rtc_clk_init(struct device_node *node,
  		goto err;
  	}
  
@@ -184,7 +350,7 @@ index 11f56de52179..7375a530c565 100644
  
  	/* Yes, I know, this is ugly. */
  	sun6i_rtc = rtc;
-@@ -354,6 +372,23 @@ CLK_OF_DECLARE_DRIVER(sun8i_h3_rtc_clk, "allwinner,sun8i-h3-rtc",
+@@ -345,6 +363,23 @@ CLK_OF_DECLARE_DRIVER(sun8i_h3_rtc_clk, "allwinner,sun8i-h3-rtc",
  CLK_OF_DECLARE_DRIVER(sun50i_h5_rtc_clk, "allwinner,sun50i-h5-rtc",
  		      sun8i_h3_rtc_clk_init);
  
@@ -208,8 +374,8 @@ index 11f56de52179..7375a530c565 100644
  static const struct sun6i_rtc_clk_data sun8i_v3_rtc_data = {
  	.rc_osc_rate = 32000,
  	.has_out_clk = 1,
-@@ -683,6 +718,7 @@ static const struct of_device_id sun6i_rtc_dt_ids[] = {
- 	{ .compatible = "allwinner,sun8i-h3-rtc" },
+@@ -675,6 +710,7 @@ static const struct of_device_id sun6i_rtc_dt_ids[] = {
+	{ .compatible = "allwinner,sun8i-r40-rtc" },
  	{ .compatible = "allwinner,sun8i-v3-rtc" },
  	{ .compatible = "allwinner,sun50i-h5-rtc" },
 +	{ .compatible = "allwinner,sun50i-h6-rtc" },
@@ -217,80 +383,95 @@ index 11f56de52179..7375a530c565 100644
  };
  MODULE_DEVICE_TABLE(of, sun6i_rtc_dt_ids);
 
-From patchwork Fri Apr 12 12:07:30 2019
+From patchwork Tue Aug 20 15:19:34 2019
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Patchwork-Submitter: =?utf-8?q?Ond=C5=99ej_Jirman?= <megous@megous.com>
-X-Patchwork-Id: 10898091
+X-Patchwork-Id: 11104053
 Return-Path: 
- <linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org>
-Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
- [172.30.200.125])
-	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 7ECA2922
+ <SRS0=T644=WQ=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 25B06912
 	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5B3CE28E53
-	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-	id 4E18828E62; Fri, 12 Apr 2019 12:08:26 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-	pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=2.0 tests=BAYES_00,DKIM_ADSP_DISCARD,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,RCVD_IN_DNSWL_MED autolearn=ham
-	version=3.3.1
+ Tue, 20 Aug 2019 15:20:26 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org
  [198.137.202.133])
-	(using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id BE36528E53
+	by mail.kernel.org (Postfix) with ESMTPS id 03B8820578
 	for <patchwork-linux-arm@patchwork.kernel.org>;
- Fri, 12 Apr 2019 12:08:25 +0000 (UTC)
+ Tue, 20 Aug 2019 15:20:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="T0L5yo+Z";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=megous.com header.i=@megous.com header.b="S0zEwvsr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B8820578
+Authentication-Results: mail.kernel.org;
+ dmarc=fail (p=none dis=none) header.from=megous.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
 	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
 	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
 	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
 	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Owner; bh=of4crIxgTulCOWI7WhBiwWRJoP3zKpvdr/0s/81unBc=; b=X4bqJerGiClQSE
-	VJazGgVr2TSj1dXzDDpz1m3SZmO1rTaAjtFTWDrGZ8uAqzyTPgl9ysq+5KHh90KJ146D4pMWi7tnm
-	CgquwEr0hMGaZrsmQF+PDbpbRai90IvX5T2N+yZ4mZWQQ61U7n10gvzHID6Riw2FS71PSIhLkG4Ry
-	qg8PawIbVQtNRfrXQ1OJsLMz5r+gj1J9TildRItFr2Ag61Ygjc2C1cGwJqlgVE5fAa+MLBlpjDM1o
-	MpZf8w/HXbDDdEgfx4hUWrFanyQ7tCVWGR6nLPDcqRYeMLYOuqmBvakqgcoVY54Ob74Lk2K70EJ/y
-	OJM8Tzu0nnldcNZLaQsw==;
+	List-Owner; bh=/EEb4sVveedeoiw9TDFRUvAG//d97MGKtk+LpFf4hWw=; b=T0L5yo+ZI0bk07
+	rDUNWpTSj03ZQ965py0E32Ke1KBHHFeS5VrC6ZhIQT/uP5/h78XASIoL0Y9pEpPrVI0Ww2QC72ILK
+	UPs2aniza1sVt/KS3xTV6gE2eSH0HhBgYnrA8KC07ib6b+o36qFHsrUq0mRvb1FrHV8tSZuYNWUYU
+	BxjSJqrJUbzKeHfRzeOwA9cUe4WqkRmrzvDFmzu62zt81Lm3ggmTXSCL2jUU3gkbx8TOUB2Zgy6w3
+	aaCCTTuK3TP63hLav31TJ7BH/tFhzYFBD+aW+Jct4hgoDf+ICLxF4lcVGAC/31iLp8s+Qc42G4xUA
+	C8FwVsxRvDZbjXtcsQLw==;
 Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtp (Exim 4.90_1 #2 (Red Hat Linux))
-	id 1hEuyl-0007xg-Kk; Fri, 12 Apr 2019 12:08:23 +0000
+	by bombadil.infradead.org with esmtp (Exim 4.92 #3 (Red Hat Linux))
+	id 1i05vt-0001JX-C1; Tue, 20 Aug 2019 15:20:25 +0000
 Received: from vps.xff.cz ([195.181.215.36])
- by bombadil.infradead.org with esmtps (Exim 4.90_1 #2 (Red Hat Linux))
- id 1hEuy0-0006zk-Eh
- for linux-arm-kernel@lists.infradead.org; Fri, 12 Apr 2019 12:07:44 +0000
+ by bombadil.infradead.org with esmtps (Exim 4.92 #3 (Red Hat Linux))
+ id 1i05v7-0007sr-Sh
+ for linux-arm-kernel@lists.infradead.org; Tue, 20 Aug 2019 15:19:40 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
- t=1555070852; bh=DlgRb649mljlYFMMyH4qWotJiy+ctlKPT9WxhNBfniE=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=tIs3Z8P4Iz3pZKxzAP7rxxh534VVXOaV6Ri8GMAPK9TK6i0ty5JJRz07GGVmasor3
- v6593OJ/5dNlT9y7BHZgJFAuvessYnsZw9Z263SzAhumRvKy0pmj7ozdhC1mXjza0G
- 6ZhI7LiQ5ZLEUdVoKVUZxVT3gbT+wvrDUd74aFE0=
+ t=1566314376; bh=P46Ks+pSwFh8evjNR4bT2iq74D9QpPdX+LOP4bcJrNU=;
+ h=From:To:Cc:Subject:Date:References:From;
+ b=S0zEwvsraRLL0ynpgWwffXnzhAvK37c2ssuZ1jfScVV5/W/7DvdbJ9nEYAiW5Fpbe
+ yNcm7wJWYtw9eK2ZU69+TU6nxJ6YCFBmeEEJuBU03A2Kx2uWma0OiQ0ib2NGHf6YwM
+ PkDZleYTPeFKpkCHOkfBo3lLRsf/s/t7kmrQyt6w=
 From: megous@megous.com
 To: Alessandro Zummo <a.zummo@towertech.it>,
  Alexandre Belloni <alexandre.belloni@bootlin.com>,
  Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
  Maxime Ripard <maxime.ripard@bootlin.com>, Chen-Yu Tsai <wens@csie.org>
-Subject: [PATCH 3/3] arm64: dts: sun50i-h6: Add support for RTC and fix the
+Subject: [PATCH v2 3/3] arm64: dts: sun50i-h6: Add support for RTC and fix the
  clock tree
-Date: Fri, 12 Apr 2019 14:07:30 +0200
-Message-Id: <20190412120730.473-4-megous@megous.com>
-In-Reply-To: <20190412120730.473-1-megous@megous.com>
-References: <20190412120730.473-1-megous@megous.com>
+Date: Tue, 20 Aug 2019 17:19:34 +0200
+Message-Id: <20190820151934.3860-4-megous@megous.com>
+In-Reply-To: <20190820151934.3860-1-megous@megous.com>
+References: <20190820151934.3860-1-megous@megous.com>
 MIME-Version: 1.0
 X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20190412_050737_316210_0FAA617B 
-X-CRM114-Status: GOOD (  11.89  )
+X-CRM114-CacheID: sfid-20190820_081938_257281_C8F332BC 
+X-CRM114-Status: GOOD (  11.75  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
 X-BeenThere: linux-arm-kernel@lists.infradead.org
-X-Mailman-Version: 2.1.21
+X-Mailman-Version: 2.1.29
 Precedence: list
 List-Id: <linux-arm-kernel.lists.infradead.org>
 List-Unsubscribe: 
@@ -309,7 +490,6 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: 
  linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
-X-Virus-Scanned: ClamAV using ClamSMTP
 
 From: Ondrej Jirman <megous@megous.com>
 
@@ -326,7 +506,7 @@ Signed-off-by: Ondrej Jirman <megous@megous.com>
  1 file changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
-index e0dc4a05c1ba..ba0f45b6f743 100644
+index 67b732e34091..67f920e0fc33 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
 @@ -56,14 +56,6 @@
@@ -367,7 +547,7 @@ index e0dc4a05c1ba..ba0f45b6f743 100644
  			clock-names = "hosc", "losc", "iosc";
  			#clock-cells = <1>;
  			#reset-cells = <1>;
-@@ -215,7 +207,7 @@
+@@ -236,7 +228,7 @@
  				     <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>,
  				     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
  				     <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
@@ -376,7 +556,7 @@ index e0dc4a05c1ba..ba0f45b6f743 100644
  			clock-names = "apb", "hosc", "losc";
  			gpio-controller;
  			#gpio-cells = <3>;
-@@ -603,10 +595,20 @@
+@@ -710,10 +702,20 @@
  			};
  		};
  
@@ -398,7 +578,7 @@ index e0dc4a05c1ba..ba0f45b6f743 100644
  				 <&ccu CLK_PLL_PERIPH0>;
  			clock-names = "hosc", "losc", "iosc", "pll-periph";
  			#clock-cells = <1>;
-@@ -627,7 +629,7 @@
+@@ -741,7 +743,7 @@
  			reg = <0x07022000 0x400>;
  			interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>,
  				     <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>;

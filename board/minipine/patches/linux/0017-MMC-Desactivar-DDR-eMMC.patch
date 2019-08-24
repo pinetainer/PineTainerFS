@@ -15,6 +15,9 @@ Aunque la eMMC soporta transferencias SDR a 200 MHz, el controlador tampoco nego
 obtenidos parecen indicar que, si la negociase, tampoco funcionaría bien la eMMC (pues 200 MHz SDR son equivalentes a 100
 MHz DDR, y ya hay problemas de precisión de sincronismo con 52 MHz DDR).
 
+Es posible, sin embargo, que simplemente se trate de problema de mala configuración del DT de la Pine, o un defecto en el controlador.
+Por tanto, quizás la causa mencionada anteriormente sea incorrecta. Estaré atento por si surgen mejores arreglos al problema.
+
 Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
 ---
 diff -pur linux.orig/drivers/mmc/host/sunxi-mmc.c linux/drivers/mmc/host/sunxi-mmc.c

@@ -86,3 +86,7 @@ tags
 [._]*.un~
 
 # End of https://www.gitignore.io/api/vim,linux,emacs
+
+# Un fichero wpa_supplicant.conf contiene información privada
+# que no debe de formar parte de un repositorio
+wpa_supplicant.conf

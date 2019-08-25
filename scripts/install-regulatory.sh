@@ -132,7 +132,8 @@ installRegulatoryFiles() {
 INTERACTIVE=1
 while getopts 'n' option; do
 	case $option in
-		n) unset INTERACTIVE;;
+		n) unset INTERACTIVE
+		   break;;
 		?) printf 'Usage: %s [-n]\n\t-n: skips asking the user for confirmation to install regulatory database files.\n' "$0"
 		   exit 2;;
 	esac

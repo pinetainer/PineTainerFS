@@ -1,6 +1,0 @@
-#!/bin/sh
-# Montar sistemas de ficheros y swap en fstab
-mkdir -p /dev/shm
-mkdir -p /dev/pts
-mount -a
-swapon -a

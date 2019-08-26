@@ -1,68 +1,20 @@
-# /etc/inittab init(8) configuration for BusyBox
-#
-# Copyright (C) 1999-2004 by Erik Andersen <andersen@codepoet.org>
-#
-#
-# Note, BusyBox init doesn't support runlevels.  The runlevels field is
-# completely ignored by BusyBox init. If you want runlevels, use sysvinit.
-#
-#
-# Format for each entry: <id>:<runlevels>:<action>:<process>
-#
-# <id>: WARNING: This field has a non-traditional meaning for BusyBox init!
-#
-#	The id field is used by BusyBox init to specify the controlling tty for
-#	the specified process to run on.  The contents of this field are
-#	appended to "/dev/" and used as-is.  There is no need for this field to
-#	be unique, although if it isn't you may have strange results.  If this
-#	field is left blank, then the init's stdin/out will be used.
-#
-# <runlevels>: The runlevels field is completely ignored.
-#
-# <action>: Valid actions include: sysinit, respawn, askfirst, wait, once,
-#                                  restart, ctrlaltdel, and shutdown.
-#
-#       Note: askfirst acts just like respawn, but before running the specified
-#       process it displays the line "Please press Enter to activate this
-#       console." and then waits for the user to press enter before starting
-#       the specified process.
-#
-#       Note: unrecognized actions (like initdefault) will cause init to emit
-#       an error message, and then go along with its business.
-#
-# <process>: Specifies the process to be executed and it's command line.
-#
-# Note: BusyBox init works just fine without an inittab. If no inittab is
-# found, it has the following default behavior:
-#         ::sysinit:/etc/init.d/rcS
-#         ::askfirst:/bin/sh
-#         ::ctrlaltdel:/sbin/reboot
-#         ::shutdown:/sbin/swapoff -a
-#         ::shutdown:/bin/umount -a -r
-#         ::restart:/sbin/init
-#         tty2::askfirst:/bin/sh
-#         tty3::askfirst:/bin/sh
-#         tty4::askfirst:/bin/sh
-#
-# Boot-time system configuration/initialization script.
-# This is run first except when booting in single-user mode.
-#
-::sysinit:/etc/init.d/rcS
+# Documentación acerca del formato de este fichero disponible en:
+# https://manpages.debian.org/testing/sysvinit-core/inittab.5.en.html
 
-# /bin/sh invocations on selected ttys
-#
-# Note below that we prefix the shell commands with a "-" to indicate to the
-# shell that it is supposed to be a login shell.  Normally this is handled by
-# login, but since we are bypassing login in this case, BusyBox lets you do
-# this yourself...
-#
-# Start an "askfirst" shell on the console (whatever that may be)
-::askfirst:-/bin/sh
+id:2:initdefault:
 
-# Stuff to do when restarting the init process
-::restart:/sbin/init
+mnt::sysinit:/bin/mount -a
+swp::sysinit:/sbin/swapon -a
+rcS:2:wait:/etc/init.d/rcS
 
-# Stuff to do before rebooting
-::shutdown:/etc/init.d/rcK
-::shutdown:/sbin/swapoff -a
-::shutdown:/bin/umount -a -r
+# Permitir que root se conecte desde el puerto serie
+S0:2:respawn:/sbin/sulogin -p -e
+
+# Comandos a ejecutar cuando el sistema se apaga
+rcK:06:wait:/etc/init.d/rcK
+swpo:06:wait:/sbin/swapoff -a
+mnto:06:wait:/bin/umount -a -r
+
+# Comandos a ejecutar para manejar apagado y reinicio
+hlt:0:wait:/sbin/halt -dhp
+reb:6:wait:/sbin/reboot

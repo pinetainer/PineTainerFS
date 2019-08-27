@@ -1,7 +1,9 @@
-config PINETAINERFS_PAQUETES_FIABILIDAD
+config PINETAINERFS_PAQUETES_RENDIMIENTO
 	bool "Paquetes de prueba de fiabilidad y rendimiento"
 	select BR2_PACKAGE_STRESS
 	select BR2_PACKAGE_DHRYSTONE
+	select BR2_PACKAGE_RAMSPEED
+	select BR2_PACKAGE_FIO
 	default n
 	help
 	  Instala paquetes útiles para probar la fiabilidad de la

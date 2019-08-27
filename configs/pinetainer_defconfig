@@ -18,12 +18,12 @@ BR2_TARGET_GENERIC_HOSTNAME=""
 BR2_TARGET_GENERIC_ISSUE=""
 BR2_INIT_SYSV=y
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
-BR2_ROOTFS_DEVICE_TABLE="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/device_table.txt"
+BR2_ROOTFS_DEVICE_TABLE="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/device_table.txt $(BR2_EXTERNAL_PineTainer_PATH)/board/pinetainer/device_table.txt"
 # BR2_TARGET_ENABLE_ROOT_LOGIN is not set
 # BR2_TARGET_GENERIC_GETTY is not set
 # BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW is not set
 BR2_ENABLE_LOCALE_WHITELIST="C"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/rootfs-overlay $(BR2_EXTERNAL_PineTainer_PATH)/board/common/rootfs-overlay"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/rootfs-overlay $(BR2_EXTERNAL_PineTainer_PATH)/board/pinetainer/rootfs-overlay"
 BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/post-build.sh"
 BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_PineTainer_PATH)/board/common/post-image.sh"
 BR2_ROOTFS_POST_SCRIPT_ARGS="-c $(BR2_EXTERNAL_PineTainer_PATH)/board/pinetainer/genimage.cfg"

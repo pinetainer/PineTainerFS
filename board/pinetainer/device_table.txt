@@ -6,6 +6,6 @@
 # dynamic configurations (where devtmpfs, mdev or udev are used).
 #
 # <name>				<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
-# Asegurarnos de que el script overlay-root.sh tiene permisos restrictivos y
+# Asegurarnos de que el script overlay-root.sh tiene permisos restrictivos
 # y adecuados para el arranque
 /sbin/overlay-root.sh			f	744	0	0	-	-	-	-	-

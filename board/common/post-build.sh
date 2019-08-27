@@ -11,7 +11,6 @@ rm -f "$1/etc/sudoers.dist" || true
 # Borrar ficheros que cuelgan de directorios temporales
 rm -rf "$1/tmp/*" || true
 rm -rf "$1/run/*" || true
-rm -rf "$1/dev/*" || true
 
 # Borrar rmt y el directorio que lo contiene, si queda vacío
 rm -f "$1/libexec/rmt" || true

@@ -5,9 +5,6 @@ printf "NAME=\"Linux\"\nVERSION=\"5.3-rc5\"\nID=linux\nID_LIKE=\"buildroot\"\nHO
 # Borrar ficheros inútiles solo usados por bash
 rm -rf "$1/etc/bash_completion.d" || true
 
-# Eliminar fichero sudoers.dist innecesario
-rm -f "$1/etc/sudoers.dist" || true
-
 # Borrar ficheros que cuelgan de directorios temporales
 rm -rf "$1/tmp/*" || true
 rm -rf "$1/run/*" || true

@@ -12,7 +12,3 @@
 /root					d	700	0	0	-	-	-	-	-
 /etc/shadow				f	600	0	0	-	-	-	-	-
 /etc/passwd				f	644	0	0	-	-	-	-	-
-/etc/network/if-up.d			d	755	0	0	-	-	-	-	-
-/etc/network/if-pre-up.d		d	755	0	0	-	-	-	-	-
-/etc/network/if-down.d			d	755	0	0	-	-	-	-	-
-/etc/network/if-post-down.d		d	755	0	0	-	-	-	-	-

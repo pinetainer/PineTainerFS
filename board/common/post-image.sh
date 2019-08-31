@@ -102,8 +102,8 @@ for file in $(printf '%s\n%s\n%s' "$BINARIES_DIR/extlinux.conf" "$BINARIES_DIR/$
 done
 unset IFS
 
-# Add 65 KiB to the size for filesystem use, and finish off the BOOT_CFG file
-BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + 65536))
+# Add 2 MiB to the size for filesystem and/or administrator use, and finish off the BOOT_CFG file
+BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + 2097152))
 printf 'Total boot.vfat size: %d bytes (%d MiB)\n\n' $BOOT_FILES_SIZE $((BOOT_FILES_SIZE / 1048576))
 printf '\t}\n\tsize = %s\n}' "$BOOT_FILES_SIZE" >> "$BOOT_CFG"
 

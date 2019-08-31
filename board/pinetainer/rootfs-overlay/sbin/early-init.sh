@@ -4,8 +4,8 @@
 # tome el control del estado de ejecución del sistema:
 # - Iniciar la vigilancia del perro guardián (watchdog)
 # - Montar el sistema de ficheros raíz (ro) como un overlay (rw)
+# - Montar el sistema de ficheros /sys
 # - Configurar los parámetros de iluminación de los LED indicadores de actividad
-# - Montar sistemas de ficheros esenciales (proc, sys, run)
 # En cierto modo, sustituye a un disco en RAM inicial típico de otras distribuciones
 # de Linux, que es innecesariamente complicado para nuestros requisitos.
 
@@ -102,11 +102,6 @@ umount /dev || echo '! No se pudo desmontar el devtmpfs del sistema de ficheros 
 cd "$DIR_OVERLAY/overlay" || mostrarErrorGrave "cambio de directorio al directorio del overlay montado" $?
 pivot_root . "${DIR_OVERLAY#/}/lower" || mostrarErrorGrave "cambio de sistema de ficheros raíz con pivot_root" $?
 
-# Montar algunos sistemas de ficheros esenciales
-bin/mount -t proc proc proc || mostrarErrorGrave "montaje de /proc" $?
-bin/mount -t sysfs sysfs sys || mostrarErrorGrave "montaje de /sys" $?
-bin/mount -t tmpfs -o mode=0755,nosuid,nodev tmpfs run || mostrarErrorGrave "montaje de /run" $?
-
 # Si hay directorios temporales de montaje de overlay en la vista del overlay,
 # borrarlos para que quede más bonito
 if [ -d "${DIR_OVERLAY#/}/overlay" ]; then
@@ -116,13 +111,16 @@ if [ -d "${DIR_OVERLAY#/}/upper" ]; then
 	bin/rmdir "${DIR_OVERLAY#/}/upper"
 fi
 
+# Montar el sistema de ficheros esencial sys
+mount -t sysfs -o defaults sysfs sys || mostrarErrorGrave "montaje de /sys" $?
+
 # Configurar disparadores de LEDs para indicar actividad de manera visual
 # al operador. Ignoramos errores que pudieran ocurrir, pues esto no es
 # vital para el funcionamiento del sistema
 printf 'heartbeat' > sys/class/leds/pine-h64:green:heartbeat/trigger 2>dev/null
-if [ -n "${DISPOSITIVO_UPPER%/dev/mmcblk*}" ]; then
+if [ -z "${DISPOSITIVO_UPPER##/dev/mmcblk*}" ]; then
 	dispositivoYPartMMC=${DISPOSITIVO_UPPER#/dev/mmcblk}
-	printf 'mmc%d' "${dispositivoYPartMMC%p*}" > sys/class/leds/pine-h64:blue:status/trigger 2>/dev/null
+	printf 'mmc%s' "${dispositivoYPartMMC%p*}" > sys/class/leds/pine-h64:blue:status/trigger 2>dev/null
 fi
 
 # Finalmente, delegar el control al proceso init auténtico

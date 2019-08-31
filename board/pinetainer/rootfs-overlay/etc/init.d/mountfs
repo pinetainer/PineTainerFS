@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# El tamaño del disco zram a crear para montar en /tmp.
+readonly TAM_ZRAM=1G
+
+readonly PATH='/bin:/sbin'
+
+# Monta un tmpfs en /tmp, a modo de regresión si no se pudo
+# montar un disco zram en ese directorio.
+fallbackTmpfs() {
+	printf 'ERROR (fallback tmpfs)\n'
+	mount -t tmpfs -o mode=1777 tmpfs /tmp >/dev/null 2>&1
+	exit
+}
+
+# Primero, montar sistemas de ficheros mencionados en fstab
+printf 'Montando sistemas de ficheros configurados en /etc/fstab: '
+mount -a && printf 'OK\n' || printf 'ERROR\n'
+
+# A continuación, montar /tmp como disco zram
+# (memoria comprimida)
+if mountpoint '/tmp' >/dev/null 2>&1; then
+	# Ya se ha montado /tmp
+	:
+else
+	printf 'Montando /tmp como disco zram: '
+
+	# Establecer el tamaño del primer disco zram,
+	# siempre creado por el núcleo (pues no es un módulo)
+	printf '%s' "$TAM_ZRAM" > /sys/block/zram0/disksize
+
+	mkfs.xfs -m crc=0 /dev/zram0 >/dev/null 2>&1 || fallbackTmpfs
+	mount /dev/zram0 /tmp >/dev/null 2>&1 || fallbackTmpfs
+	chmod 1777 /tmp >/dev/null 2>&1
+
+	printf 'OK\n'
+fi

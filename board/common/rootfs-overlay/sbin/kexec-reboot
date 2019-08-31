@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# El fichero de configuración del reinicio con kexec.
+readonly FICHERO_CONF='/etc/kexec.conf'
+# La configuración predeterminada a usar para kexec,
+# si no se ha encontrado el fichero de configuración.
+readonly CONF_PREDET='KERNEL=/boot/Image'
+
+# Desmonta todos los sistemas de ficheros posibles,
+# remontándolos como de solo lectura si están en uso
+# o contienen ficheros necesarios.
+desmontarSistemasFicheros() {
+	if [ -z "$sistemasFicherosDesmontados" ]; then
+		sistemasFicheros=$(/bin/cat /proc/mounts)
+		IFS='
+'
+		for sistemaFicheros in $sistemasFicheros; do
+			dispositivo="${sistemaFicheros%% *}"
+			puntoMontaje="$(echo "$sistemaFicheros" | cut -f2 -d' ')"
+
+			# Remontar como solo lectura. Podríamos necesitar ficheros dentro de ese sistema de ficheros
+			# (el reinicio inminente los va a desmontar completamente de todos modos... y si algo va mal, al
+			# menos es más fácil que el operador haga algo si tiene ya sistemas de ficheros montados)
+			/bin/mount -o remount,ro "$dispositivo" "$puntoMontaje" >/dev/null 2>&1
+		done
+
+		# Sincronizar cachés a discos, por si acaso
+		/bin/sync
+
+		sistemasFicherosDesmontados=1
+	fi
+}
+
+# ¿Procede hacer un reinicio con kexec?
+if [ ! -f "/run/no-kexec-reboot" ]; then
+	printf 'Reiniciando: usando llamada kexec...\n'
+
+	# Leer parámetros desde $FICHERO_CONF, usando
+	# la configuración predeterminada si no se ha
+	# leído nada desde el fichero
+	kexec_conf=$(/bin/cat "$FICHERO_CONF" 2>/dev/null)
+	kexec_conf=${kexec_conf:-$CONF_PREDET}
+
+	# Interpretar el fichero de configuración, línea por
+	# línea
+	IFS='
+'
+	for registro in $kexec_conf; do
+		case "$registro" in
+			KERNEL=*)
+				kernel="${registro#KERNEL=}"
+				break;;
+			APPEND=*)
+				append="${registro#APPEND=}"
+				break;;
+			COMMAND-LINE=*)
+				command_line="${registro#COMMAND-LINE=}"
+				break;;
+		esac
+	done
+
+	# Necesitamos saber qué kernel ejecutar
+	if [ -z "$kernel" ]; then
+		printf '! No se ha especificado un kernel a cargar en el archivo de configuración %s.\n' "$FICHERO_CONF"
+		exit 1
+	fi
+
+	# Cargar el kernel para kexec.
+	# --reuse-cmdline es necesario para que el kernel inicialice
+	# correctamente el mapa de memoria de la Pine (en caso de no usarse,
+	# el kernel entra en pánico nada más iniciarse por no poder
+	# reservar memoria)
+	if [ -n "$append" ]; then
+		if [ -n "$command_line" ]; then
+			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --append="$append" --command-line="$command_line"
+		else
+			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --append="$append"
+		fi
+	else
+		if [ -n "$command_line" ]; then
+			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --command-line="$command_line"
+		else
+			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline
+		fi
+	fi
+
+	# Desmontar todos los sistemas de ficheros ahora,
+	# tras haber leído de ellos la imagen del kernel
+	desmontarSistemasFicheros
+
+	# Finalmente, ejecutar el kernel cargado
+	/usr/sbin/kexec -e
+
+	# Si llegamos aquí, es porque kexec no ha funcionado
+	printf '! Ha ocurrido un error al intentar reiniciar con kexec. Se efectúa un reinicio clásico con coldreboot.\n'
+	sleep 2
+fi
+
+printf 'Reiniciando: reinicio clásico...\n'
+
+# Desmontar todos los sistemas de ficheros
+desmontarSistemasFicheros
+
+# Simplemente llamar a reboot, para hacer
+# un reinicio clásico
+/sbin/reboot $@
+exit $?

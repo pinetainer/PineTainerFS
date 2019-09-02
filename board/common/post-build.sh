@@ -10,8 +10,8 @@ rm -rf "$1/etc/bash_completion.d" || true
 mv "$1/etc/init.d/S20urandom" "$1/etc/init.d/S01urandom.sh" || true
 
 # Borrar ficheros que cuelgan de directorios temporales
-rm -rf "$1/tmp/*" || true
-rm -rf "$1/run/*" || true
+find "$1/tmp" -mindepth 1 -delete || true
+find "$1/run" -mindepth 1 -delete || true
 find "$1/dev" -mindepth 1 -delete || true
 
 # Borrar rmt y el directorio que lo contiene, si queda vacío

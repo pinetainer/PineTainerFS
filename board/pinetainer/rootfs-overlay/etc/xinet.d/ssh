@@ -1,0 +1,14 @@
+service ssh {
+	flags = NORETRY
+	socket_type = stream
+	wait = no
+	user = root
+	server = /usr/sbin/dropbear
+	server_args = -R
+	instances = 1
+	log_type = SYSLOG daemon
+	log_on_success = HOST EXIT DURATION TRAFFIC
+	log_on_failure = HOST
+	cps = 5 30
+	umask = 077
+}

@@ -4,7 +4,7 @@ service ssh {
 	wait = no
 	user = root
 	server = /usr/sbin/dropbear
-	server_args = -R
+	server_args = -R -i
 	instances = 1
 	log_type = SYSLOG daemon
 	log_on_success = HOST EXIT DURATION TRAFFIC

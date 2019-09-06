@@ -3,6 +3,7 @@
 
 id:2:initdefault:
 
+pts::sysinit:/bin/mkdir -p /dev/pts
 mnt::sysinit:/bin/mount -a
 swp::sysinit:/sbin/swapon -a
 rcS:2:wait:/etc/init.d/rcS

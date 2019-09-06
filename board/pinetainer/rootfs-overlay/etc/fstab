@@ -2,3 +2,4 @@
 proc		/proc		proc	defaults		0	0
 tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
 /dev/mmcblk2p1	/boot		vfat	ro			0	0
+/dev/mmcblk2p5	swap		swap	defaults		0	0

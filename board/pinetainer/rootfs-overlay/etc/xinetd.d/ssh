@@ -1,4 +1,5 @@
-service ssh {
+service ssh
+{
 	flags = NORETRY
 	socket_type = stream
 	wait = no
@@ -7,7 +8,7 @@ service ssh {
 	server_args = -R -i
 	instances = 1
 	log_type = SYSLOG daemon
-	log_on_success = HOST EXIT DURATION TRAFFIC
+	log_on_success = HOST EXIT DURATION
 	log_on_failure = HOST
 	cps = 5 30
 	umask = 077

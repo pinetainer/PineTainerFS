@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Dejar de considerar la interfaz de bonding como
+# maestra de las físicas, y descargar el módulo
+if [ "$IFACE" = 'bond0' ]; then
+	ip link set eth0 nomaster
+	ip link set wlan0 nomaster
+	modprobe -r bonding
+fi

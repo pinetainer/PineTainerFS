@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# La cantidad de VLAN a crear en el puente Ethernet.
+# Se corresponde con el número de subrredes en las que
+# se podrán organizar los contenedores (una VLAN es una
+# red independiente a nivel de enlace y red).
+# El direccionamiento de red ha sido diseñado para permitir
+# un máximo de 4096 VLAN.
+readonly NUM_VLAN=8
+# El nombre del dispositivo de puente Ethernet a crear.
+readonly DISPOSITIVO_PUENTE=br0
+
+# No hacer nada si no estamos configurando el dispositivo
+# de puente
+if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
+	# Eliminar puente de igual nombre ya creado, si hay
+	if [ -d /sys/class/net/$DISPOSITIVO_PUENTE ]; then
+		ip link del $DISPOSITIVO_PUENTE || exit $?
+	fi
+
+	# Crear el puente Ethernet (~ switch virtual)
+	# a donde se conectarán los contenedores
+	ip link add $DISPOSITIVO_PUENTE type bridge vlan_filtering 1 || exit $?
+
+	ip link set $DISPOSITIVO_PUENTE up || exit $?
+
+	# Crear adaptadores de red 802.1q, para que la Pine pueda
+	# comunicarse con cada red virtual. Darle a cada adaptador
+	# la primera IP de una subred
+	for vlan in $(seq 1 $NUM_VLAN); do
+		ip link add link $DISPOSITIVO_PUENTE name $DISPOSITIVO_PUENTE.$vlan type vlan id $vlan || exit $?
+
+		# Calcular los octetos de red a partir del identificador de VLAN.
+		# La primera VLAN iría en la red 172.16.0.0/24, la segunda en 172.16.1.0/24,
+		# y así sucesivamente, hasta agotar el direccionamiento privado del bloque.
+		octetos_red=$((16 + ($vlan - 1) / 256))
+		octetos_red="$octetos_red.$((($vlan - 1) % 256))"
+
+		ip addr add 172.$octetos_red.1/24 dev $DISPOSITIVO_PUENTE.$vlan
+		ip link set $DISPOSITIVO_PUENTE.$vlan up || exit $?
+	done
+fi

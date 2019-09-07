@@ -1,0 +1,12 @@
+# La interfaz de loopback es gestionada por ifup/ifdown
+
+# Configurar interfaz bond0
+# (bonding de Ethernet + Wi-Fi)
+auto bond0
+iface bond0 inet static
+        address 192.168.0.29/27
+        gateway 192.168.0.1
+
+# Crear interfaz de puente Ethernet para contenedores
+auto br0
+iface br0 inet manual

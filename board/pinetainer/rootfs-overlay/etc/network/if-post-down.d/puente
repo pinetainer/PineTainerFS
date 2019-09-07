@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /etc/network/if-pre-up.d/puente
+
+# No hacer nada si no estamos configurando el
+# dispositivo de puente
+if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
+	# Eliminar puente Ethernet creado. Esto
+	# elimina automáticamente adaptadores de
+	# VLAN creados
+	[ -d /sys/class/net/$DISPOSITIVO_PUENTE ] && ip link del $DISPOSITIVO_PUENTE
+fi

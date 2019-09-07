@@ -3,6 +3,7 @@ service ssh
 	flags = NORETRY
 	socket_type = stream
 	wait = no
+	bind = bond0
 	user = root
 	server = /usr/sbin/dropbear
 	server_args = -R -i

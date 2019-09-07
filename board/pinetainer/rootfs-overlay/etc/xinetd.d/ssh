@@ -7,7 +7,6 @@ service ssh
 	server = /usr/sbin/dropbear
 	server_args = -R -i
 	instances = 1
-	log_type = SYSLOG daemon
 	log_on_success = HOST EXIT DURATION
 	log_on_failure = HOST
 	cps = 5 30

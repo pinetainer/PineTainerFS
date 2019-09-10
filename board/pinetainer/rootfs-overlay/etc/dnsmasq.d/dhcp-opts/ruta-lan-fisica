@@ -1,0 +1,17 @@
+# Por defecto, dnsmasq establece la dirección de la
+# puerta de enlace a la de la Pine. Eso no nos interesa en
+# la LAN física, donde se encuentra la pasarela del ISP,
+# pues introduce un salto más sin ningún beneficio
+tag:lan-fisica,option:router,192.168.0.1
+
+# Si el cliente DHCP pregunta por un servidor NTP, indicarle
+# el que se está ejecutando en la Pine
+tag:lan-fisica,option:ntp-server,192.168.0.29
+tag:vlan-br0-1,option:ntp-server,172.16.0.1
+tag:vlan-br0-2,option:ntp-server,172.16.1.1
+tag:vlan-br0-3,option:ntp-server,172.16.2.1
+tag:vlan-br0-4,option:ntp-server,172.16.3.1
+tag:vlan-br0-5,option:ntp-server,172.16.4.1
+tag:vlan-br0-6,option:ntp-server,172.16.5.1
+tag:vlan-br0-7,option:ntp-server,172.16.6.1
+tag:vlan-br0-8,option:ntp-server,172.16.7.1

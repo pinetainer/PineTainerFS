@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# No hacer nada si no estamos configurando bond0
+[ "$IFACE" != 'bond0' ] && exit 0
+
+. /etc/network/if-pre-up.d/puente
+
+################
+# ENRUTAMIENTO #
+################
+
+# Activar enrutamiento IPv4
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Desde VLANs, permitir enrutamiento por defecto hacia cualquier red,
+# excepto para otras VLANs y la LAN física
+for vlanActual in $(seq 1 $NUM_VLAN); do
+	for otraVlan in $(seq 1 $NUM_VLAN); do
+		if [ $otraVlan != $vlanActual ]; then
+			iptables -A FORWARD -s $(vlanARed $vlanActual).0/24 -d $(vlanARed $otraVlan).0/24 -j DROP || exit $?
+			iptables -A INPUT -s $(vlanARed $vlanActual).0/24 -d $(vlanARed $otraVlan).0/24 -j DROP || exit $?
+		fi
+	done
+done
+iptables -A FORWARD -s 172.16.0.0/12 -d 192.168.0.0/27 -j DROP || exit $?
+iptables -A INPUT -s 172.16.0.0/12 -d 192.168.0.0/27 -j DROP || exit $?
+
+# Descartar paquetes desde LAN física a VLANs
+# (aislamiento completo y bidireccional de las redes)
+iptables -A FORWARD -s 192.168.0.0/27 -d 172.16.0.0/12 -j DROP || exit $?
+iptables -A INPUT -s 192.168.0.0/27 -d 172.16.0.0/12 -j DROP || exit $?
+
+########
+# SNAT #
+########
+
+# Los paquetes enrutados desde las VLAN por bond0 sufren
+# SNAT, para que la pasarela del ISP pueda abstraerse de la
+# presencia de los contenedores
+iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o bond0 -j SNAT --to-source 192.168.0.29 || exit $?

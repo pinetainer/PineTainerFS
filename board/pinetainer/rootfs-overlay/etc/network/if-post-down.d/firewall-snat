@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# No hacer nada si no estamos configurando bond0
+[ "$IFACE" != 'bond0' -a "$IFACE" != '--all' ] && exit 0
+
+################
+# ENRUTAMIENTO #
+################
+
+# Desactivar enrutamiento IPv4
+echo 0 > /proc/sys/net/ipv4/ip_forward
+
+# Eliminar reglas creadas
+iptables -F FORWARD || exit $?
+
+########
+# SNAT #
+########
+
+# Eliminar reglas creadas
+iptables -t nat -F POSTROUTING || exit $?

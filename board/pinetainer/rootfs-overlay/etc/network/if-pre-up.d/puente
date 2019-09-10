@@ -10,6 +10,17 @@ readonly NUM_VLAN=8
 # El nombre del dispositivo de puente Ethernet a crear.
 readonly DISPOSITIVO_PUENTE=br0
 
+# Convierte un identificador de VLAN a una dirección de red,
+# sin el últmo octeto, en notación punteada decimal.
+# $1: el identificador a convertir.
+vlanARed() {
+	# Calcular los octetos de red a partir del identificador de VLAN.
+	# La primera VLAN iría en la red 172.16.0.0/24, la segunda en 172.16.1.0/24,
+	# y así sucesivamente, hasta agotar el direccionamiento privado del bloque.
+	octetos_red=$((16 + ($vlan - 1) / 256))
+	printf "172.$octetos_red.$((($vlan - 1) % 256))"
+}
+
 # No hacer nada si no estamos configurando el dispositivo
 # de puente
 if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
@@ -29,14 +40,7 @@ if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
 	# la primera IP de una subred
 	for vlan in $(seq 1 $NUM_VLAN); do
 		ip link add link $DISPOSITIVO_PUENTE name $DISPOSITIVO_PUENTE.$vlan type vlan id $vlan || exit $?
-
-		# Calcular los octetos de red a partir del identificador de VLAN.
-		# La primera VLAN iría en la red 172.16.0.0/24, la segunda en 172.16.1.0/24,
-		# y así sucesivamente, hasta agotar el direccionamiento privado del bloque.
-		octetos_red=$((16 + ($vlan - 1) / 256))
-		octetos_red="$octetos_red.$((($vlan - 1) % 256))"
-
-		ip addr add 172.$octetos_red.1/24 dev $DISPOSITIVO_PUENTE.$vlan
+		ip addr add $(vlanARed $vlan).1/24 dev $DISPOSITIVO_PUENTE.$vlan
 		ip link set $DISPOSITIVO_PUENTE.$vlan up || exit $?
 	done
 fi

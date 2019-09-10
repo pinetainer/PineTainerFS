@@ -5,16 +5,18 @@
 # in both static device configurations (where /dev/ is static) and in
 # dynamic configurations (where devtmpfs, mdev or udev are used).
 #
-# <name>				<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
+# <name>					<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
 # Asegurarnos de que el script early-init.sh tiene permisos restrictivos
 # y adecuados para el arranque, al igual que mountfs
-/sbin/early-init.sh			f	744	0	0	-	-	-	-	-
-/etc/init.d/mountfs			f	744	0	0	-	-	-	-	-
-/etc/init.d/S81xinetd.sh		f	744	0	0	-	-	-	-	-
-/etc/init.d/S82knockd.sh		f	744	0	0	-	-	-	-	-
-/etc/network/if-pre-up.d/puente		f	774	0	0	-	-	-	-	-
-/etc/network/if-post-down.d/puente	f	774	0	0	-	-	-	-	-
-/etc/network/if-pre-up.d/bonding	f	774	0	0	-	-	-	-	-
-/etc/network/if-post-down.d/bonding	f	774	0	0	-	-	-	-	-
-/etc/network/if-pre-up.d/wlan		f	774	0	0	-	-	-	-	-
-/etc/network/if-post-down.d/wlan	f	774	0	0	-	-	-	-	-
+/sbin/early-init.sh				f	744	0	0	-	-	-	-	-
+/etc/init.d/mountfs				f	744	0	0	-	-	-	-	-
+/etc/init.d/S81xinetd.sh			f	744	0	0	-	-	-	-	-
+/etc/init.d/S82knockd.sh			f	744	0	0	-	-	-	-	-
+/etc/network/if-pre-up.d/puente			f	774	0	0	-	-	-	-	-
+/etc/network/if-post-down.d/puente		f	774	0	0	-	-	-	-	-
+/etc/network/if-pre-up.d/bonding		f	774	0	0	-	-	-	-	-
+/etc/network/if-post-down.d/bonding		f	774	0	0	-	-	-	-	-
+/etc/network/if-pre-up.d/wlan			f	774	0	0	-	-	-	-	-
+/etc/network/if-post-down.d/wlan		f	774	0	0	-	-	-	-	-
+/etc/network/if-pre-up.d/firewall-snat		f	774	0	0	-	-	-	-	-
+/etc/network/if-post-down.d/firewall-snat	f	774	0	0	-	-	-	-	-

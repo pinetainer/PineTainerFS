@@ -1,5 +1,9 @@
 # La interfaz de loopback es gestionada por ifup/ifdown
 
+# Interfaz Wi-Fi
+auto wlan0
+iface wlan0 inet manual
+
 # Configurar interfaz bond0
 # (bonding de Ethernet + Wi-Fi)
 auto bond0

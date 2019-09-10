@@ -5,6 +5,8 @@
 # correspondientes
 if [ "$IFACE" = 'bond0' ]; then
 	modprobe bonding mode=active-backup miimon=100 max_bonds=1 fail_over_mac=active primary=eth0 updelay=1000 || exit $?
+	ip link set eth0 down || exit $?
 	ip link set eth0 master $IFACE || exit $?
+	ip link set wlan0 down || exit $?
 	ip link set wlan0 master $IFACE || exit $?
 fi

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Iniciar wpa_supplicant para configurar el enlace inalámbrico
+case $IFACE in
+	wlan*)
+		wpa_supplicant -i$IFACE -B -c/etc/wpa_supplicant.conf -s || exit $?;;
+esac

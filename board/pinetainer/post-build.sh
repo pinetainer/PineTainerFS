@@ -15,3 +15,8 @@ sed -i '/^mnt::sysinit:/cmnt::sysinit:/etc/init.d/mountfs' "$1/etc/inittab"
 rm -f "$1/etc/init.d/S50dropbear"
 rm -f "$1/etc/dropbear"
 mkdir -p "$1/etc/dropbear"
+
+# Dar permisos restrictivos al fichero wpa_supplicant.conf, si existe
+if [ -f "$1/etc/wpa_supplicant.conf" ]; then
+	chmod 660 "$1/etc/wpa_supplicant.conf"
+fi

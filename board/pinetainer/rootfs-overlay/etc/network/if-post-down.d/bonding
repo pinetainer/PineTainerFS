@@ -1,4 +1,5 @@
 #!/bin/sh
 
 # Descargar el módulo que proporciona bond0
-[ "$IFACE" = 'bond0' ] && modprobe -r bonding
+[ "$IFACE" = 'bond0' ] && (modprobe -r bonding; exit $?)
+exit 0

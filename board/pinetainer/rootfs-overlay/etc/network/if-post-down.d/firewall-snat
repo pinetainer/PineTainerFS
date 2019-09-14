@@ -13,9 +13,22 @@ echo 0 > /proc/sys/net/ipv4/ip_forward
 # Eliminar reglas creadas
 iptables -F FORWARD || exit $?
 
+# Restaurar política predeterminada
+iptables -P FORWARD ACCEPT || exit $?
+
 ########
 # SNAT #
 ########
 
 # Eliminar reglas creadas
 iptables -t nat -F POSTROUTING || exit $?
+
+###############
+# CORTAFUEGOS #
+###############
+
+# Eliminar reglas creadas
+iptables -F INPUT || exit $?
+
+# Restaurar política predeterminada
+iptables -P INPUT ACCEPT || exit $?

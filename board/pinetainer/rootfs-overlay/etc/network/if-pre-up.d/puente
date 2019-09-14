@@ -32,6 +32,7 @@ if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
 	# Crear el puente Ethernet (~ switch virtual)
 	# a donde se conectarán los contenedores
 	ip link add $DISPOSITIVO_PUENTE type bridge vlan_filtering 1 || exit $?
+	bridge vlan del vid 1 dev $DISPOSITIVO_PUENTE self
 
 	ip link set $DISPOSITIVO_PUENTE up || exit $?
 
@@ -41,6 +42,7 @@ if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
 	for vlan in $(seq 1 $NUM_VLAN); do
 		ip link add link $DISPOSITIVO_PUENTE name $DISPOSITIVO_PUENTE.$vlan type vlan id $vlan || exit $?
 		ip addr add $(vlanARed $vlan).1/24 dev $DISPOSITIVO_PUENTE.$vlan
+		bridge vlan add vid $vlan dev $DISPOSITIVO_PUENTE self
 		ip link set $DISPOSITIVO_PUENTE.$vlan up || exit $?
 	done
 fi

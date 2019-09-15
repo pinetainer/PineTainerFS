@@ -1,0 +1,81 @@
+DVFS: CPU: undervolt de 30 mV
+
+La CPU parece funcionar correctamente a 30 mV menos en todas las
+frecuencias disponibles. Esto reduce su consumo de energía y generación
+de calor, lo que se traduce en mayores frecuencias para cargas de
+trabajo prolongadas, y debería de mejorar el rendimiento.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+--- diff -pur linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts	2019-09-15 13:45:36.012026550 +0200
++++ diff -pur linux/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts	2019-09-15 13:46:05.700026645 +0200
+@@ -260,7 +260,7 @@
+ 
+ 			reg_dcdca: dcdca {
+ 				regulator-always-on;
+-				regulator-min-microvolt = <800000>;
++				regulator-min-microvolt = <770000>;
+ 				regulator-max-microvolt = <1160000>;
+ 				regulator-name = "vdd-cpu";
+ 			};
+
+--- diff -pur linux.orig/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-09-15 13:43:29.300026145 +0200
++++ diff -pur linux/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi	2019-09-15 13:45:23.672026511 +0200
+@@ -134,49 +134,49 @@
+ 
+ 		opp@480000000 {
+ 			opp-hz = /bits/ 64 <480000000>;
+-			opp-microvolt = <800000 800000 880000>;
++			opp-microvolt = <770000 770000 880000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@720000000 {
+ 			opp-hz = /bits/ 64 <720000000>;
+-			opp-microvolt = <800000 800000 880000>;
++			opp-microvolt = <770000 770000 880000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@816000000 {
+ 			opp-hz = /bits/ 64 <816000000>;
+-			opp-microvolt = <800000 800000 880000>;
++			opp-microvolt = <770000 770000 880000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@888000000 {
+ 			opp-hz = /bits/ 64 <888000000>;
+-			opp-microvolt = <800000 800000 940000>;
++			opp-microvolt = <770000 770000 940000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@1080000000 {
+ 			opp-hz = /bits/ 64 <1080000000>;
+-			opp-microvolt = <840000 840000 1060000>;
++			opp-microvolt = <810000 810000 1060000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@1320000000 {
+ 			opp-hz = /bits/ 64 <1320000000>;
+-			opp-microvolt = <900000 900000 1160000>;
++			opp-microvolt = <870000 870000 1160000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 
+ 		opp@1488000000 {
+ 			opp-hz = /bits/ 64 <1488000000>;
+-			opp-microvolt = <960000 960000 1160000>;
++			opp-microvolt = <930000 930000 1160000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+  		};
+ 
+ 		opp@1800000000 {
+ 			opp-hz = /bits/ 64 <1800000000>;
+-			opp-microvolt = <1060000 1060000 1160000>;
++			opp-microvolt = <1030000 1030000 1160000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+ 		};
+ 	};

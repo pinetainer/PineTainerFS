@@ -455,13 +455,10 @@ When the four CPUs operate at 1.4 GHz, 100% busy, the temperature is
 stable at about 90 degrees, and the system can still operate normally.
 
 AlexTMjugador: como este parche se usa en conjunto con el que añade soporte para
-el controlador térmico, volver a añadir la frecuencia de 1,8 GHz. También reducir
-el voltaje máximo aplicado a los dos mayores puntos de frecuencia, para reducir
-la generación de calor y aumentar el rendimiento en cargas de trabajo prolongadas
-(undervolting).
+el controlador térmico, volver a añadir la frecuencia de 1,8 GHz.
 
 Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
-Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Reviewed-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
 ---
  arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi | 55 ++++++++++++++++++++
  1 file changed, 55 insertions(+)
@@ -536,25 +533,25 @@ index 723f5d991a74..84fb47062fe6 100644
 +
 +		opp@1080000000 {
 +			opp-hz = /bits/ 64 <1080000000>;
-+			opp-microvolt = <800000 800000 1060000>;
++			opp-microvolt = <840000 840000 1060000>;
 +			clock-latency-ns = <244144>; /* 8 32k periods */
 +		};
 +
 +		opp@1320000000 {
 +			opp-hz = /bits/ 64 <1320000000>;
-+			opp-microvolt = <800000 800000 1160000>;
++			opp-microvolt = <900000 900000 1160000>;
 +			clock-latency-ns = <244144>; /* 8 32k periods */
 +		};
 +
 +		opp@1488000000 {
 +			opp-hz = /bits/ 64 <1488000000>;
-+			opp-microvolt = <840000 840000 1160000>;
++			opp-microvolt = <960000 960000 1160000>;
 +			clock-latency-ns = <244144>; /* 8 32k periods */
 + 		};
 +
 +		opp@1800000000 {
 +			opp-hz = /bits/ 64 <1800000000>;
-+			opp-microvolt = <960000 960000 1160000>;
++			opp-microvolt = <1060000 1060000 1160000>;
 +			clock-latency-ns = <244144>; /* 8 32k periods */
 		};
  	};

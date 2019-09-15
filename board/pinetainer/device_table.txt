@@ -12,6 +12,7 @@
 /etc/init.d/mountfs				f	744	0	0	-	-	-	-	-
 /etc/init.d/S81xinetd.sh			f	744	0	0	-	-	-	-	-
 /etc/init.d/S82knockd.sh			f	744	0	0	-	-	-	-	-
+/etc/init.d/S98lxc.sh				f	744	0	0	-	-	-	-	-
 /etc/network/if-pre-up.d/puente			f	774	0	0	-	-	-	-	-
 /etc/network/if-post-down.d/puente		f	774	0	0	-	-	-	-	-
 /etc/network/if-pre-up.d/bonding		f	774	0	0	-	-	-	-	-

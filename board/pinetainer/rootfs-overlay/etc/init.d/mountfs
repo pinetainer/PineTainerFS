@@ -3,7 +3,15 @@
 # El tamaño del disco zram a crear para montar en /tmp.
 readonly TAM_ZRAM=1G
 
-readonly PATH='/bin:/sbin'
+# Los controladores de cgroup v1 que estarán disponibles.
+# lxc requiere que cada controlador tenga un directorio (jerarquía) independiente
+# (all no funciona).
+readonly CONTROLADORES_CGROUP='cpu,cpuacct,blkio,memory,devices,freezer,net_cls,net_prio,pids'
+# El directorio raíz de todos los controladores (jerarquías) de cgroup v1, donde
+# se montará un tmpfs.
+readonly RAIZ_CGROUP='/sys/fs/cgroup'
+
+readonly PATH='/bin:/sbin:/usr/sbin'
 
 # Monta un tmpfs en /tmp, a modo de regresión si no se pudo
 # montar un disco zram en ese directorio.
@@ -11,6 +19,20 @@ fallbackTmpfs() {
 	printf 'ERROR (fallback tmpfs)\n'
 	mount -t tmpfs -o mode=1777 tmpfs /tmp >/dev/null 2>&1
 	exit
+}
+
+# Monta jerarquías de cgroups v1.
+montarJerarquias() {
+	IFS=','
+
+	mount -t tmpfs -o size=64k cgroup_root /sys/fs/cgroup && for controlador in $CONTROLADORES_CGROUP; do
+		mkdir -p "$RAIZ_CGROUP/$controlador" && mount -t cgroup -o $controlador cgroup "$RAIZ_CGROUP/$controlador"
+		if [ $? != 0 ]; then
+			break
+		fi
+	done
+
+	unset IFS
 }
 
 # Primero, montar sistemas de ficheros mencionados en fstab
@@ -35,3 +57,12 @@ else
 
 	printf 'OK\n'
 fi
+
+
+# Escanear volúmenes lógicos disponibles
+printf 'Escaneando volúmenes lógicos disponibles: '
+vgchange -aay --sysinit && printf 'OK\n' || printf 'ERROR\n'
+
+# Finalmente, encargarse de los cgroups
+printf 'Montando jerarquías de cgroups v1: '
+montarJerarquias && printf 'OK\n' || printf 'ERROR\n'

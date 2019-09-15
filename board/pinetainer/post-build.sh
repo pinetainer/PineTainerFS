@@ -20,3 +20,6 @@ mkdir -p "$1/etc/dropbear"
 if [ -f "$1/etc/wpa_supplicant.conf" ]; then
 	chmod 660 "$1/etc/wpa_supplicant.conf"
 fi
+
+# Eliminar ficheros innecesarios generados por LXC
+rm -rf "$1/usr/share/lxc/selinux" || true

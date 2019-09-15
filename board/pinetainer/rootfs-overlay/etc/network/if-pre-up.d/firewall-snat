@@ -51,13 +51,18 @@ iptables -P INPUT DROP || exit $?
 # a la interfaz situada en la LAN física de la Pine
 iptables -A INPUT -s 192.168.0.0/27 -d 192.168.0.29 -j ACCEPT || exit $?
 iptables -A INPUT -s 192.168.0.0/27 -d 192.168.0.31 -j ACCEPT || exit $?
-iptables -A INPUT -i bond0 -d 255.255.255.255 -j ACCEPT || exit $?
 
 # Aceptar paquetes destinados a la misma VLAN por la que vienen
 # (aislamiento entre servicios ofrecidos por la Pine para diferentes VLAN)
 for vlan in $(seq 1 $NUM_VLAN); do
-	iptables -A INPUT -s $(vlanARed $vlanActual).0/24 -d $(vlanARed $vlanActual).0/24 -j ACCEPT || exit $?
+	iptables -A INPUT -s $(vlanARed $vlan).0/24 -d $(vlanARed $vlan).0/24 -j ACCEPT || exit $?
+	iptables -A INPUT -i br0.$vlan -d $(vlanARed $vlan).255 -j ACCEPT || exit $?
 done
+
+# Aceptar broadcasts limitados, vengan de donde vengan.
+# Se asume que un paquete proveniente de Internet no tiene
+# nunca como destino un broadcast limitado
+iptables -A INPUT -d 255.255.255.255 -j ACCEPT || exit $?
 
 # Exponer servicios brindados a la LAN física que se desea que sean accesibles desde Internet.
 # Nunca se exponen servicios brindados exclusivamente a las VLAN

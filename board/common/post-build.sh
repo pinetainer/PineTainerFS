@@ -1,6 +1,6 @@
 #!/bin/sh
 # Información de versión más apropiada que la predeterminada
-printf "NAME=\"Linux\"\nVERSION=\"5.3-rc8\"\nID=linux\nID_LIKE=\"buildroot\"\nHOME_URL=\"https://github.com/pinetainer\"\nVARIANT=\"PineTainer\"\nVARIANT_ID=\"PineTainer\"" > "$1/usr/lib/os-release"
+printf "NAME=\"Linux\"\nVERSION=\"5.3\"\nID=linux\nID_LIKE=\"buildroot\"\nHOME_URL=\"https://github.com/pinetainer\"\nVARIANT=\"PineTainer\"\nVARIANT_ID=\"PineTainer\"" > "$1/usr/lib/os-release"
 
 # Borrar ficheros inútiles solo usados por bash
 rm -rf "$1/etc/bash_completion.d" || true

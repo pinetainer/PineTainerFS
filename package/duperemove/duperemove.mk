@@ -5,9 +5,9 @@
 ################################################################################
 
 DUPEREMOVE_VERSION = v0.11.1
-DUPEREMOVE_SITE = git://github.com/markfasheh/duperemove.git
+DUPEREMOVE_SITE = $(call github,markfasheh,duperemove,$(DUPEREMOVE_VERSION))
 DUPEREMOVE_LICENSE = GPL-2.0
-DUPEREMOVE_DEPENDENCIES = host-pkgconf
+DUPEREMOVE_DEPENDENCIES = host-pkgconf sqlite libglib2
 
 define DUPEREMOVE_BUILD_CMDS
 	$(MAKE) -C $(@D) $(TARGET_CONFIGURE_OPTS)

@@ -1,5 +1,3 @@
-source "$BR2_EXTERNAL_PineTainer_PATH/package/duperemove/Config.in"
-
 config PINETAINERFS_PAQUETES_RENDIMIENTO
 	bool "Paquetes de prueba de fiabilidad y rendimiento"
 	select BR2_PACKAGE_STRESS

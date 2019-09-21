@@ -1,4 +1,4 @@
 # Renombrar la interfaz de red que se conecte mediante USB, y activarla
 ACTION=="add", SUBSYSTEM=="net", DRIVERS=="usb", NAME="usb0", RUN="/sbin/ifup --allow=hotplug $name"
 # Desactivar interfaces de red que se desconecten
-ACTION=="remove", SUBSYSTEM=="net", RUN="/sbin/ifdown --allow=hotplug --force $name"
+ACTION=="remove", SUBSYSTEM=="net", RUN="/sbin/ifdown --allow=hotplug $name"

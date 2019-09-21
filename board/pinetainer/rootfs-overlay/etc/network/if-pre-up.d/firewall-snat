@@ -22,11 +22,11 @@ readonly PUERTOS_UDP_PUBLICOS='123'
 # las redes que se especifiquen manualmente
 iptables -P FORWARD DROP || exit $?
 
-# Enrutar paquetes desde VLANs hacia Internet
-iptables -A FORWARD -s 172.16.0.0/12 -o bond0 ! -d 192.168.0.0/27 -j ACCEPT || exit $?
+# Enrutar paquetes desde VLANs hacia Internet (máscara /16 por posibilidad de tethering)
+iptables -A FORWARD -s 172.16.0.0/12 -o bond0 ! -d 192.168.0.0/16 -j ACCEPT || exit $?
 
 # Enrutar paquetes desde Internet hacia VLANs
-iptables -A FORWARD -i bond0 ! -s 192.168.0.0/27 -d 172.16.0.0/12 -j ACCEPT || exit $?
+iptables -A FORWARD -i bond0 ! -s 192.168.0.0/16 -d 172.16.0.0/12 -j ACCEPT || exit $?
 
 # Activar enrutamiento IPv4
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -38,7 +38,7 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 # Los paquetes enrutados desde las VLAN por bond0 sufren
 # SNAT, para que la pasarela del ISP pueda abstraerse de la
 # presencia de los contenedores
-iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o bond0 -j SNAT --to-source 192.168.0.29 || exit $?
+iptables -t nat -A POSTROUTING ! -s 192.168.0.0/27 -o bond0 -j SNAT --to-source 192.168.0.29 || exit $?
 
 ###############
 # CORTAFUEGOS #
@@ -49,8 +49,8 @@ iptables -P INPUT DROP || exit $?
 
 # Siempre aceptar paquetes provenientes de la LAN física, si van destinados
 # a la interfaz situada en la LAN física de la Pine
-iptables -A INPUT -s 192.168.0.0/27 -d 192.168.0.29 -j ACCEPT || exit $?
-iptables -A INPUT -s 192.168.0.0/27 -d 192.168.0.31 -j ACCEPT || exit $?
+iptables -A INPUT -s 192.168.0.0/16 -d 192.168.0.29 -j ACCEPT || exit $?
+iptables -A INPUT -s 192.168.0.0/16 -d 192.168.0.31 -j ACCEPT || exit $?
 
 # Aceptar paquetes destinados a la misma VLAN por la que vienen
 # (aislamiento entre servicios ofrecidos por la Pine para diferentes VLAN)

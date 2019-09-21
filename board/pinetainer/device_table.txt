@@ -21,3 +21,5 @@
 /etc/network/if-post-down.d/wlan		f	774	0	0	-	-	-	-	-
 /etc/network/if-pre-up.d/firewall-snat		f	774	0	0	-	-	-	-	-
 /etc/network/if-post-down.d/firewall-snat	f	774	0	0	-	-	-	-	-
+/etc/network/if-pre-up.d/tethering		f	774	0	0	-	-	-	-	-
+/etc/network/if-post-down.d/tethering		f	774	0	0	-	-	-	-	-

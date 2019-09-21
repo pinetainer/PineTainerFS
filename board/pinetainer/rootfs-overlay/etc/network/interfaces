@@ -4,12 +4,17 @@
 auto wlan0
 iface wlan0 inet manual
 
+# Interfaz de tethering
+allow-hotplug usb0
+iface usb0 inet manual
+
 # Configurar interfaz bond0
-# (bonding de Ethernet + Wi-Fi)
+# (bonding de Ethernet + Wi-Fi + tethering)
 auto bond0
 iface bond0 inet static
-        address 192.168.0.29/27
-        gateway 192.168.0.1
+	address 192.168.0.29/27
+	gateway 192.168.0.1
+	metric 1
 
 # Crear interfaz de puente Ethernet para contenedores
 auto br0

@@ -23,7 +23,7 @@ vlanARed() {
 
 # No hacer nada si no estamos configurando el dispositivo
 # de puente
-if [ "$IFACE" = $DISPOSITIVO_PUENTE ]; then
+if [ "$IFACE" = $DISPOSITIVO_PUENTE -a "$MODE" = 'start' ]; then
 	# Eliminar puente de igual nombre ya creado, si hay
 	if [ -d /sys/class/net/$DISPOSITIVO_PUENTE ]; then
 		ip link del $DISPOSITIVO_PUENTE || exit $?

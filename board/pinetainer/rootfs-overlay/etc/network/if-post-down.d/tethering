@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. /etc/network/if-pre-up.d/tethering
+
+# No hacer nada si no estamos configurando usb0
+if [ "$IFACE" = 'usb0' ]; then
+	# Eliminar la IP de bond0 situada en la red de tethering, y su puerta de enlace
+	ip addr del 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING/24 dev bond0 >/dev/null 2>&1
+	ip route del default via 192.168.$OCTETO_RED_TETHERING.$PUERTA_ENLACE_TETHERING dev bond0 >/dev/null 2>&1
+
+	# Eliminar entradas de iptables creadas
+	if iptables -t nat -C POSTROUTING -o bond0 ! -s 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j SNAT \
+		--to-source 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING >/dev/null 2>&1
+	then
+		iptables -t nat -D POSTROUTING -o bond0 ! -s 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j SNAT \
+			--to-source 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING || exit $?
+	fi
+	if iptables -t nat -C PREROUTING -i bond0 -d 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j DNAT \
+		--to-destination 192.168.0.29 >/dev/null 2>&1
+	then
+		iptables -t nat -D PREROUTING -i bond0 -d 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j DNAT --to-destination 192.168.0.29 || exit $?
+	fi
+fi

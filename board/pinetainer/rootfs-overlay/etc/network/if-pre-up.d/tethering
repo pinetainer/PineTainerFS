@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# El penúltimo octeto de la red de tethering creada por el smartphone.
+# Normalmente es 42.
+readonly OCTETO_RED_TETHERING=42
+# La dirección de host donde se encuentra la puerta de enlace, dentro
+# de la red de tethering. Se corresponde con el último octeto de la
+# dirección completa. Si fuese 1, podría haber conflictos con entradas
+# estáticas en la tabla ARP.
+readonly PUERTA_ENLACE_TETHERING=129
+# El último octeto de la dirección de red que la Pine se autoasignará
+# cuando se esté usando tethering.
+readonly OCTETO_HOST_TETHERING=50
+
+# No hacer nada si no estamos configurando usb0, estamos
+# desconfigurando interfaces o no tenemos bonding disponible
+if [ "$IFACE" = 'usb0' -a "$MODE" = 'start' -a -d /sys/class/net/bond0 -a -d /sys/class/net/$IFACE ]; then
+	# El uso de tethering implica tener que usar una puerta de enlace
+	# en otra red para poder enviar comunicarse con Internet. Así pues,
+	# hacemos la puerta de enlace accesible y la configuramos como de
+	# mayor prioridad que la habitual: se supone que si recurrimos a tethering
+	# es porque queremos usar la otra puerta de enlace siempre
+	ip addr add 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING/24 dev bond0 || exit $?
+	ip route add default via 192.168.$OCTETO_RED_TETHERING.$PUERTA_ENLACE_TETHERING dev bond0 metric 0 || exit $?
+
+	# Queremos que la transición de una red a otra sea lo más transparente posible
+	# para las aplicaciones e iptables. Así pues, haremos SNAT de todos los paquetes que
+	# generemos hacia bond0, para que el otro extremo reconozca la IP como parte de su red.
+	# También realizaremos DNAT de todas las comunicaciones destinadas hacia la IP en
+	# la red de tethering, destiándolas en su lugar a la IP en la red habitual
+	iptables -t nat -I POSTROUTING -o bond0 ! -s 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j SNAT --to-source 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING || exit $?
+	iptables -t nat -A PREROUTING -i bond0 -d 192.168.$OCTETO_RED_TETHERING.$OCTETO_HOST_TETHERING -j DNAT --to-destination 192.168.0.29 || exit $?
+
+	# Registrarnos como participantes del bonding
+	ip link set $IFACE down || exit $?
+	ip link set $IFACE master bond0 || exit $?
+fi

@@ -35,7 +35,27 @@ montarJerarquias() {
 	unset IFS
 }
 
-# Primero, montar sistemas de ficheros mencionados en fstab
+# Monta el sistema de ficheros proc, si no fue montado
+# ya en /proc.
+montarProcSiNecesario() {
+	if mountpoint /proc >/dev/null 2>&1; then
+		# Ya se ha montado /proc
+		:
+	else
+		mount -t proc proc /proc
+	fi
+}
+
+# Necesitamos haber montado /proc para usar LVM
+if montarProcSiNecesario; then
+	# Escanear volúmenes lógicos disponibles
+	printf 'Escaneando volúmenes lógicos disponibles: '
+	vgchange -aay --sysinit && printf 'OK\n' || printf 'ERROR\n'
+else
+	printf 'No se pudo montar /proc. No se han escaneado los volúmenes lógicos disponibles.\n'
+fi
+
+# Montar sistemas de ficheros mencionados en fstab
 printf 'Montando sistemas de ficheros configurados en /etc/fstab: '
 mount -a && printf 'OK\n' || printf 'ERROR\n'
 
@@ -57,11 +77,6 @@ else
 
 	printf 'OK\n'
 fi
-
-
-# Escanear volúmenes lógicos disponibles
-printf 'Escaneando volúmenes lógicos disponibles: '
-vgchange -aay --sysinit && printf 'OK\n' || printf 'ERROR\n'
 
 # Finalmente, encargarse de los cgroups
 printf 'Montando jerarquías de cgroups v1: '

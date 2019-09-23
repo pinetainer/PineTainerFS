@@ -215,7 +215,7 @@ index 319cd0461..ea554faae 100644
 +	/* Ignore the first quotation pair if present */
 +	if (arglen > 1 && (arg[0] == '"' && arg[arglen - 1] == '"' || arg[0] == '\'' && arg[arglen - 1] == '\'')) {
 +		arg++;
-+		arglen--;
++		arglen -= 2;
 +	}
 +
 +	/* arglen + \0 */

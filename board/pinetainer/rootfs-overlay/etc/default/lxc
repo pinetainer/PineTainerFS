@@ -1,28 +1,21 @@
-# LXC_AUTO - whether or not to start containers at boot
-LXC_AUTO="true"
+# Valores de configuración para /usr/libexec/lxc/lxc-containers
 
-# BOOTGROUPS - What groups should start on bootup?
-#	Comma separated list of groups.
-#	Leading comma, trailing comma or embedded double
-#	comma indicates when the NULL group should be run.
-# Example (default): boot the onboot group first then the NULL group
-BOOTGROUPS="onboot"
+# Si true, se iniciarán contenedores con
+# la propiedad lxc.start.auto al arrancar la Pine
+LXC_AUTO=true
 
-# SHUTDOWNDELAY - Wait time for a container to shut down.
-#	Container shutdown can result in lengthy system
-#	shutdown times.  Even 5 seconds per container can be
-#	too long.
+# Grupos de contenedores a arrancar, por orden
+BOOTGROUPS="pinetainer"
+
+# Segundos a esperar antes de detener forzosamente los contenedores
 SHUTDOWNDELAY=5
 
-# OPTIONS can be used for anything else.
-#	If you want to boot everything then
-#	options can be "-a" or "-a -A".
+# Opciones para iniciar contenedores con lxc-autostart
 OPTIONS=
 
-# STOPOPTS are stop options.  The can be used for anything else to stop.
-#	If you want to kill containers fast, use -k
+# Opciones para detener contenedores con lxc-autostart
 STOPOPTS="-a -A -s"
 
-USE_LXC_BRIDGE="false"  # overridden in lxc-net
-
-[ ! -f /etc/default/lxc-net ] || . /etc/default/lxc-net
+# No inicializar la red con scripts de LXC
+# (ya lo hacemos en ifupdown)
+USE_LXC_BRIDGE=false

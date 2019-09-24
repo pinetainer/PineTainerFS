@@ -3,14 +3,14 @@
 case "$1" in
   start)
 	printf "Iniciando contenedores de LXC: "
-	lxc-autostart
+	/usr/libexec/lxc/lxc-containers $1
 	{
 		[ $? = 0 ] && echo "OK"
 	} || echo "ERROR"
 	;;
   stop)
 	printf "Deteniendo contenedores de LXC: "
-	lxc-autostart -saA -t5
+	/usr/libexec/lxc/lxc-containers $1
 	{
 		[ $? = 0 ] && echo "OK"
 	} || echo "ERROR"

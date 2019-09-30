@@ -30,7 +30,10 @@ montarJerarquias() {
 		if [ $? != 0 ]; then
 			break
 		fi
-	done
+	done && \
+	# También montamos una jerarquía sin controladores llamada "systemd", pues se espera su existencia
+	# por parte de contenedores que utilicen systemd
+	mkdir -p "$RAIZ_CGROUP/systemd" && mount -t cgroup -o none,name=systemd cgroup "$RAIZ_CGROUP/systemd"
 
 	unset IFS
 }

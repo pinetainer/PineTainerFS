@@ -1,0 +1,30 @@
+From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Date: Mon, 30 Sep 2019 22:51:01 +0200
+Subject: [PATCH] lxc-containers.in: No gestionar archivos de bloqueo
+
+Esto provoca errores en la ejecución del script en el caso de la Pine.
+---
+ config/init/common/lxc-containers.in | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/config/init/common/lxc-containers.in b/config/init/common/lxc-containers.in
+index 3779d83b3..343c3e58f 100644
+--- a/config/init/common/lxc-containers.in
++++ b/config/init/common/lxc-containers.in
+@@ -81,13 +81,11 @@ case "$1" in
+         if [ -n "$BOOTGROUPS" ]; then
+             BOOTGROUPS="-g $BOOTGROUPS"
+         fi
+-        touch "$lockdir"/lxc
+         # Start containers
+         wait_for_bridge
+ 
+         # Start autoboot containers first then the NULL group "onboot,".
+         "$bindir"/lxc-autostart $OPTIONS $BOOTGROUPS
+-        rm -f "$lockdir"/lxc
+     ;;
+ 
+     stop)
+-- 
+2.20.1
+

@@ -1,0 +1,52 @@
+#!/bin/sh
+
+. /usr/libexec/lxc/pinetainer-functions.sh
+
+showUsageAndExit() {
+	echo "Usage: $0 -i container_name -f container_rootfs_size [-c cpu_shares_percent] [-m memory_percent] [-n network_bw_percent] [-l disk_bw_percent]"
+	exit 1
+}
+
+# Parameters:
+# $1: the name of the variable to initialize from $OPTARG, if it is a valid percentage
+validateAndSetPercentOptarg() {
+	if [ "$OPTARG" -gt 0 -a "$OPTARG" -le 100 ] 2>&4; then
+		eval "$1=\"$OPTARG\""
+	else
+		echo "Invalid $1 argument, expected [0, 100] percentage number"
+		showUsageAndExit
+	fi
+}
+
+# Parameters:
+# $1: the name of the argument to check if it was initialized
+checkMissingArgument() {
+	if eval "[ -z \"\$$1\" ]"; then
+		echo "Missing $1 argument"
+		showUsageAndExit
+	fi
+}
+
+# Parse command line options
+while getopts 'i:c:m:n:d:' option; do
+	case $option in
+		'i') container_name="$OPTARG";;
+		'f') container_rootfs_size="$OPTARG";;
+		'd') distribution="$OPTARG";;
+		'r') release="$OPTARG";;
+		'a') arch="$OPTARG";;
+		'c') validateAndSetPercentOptarg 'cpu_shares_percent';;
+		'm') validateAndSetPercentOptarg 'memory_percent';;
+		'n') validateAndSetPercentOptarg 'network_bw_percent';;
+		'l') validateAndSetPercentOptarg 'disk_bw_percent';;
+		'?') showUsageAndExit;;
+	esac
+done
+checkMissingArgument 'container_name'
+checkMissingArgument 'container_rootfs_size'
+checkMissingArgument 'distribution'
+checkMissingArgument 'release'
+checkMissingArgument 'arch'
+
+# Create the Pinetainer!
+createContainer "$container_name" "$container_rootfs_size" "$distribution" "$release" "$arch"

@@ -24,18 +24,36 @@ fallbackTmpfs() {
 # Monta jerarquías de cgroups v1.
 montarJerarquias() {
 	IFS=','
-
 	mount -t tmpfs -o size=64k cgroup_root /sys/fs/cgroup && for controlador in $CONTROLADORES_CGROUP; do
 		mkdir -p "$RAIZ_CGROUP/$controlador" && mount -t cgroup -o $controlador cgroup "$RAIZ_CGROUP/$controlador"
 		if [ $? != 0 ]; then
 			break
+		else
+			# Establecer parámetros predeterminados para algunos controladores
+			if [ "$controlador" = 'memory' ]; then
+				echo 1 > "$RAIZ_CGROUP/$controlador/memory.use_hierarchy"
+			fi
+
+			# Añadir todos los procesos presentes hasta la fecha a un cgroup no raíz, para un mejor
+			# control de sus límites de recursos: si están en el cgroup raíz, cada proceso se considera un cgroup
+			# para controladores como cpu.share
+			unset IFS
+			IFS='
+'			mkdir -p "$RAIZ_CGROUP/$controlador/system" && mkdir -p "$RAIZ_CGROUP/$controlador/lxc" && \
+			for tarea in $(cat "$RAIZ_CGROUP/$controlador/tasks"); do
+				echo $tarea >> "$RAIZ_CGROUP/$controlador/system/tasks" || true
+			done && \
+			if [ "$controlador" = 'cpu' ]; then
+				# Usar solamente el 10% del tiempo total de CPU para los procesos del sistema
+				# (1024 / 10 ~= 103). Otros cgroup (el cgroup lxc) tendrán derecho a repartirse
+				# el 90% del tiempo de CPU
+				echo 103 > "$RAIZ_CGROUP/$controlador/system/cpu.shares"
+			fi
 		fi
 	done && \
 	# También montamos una jerarquía sin controladores llamada "systemd", pues se espera su existencia
 	# por parte de contenedores que utilicen systemd
 	mkdir -p "$RAIZ_CGROUP/systemd" && mount -t cgroup -o none,name=systemd cgroup "$RAIZ_CGROUP/systemd"
-
-	unset IFS
 }
 
 # Monta el sistema de ficheros proc, si no fue montado
@@ -64,7 +82,7 @@ mount -a && printf 'OK\n' || printf 'ERROR\n'
 
 # A continuación, montar /tmp como disco zram
 # (memoria comprimida)
-if mountpoint '/tmp' >/dev/null 2>&1; then
+if mountpoint -q '/tmp'; then
 	# Ya se ha montado /tmp
 	:
 else

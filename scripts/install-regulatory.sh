@@ -1,7 +1,9 @@
-#!/bin/sh -f
+#!/bin/sh
 
 # Base URL to download regulatory database files from.
 readonly GIT_URL='https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/plain/'
+# The root directory where kernel configs will be located
+readonly KERNEL_CONFIG_ROOT_SEARCH_DIR='board'
 # Kconfig symbol to look for to deduce where the kernel expects firmware files to be.
 readonly EXTRA_FIRMWARE_DIR_SYMBOL='EXTRA_FIRMWARE_DIR'
 # The default firmware directory, where the kernel should expect to find firmware files
@@ -12,42 +14,15 @@ readonly DEFAULT_FIRMWARE_DIR='/lib/firmware'
 # status code.
 printError() {
 	printf '\n' >&2
-	printf '! %s\n' "$1" >&2
+	printf '\033[1;91;40m! %s\n' "$1" >&2
 	exit 1
 }
 
 # Gets the download URL for a certain file that is inside the Git
 # repository specified in $GIT_URL.
 # $1: the file to get the download URL of. It'll be printed to stdout.
-getDownloadUrl() {
+buildDownloadUrl() {
 	printf '%s%s' "$GIT_URL" "$1"
-}
-
-# Reads one character from stdin, representing an answer to a yes/no
-# question. The answer is printed to stdout.
-readYesNoAnswer() {
-	sttyOld=$(stty -g)
-	stty -icanon min 1
-
-	printf '%s' "$(dd bs=1 count=1 2>/dev/null)"
-
-	stty "$sttyOld"
-}
-
-# Asks a yes/no question to the user. A newline character is printed
-# to stdout after the answer automatically, to prettify output. The
-# answer is saved to the ANSWER variable.
-# $1: the question text.
-# $2: the default answer, if running in non-interactive mode (defaults to y).
-askYesNoQuestion() {
-	if [ "$INTERACTIVE" = '1' ]; then
-		printf '%s' "$1"
-		ANSWER=$(readYesNoAnswer)
-		printf '\n'
-	else
-		# Assume default answer
-		ANSWER=${2:-y}
-	fi
 }
 
 # Adds to the EXTRA_FIRMWARE_DIR variable a new directory to install regulatory
@@ -57,49 +32,38 @@ askYesNoQuestion() {
 addFirmwareFolderFromConfig() {
 	KERNEL_CONFIGS=$((KERNEL_CONFIGS + 1))
 
-	IFS='
-'
-
-	(cat "$1" || catError=1) | for config; do
+	while read -r config; do
 		# Split line in two, using the = character as a token
 		symbol=${config%%=*}
 		value=${config#*=}
 
 		if [ "$symbol" = "$EXTRA_FIRMWARE_DIR_SYMBOL" ]; then
-			askYesNoQuestion $(printf '%s sets %s to %s. Install regulatory files there? (Y/n) ' "$1" "$EXTRA_FIRMWARE_DIR" "$value")
-
-			if [ "$ANSWER" != 'n' -a "$ANSWER" != 'N' ]; then
+			if ! echo "$EXTRA_FIRMWARE_DIRS" | grep -Fq "$value"; then
+				printf '> %s sets %s to %s. Adding %s to the list of directories to install regulatory files to.\n' "$1" "$EXTRA_FIRMWARE_DIR_SYMBOL" "$value" "$value"
 				EXTRA_FIRMWARE_DIRS=$(printf '%s\n%s' "$value" "$EXTRA_FIRMWARE_DIRS")
-				folderFound=1
 			fi
+			folderFound=1
 
 			break
 		fi
-	done
+	done < "$1"
 
 	# If we parsed the file, but it didn't cointain a firmware directory (i.e. is a defconfig),
 	# then append the default directory
-	if [ -z "$folderFound" -a -z "$catError" ]; then
-		askYesNoQuestion $(printf 'Install regulatory files in %s? (Y/n) ' "$DEFAULT_FIRMWARE_DIR")
-
-		if [ "$ANSWER" != 'n' -a "$ANSWER" != 'N' ]; then
+	if [ -z "$folderFound" ]; then
+		if ! echo "$EXTRA_FIRMWARE_DIRS" | grep -Fq "$DEFAULT_FIRMWARE_DIR"; then
+			printf '> %s does not define %s. Adding %s to the list of directories to install regulatory files to.\n' "$1" "$EXTRA_FIRMWARE_DIR_SYMBOL" "$DEFAULT_FIRMWARE_DIR"
 			EXTRA_FIRMWARE_DIRS=$(printf '%s\n%s' "$EXTRA_FIRMWARE_DIRS" "$DEFAULT_FIRMWARE_DIR")
 		fi
 	fi
-
-	unset IFS
-	unset folderFound
-	unset catError
 }
 
-
-# Downloads a file from getDownloadUrl, saving it in the specified folder,
+# Downloads a file from buildDownloadUrl, saving it in the specified folder,
 # only if it didn't exist or is newer than the previous one.
 # $1: the filename to download from the Git repository defined in $GIT_URL.
 # $2: the folder to save the file to.
 downloadTo() {
-	wget -Nc --no-if-modified-since -P "$2" "$(getDownloadUrl $1)" || printError "An error occured while downloading $1."
-	return $?
+	wget -Nc --no-if-modified-since -P "$2" "$(buildDownloadUrl "$1")" || printError "An error occured while downloading $1."
 }
 
 # Installs the regulatory database files in the directory where the kernel
@@ -107,9 +71,11 @@ downloadTo() {
 installRegulatoryFiles() {
 	KERNEL_CONFIGS=0
 
-	for file in $(find -type f -name 'linux.config'); do
+	while IFS= read -r file; do
 		addFirmwareFolderFromConfig "$file"
-	done
+	done <<CMD
+$(find "$KERNEL_CONFIG_ROOT_SEARCH_DIR" ! -name '*\\n*' -name 'linux.config')
+CMD
 
 	if [ -n "$EXTRA_FIRMWARE_DIRS" ]; then
 		for directory in $EXTRA_FIRMWARE_DIRS; do
@@ -122,21 +88,10 @@ installRegulatoryFiles() {
 	fi
 
 	if [ $KERNEL_CONFIGS -eq 0 ]; then
-		echo '- No kernel configuration files found. Nothing has been installed. Please check that the linux.config files are in your current working directory, or inside a subfolder.'
+		echo '\033[1;91;40m! No kernel configuration files found. Nothing has been installed. Please check that the linux.config files are in your current working directory, or inside a subfolder.'
 	else
-		echo "- Regulatory database files installed for $KERNEL_CONFIGS kernel/s."
+		echo "> Regulatory database files installed for $KERNEL_CONFIGS kernel(s)."
 	fi
 }
-
-# Parse command line arguments
-INTERACTIVE=1
-while getopts 'n' option; do
-	case $option in
-		n) unset INTERACTIVE
-		   break;;
-		?) printf 'Usage: %s [-n]\n\t-n: skips asking the user for confirmation to install regulatory database files.\n' "$0"
-		   exit 2;;
-	esac
-done
 
 installRegulatoryFiles

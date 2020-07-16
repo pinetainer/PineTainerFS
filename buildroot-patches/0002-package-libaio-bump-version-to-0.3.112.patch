@@ -1,0 +1,322 @@
+From 6bc9c1c2988fbc574f14c62ed25e8109847b7898 Mon Sep 17 00:00:00 2001
+From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Date: Wed, 15 Jul 2020 14:02:31 +0200
+Subject: [PATCH] package/libaio: bump version to 0.3.112
+
+This new version integrates the Buildroot patches already.
+However, I added a new patch to fix some symbols not being
+exported when compiling with LTO and GCC 10.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+ ...01-fix-LTO-removing-exported-symbols.patch | 103 ++++++++++++++++++
+ ...-ENABLE_SHARED-boolean-to-allow-stat.patch |  56 ----------
+ ...ile-add-missing-DESTDIR-variable-use.patch |  32 ------
+ ...t-libgcc-to-avoid-unresolved-symbols.patch |  57 ----------
+ package/libaio/libaio.hash                    |   2 +-
+ package/libaio/libaio.mk                      |   2 +-
+ 6 files changed, 105 insertions(+), 147 deletions(-)
+ create mode 100644 package/libaio/0001-fix-LTO-removing-exported-symbols.patch
+ delete mode 100644 package/libaio/0001-src-Makefile-add-ENABLE_SHARED-boolean-to-allow-stat.patch
+ delete mode 100644 package/libaio/0002-Makefile-add-missing-DESTDIR-variable-use.patch
+ delete mode 100644 package/libaio/0003-Link-against-libgcc-to-avoid-unresolved-symbols.patch
+
+diff --git a/package/libaio/0001-fix-LTO-removing-exported-symbols.patch b/package/libaio/0001-fix-LTO-removing-exported-symbols.patch
+new file mode 100644
+index 0000000000..5084758ce6
+--- /dev/null
++++ b/package/libaio/0001-fix-LTO-removing-exported-symbols.patch
+@@ -0,0 +1,103 @@
++From c04d7aebba3269305bed21347b948d243f7e56fc Mon Sep 17 00:00:00 2001
++From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
++Date: Tue, 14 Jul 2020 21:26:49 +0200
++Subject: [PATCH] Fix LTO removing exported symbols
++
++Symbol versioning and LTO don't work so well together.
++Fix that by marking versioned symbols as externally visible. See:
++https://stackoverflow.com/a/54045851/9366153
++https://forums.gentoo.org/viewtopic-t-1096510-start-0.html
++
++Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
++---
++ src/Makefile        | 1 +
++ src/compat-0_1.c    | 7 ++++---
++ src/io_cancel.c     | 2 +-
++ src/io_getevents.c  | 2 +-
++ src/io_queue_wait.c | 2 +-
++ 5 files changed, 8 insertions(+), 6 deletions(-)
++
++diff --git a/src/Makefile b/src/Makefile
++index 37ae219..94911b4 100644
++--- a/src/Makefile
+++++ b/src/Makefile
++@@ -4,6 +4,7 @@ libdir=$(prefix)/lib
++ 
++ CFLAGS ?= -g -fomit-frame-pointer -O2
++ CFLAGS += -Wall -I. -fPIC
+++CFLAGS += -flto-partition=none
++ SO_CFLAGS=-shared $(CFLAGS)
++ L_CFLAGS=$(CFLAGS)
++ LINK_FLAGS=
++diff --git a/src/compat-0_1.c b/src/compat-0_1.c
++index 136396f..ded0bd0 100644
++--- a/src/compat-0_1.c
+++++ b/src/compat-0_1.c
++@@ -29,7 +29,7 @@
++ 
++ /* ABI change.  Provide partial compatibility on this one for now. */
++ SYMVER(compat0_1_io_cancel, io_cancel, 0.1);
++-int compat0_1_io_cancel(io_context_t ctx, struct iocb *iocb)
+++__attribute__((externally_visible)) int compat0_1_io_cancel(io_context_t ctx, struct iocb *iocb)
++ {
++ 	struct io_event event;
++ 
++@@ -38,7 +38,7 @@ int compat0_1_io_cancel(io_context_t ctx, struct iocb *iocb)
++ }
++ 
++ SYMVER(compat0_1_io_queue_wait, io_queue_wait, 0.1);
++-int compat0_1_io_queue_wait(io_context_t ctx, struct timespec *when)
+++__attribute__((externally_visible)) int compat0_1_io_queue_wait(io_context_t ctx, struct timespec *when)
++ {
++ 	struct timespec timeout;
++ 	if (when)
++@@ -49,7 +49,8 @@ int compat0_1_io_queue_wait(io_context_t ctx, struct timespec *when)
++ 
++ /* ABI change.  Provide backwards compatibility for this one. */
++ SYMVER(compat0_1_io_getevents, io_getevents, 0.1);
++-int compat0_1_io_getevents(io_context_t ctx_id, long nr,
+++__attribute__((externally_visible)) int compat0_1_io_getevents(
+++		       io_context_t ctx_id, long nr,
++ 		       struct io_event *events,
++ 		       const struct timespec *const_timeout)
++ {
++diff --git a/src/io_cancel.c b/src/io_cancel.c
++index 2f0f5f4..eb1e2f8 100644
++--- a/src/io_cancel.c
+++++ b/src/io_cancel.c
++@@ -19,5 +19,5 @@
++ #include <libaio.h>
++ #include "syscall.h"
++ 
++-io_syscall3(int, io_cancel_0_4, io_cancel, io_context_t, ctx, struct iocb *, iocb, struct io_event *, event)
+++__attribute__((externally_visible)) io_syscall3(int, io_cancel_0_4, io_cancel, io_context_t, ctx, struct iocb *, iocb, struct io_event *, event)
++ DEFSYMVER(io_cancel_0_4, io_cancel, 0.4)
++diff --git a/src/io_getevents.c b/src/io_getevents.c
++index 90d6081..fc636af 100644
++--- a/src/io_getevents.c
+++++ b/src/io_getevents.c
++@@ -25,7 +25,7 @@
++ 
++ io_syscall5(int, __io_getevents_0_4, io_getevents, io_context_t, ctx, long, min_nr, long, nr, struct io_event *, events, struct timespec *, timeout)
++ 
++-int io_getevents_0_4(io_context_t ctx, long min_nr, long nr, struct io_event * events, struct timespec * timeout)
+++__attribute__((externally_visible)) int io_getevents_0_4(io_context_t ctx, long min_nr, long nr, struct io_event * events, struct timespec * timeout)
++ {
++ 	if (aio_ring_is_empty(ctx, timeout))
++ 		return 0;
++diff --git a/src/io_queue_wait.c b/src/io_queue_wait.c
++index 538d2f3..d41daf5 100644
++--- a/src/io_queue_wait.c
+++++ b/src/io_queue_wait.c
++@@ -24,7 +24,7 @@
++ 
++ struct timespec;
++ 
++-int io_queue_wait_0_4(io_context_t ctx, struct timespec *timeout)
+++__attribute__((externally_visible)) int io_queue_wait_0_4(io_context_t ctx, struct timespec *timeout)
++ {
++ 	return io_getevents(ctx, 0, 0, NULL, timeout);
++ }
++-- 
++2.27.0
++
+diff --git a/package/libaio/0001-src-Makefile-add-ENABLE_SHARED-boolean-to-allow-stat.patch b/package/libaio/0001-src-Makefile-add-ENABLE_SHARED-boolean-to-allow-stat.patch
+deleted file mode 100644
+index 9c876bdc5c..0000000000
+--- a/package/libaio/0001-src-Makefile-add-ENABLE_SHARED-boolean-to-allow-stat.patch
++++ /dev/null
+@@ -1,56 +0,0 @@
+-From 4dc04ef55710f7f5c1e55ebb5cba8e22a126404e Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+-Date: Mon, 29 Aug 2016 22:14:26 +0200
+-Subject: [PATCH] src/Makefile: add ENABLE_SHARED boolean to allow static-only
+- build
+-
+-Currently, the libaio builds sytem builds a shared library
+-unconditionally. In some environments, this is not possible or
+-desirable. This commit adds a new Makefile variable, ENABLE_SHARED,
+-which defaults to "1" (i.e shared library enabled) and that allows to
+-override this behavior, and therefore to disable the build and
+-installation of the shared library.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+----
+- src/Makefile | 9 ++++++++-
+- 1 file changed, 8 insertions(+), 1 deletion(-)
+-
+-diff --git a/src/Makefile b/src/Makefile
+-index eadb336..cfab240 100644
+---- a/src/Makefile
+-+++ b/src/Makefile
+-@@ -8,12 +8,17 @@ SO_CFLAGS=-shared $(CFLAGS)
+- L_CFLAGS=$(CFLAGS)
+- LINK_FLAGS=
+- LINK_FLAGS+=$(LDFLAGS)
+-+ENABLE_SHARED ?= 1
+- 
+- soname=libaio.so.1
+- minor=0
+- micro=1
+- libname=$(soname).$(minor).$(micro)
+--all_targets += libaio.a $(libname)
+-+all_targets += libaio.a
+-+
+-+ifeq ($(ENABLE_SHARED),1)
+-+all_targets += $(libname)
+-+endif
+- 
+- all: $(all_targets)
+- 
+-@@ -55,9 +60,11 @@ $(libname): $(libaio_sobjs) libaio.map
+- install: $(all_targets)
+- 	install -D -m 644 libaio.h $(includedir)/libaio.h
+- 	install -D -m 644 libaio.a $(libdir)/libaio.a
+-+ifeq ($(ENABLE_SHARED),1)
+- 	install -D -m 755 $(libname) $(libdir)/$(libname)
+- 	ln -sf $(libname) $(libdir)/$(soname)
+- 	ln -sf $(libname) $(libdir)/libaio.so
+-+endif
+- 
+- $(libaio_objs): libaio.h
+- 
+--- 
+-2.14.4
+-
+diff --git a/package/libaio/0002-Makefile-add-missing-DESTDIR-variable-use.patch b/package/libaio/0002-Makefile-add-missing-DESTDIR-variable-use.patch
+deleted file mode 100644
+index 49b9892ea4..0000000000
+--- a/package/libaio/0002-Makefile-add-missing-DESTDIR-variable-use.patch
++++ /dev/null
+@@ -1,32 +0,0 @@
+-From 517d9fbe63fbd7e72445dce1cb3f3d8457d838cb Mon Sep 17 00:00:00 2001
+-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+-Date: Tue, 14 Aug 2018 23:17:25 +0200
+-Subject: [PATCH] Makefile: add missing DESTDIR variable use
+-
+-Patch borrowed from OpenEmbedded, available at
+-recipes/libaio/libaio-0.3.106/destdir.patch in their source tree.
+-
+-It just adds support for the traditional DESTDIR variable to install
+-the library in a different sysroot than the normal /.
+-
+-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+----
+- Makefile | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/Makefile b/Makefile
+-index e9dbdb0..c1fb831 100644
+---- a/Makefile
+-+++ b/Makefile
+-@@ -14,7 +14,7 @@ all:
+- 	@$(MAKE) -C src
+- 
+- install:
+--	@$(MAKE) -C src install prefix=$(prefix) includedir=$(includedir) libdir=$(libdir)
+-+	@$(MAKE) -C src install prefix=$(DESTDIR)$(prefix) includedir=$(DESTDIR)$(includedir) libdir=$(DESTDIR)$(libdir)
+- 
+- check:
+- 	@$(MAKE) -C harness check
+--- 
+-2.14.4
+-
+diff --git a/package/libaio/0003-Link-against-libgcc-to-avoid-unresolved-symbols.patch b/package/libaio/0003-Link-against-libgcc-to-avoid-unresolved-symbols.patch
+deleted file mode 100644
+index 17204be75b..0000000000
+--- a/package/libaio/0003-Link-against-libgcc-to-avoid-unresolved-symbols.patch
++++ /dev/null
+@@ -1,57 +0,0 @@
+-From 672eaebd131c789a528e3a9cd089b4b69a82012b Mon Sep 17 00:00:00 2001
+-From: Guillem Jover <guillem@debian.org>
+-Date: Fri, 28 Sep 2018 13:15:54 +0300
+-Subject: [PATCH] Link against libgcc to avoid unresolved symbols
+-
+-We need to link agaisnt -lgcc, on at least hppa, PPC and ARC.
+-That's because in some corner-cases like compilation with -Os
+-on ARC and PPC so-called millicode (basically function prologue and
+-epilogue) implemented in libgcc.a is used. So we end up with
+-GLOBAL UNDEFINED symbol in libaio.so and then on linkage of the final
+-applicaiton LD fails to proceed saying:
+---------------------------->8----------------------
+-hidden symbol '__ld_r13_to_r15_ret' in .../libgcc.a(_millicodethunk_ret.o) is referenced by DSO
+---------------------------->8----------------------
+-
+-Also it looks like in general it is not the best idea to use either
+-"-nostartfiles" or "-nostdlib" when linking shared libs because
+-default construtor/destructor functions won't be executed, see
+-"5.2. Library constructor and destructor functions" in [1]
+-
+-So let's stop passing "-nostdlib" and "-nostartfiles" and get required
+-stuff built-in libaio.
+-
+-Initial patch taken from Debian [2].
+-
+-Fixes build failures in Buildroot like blktrace [3], lvm2 [4].
+-
+-Was submitted upstream via pull-request [5].
+-
+-[1] http://tldp.org/HOWTO/Program-Library-HOWTO/miscellaneous.html
+-[2] https://sources.debian.org/patches/libaio/0.3.111-1/01_link_libs.patch/
+-[3] http://autobuild.buildroot.net/results/17461209755038a30118d76acb4f43469a22a139/
+-[4] http://autobuild.buildroot.net/results/a5dfc87f94b97135e5cc84f6a876114891ed9dd9/
+-[5] https://pagure.io/libaio/pull-request/7
+-
+-Signed-off-by: Guillem Jover <guillem@debian.org>
+-Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
+----
+- src/Makefile | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/src/Makefile b/src/Makefile
+-index eadb336b47e3..5911c810c766 100644
+---- a/src/Makefile
+-+++ b/src/Makefile
+-@@ -3,7 +3,7 @@ includedir=$(prefix)/include
+- libdir=$(prefix)/lib
+- 
+- CFLAGS ?= -g -fomit-frame-pointer -O2
+--CFLAGS += -nostdlib -nostartfiles -Wall -I. -fPIC
+-+CFLAGS += -Wall -I. -fPIC
+- SO_CFLAGS=-shared $(CFLAGS)
+- L_CFLAGS=$(CFLAGS)
+- LINK_FLAGS=
+--- 
+-2.17.1
+-
+diff --git a/package/libaio/libaio.hash b/package/libaio/libaio.hash
+index 17dd1ff706..fd6c8f3982 100644
+--- a/package/libaio/libaio.hash
++++ b/package/libaio/libaio.hash
+@@ -1,5 +1,5 @@
+ # From https://releases.pagure.org/libaio/CHECKSUMS
+-sha256	62cf871ad8fd09eb3418f00aca7a7d449299b8e1de31c65f28bf6a2ef1fa502a	libaio-0.3.111.tar.gz
++sha256	ab0462f2c9d546683e5147b1ce9c195fe95d07fac5bf362f6c01637955c3b492	libaio-0.3.112.tar.gz
+ 
+ # Hash for license file:
+ sha256	5bbcbb737e60fe9deba08ecbd00920cfcc3403ba2e534c64fdeea49d6bb87509	COPYING
+diff --git a/package/libaio/libaio.mk b/package/libaio/libaio.mk
+index a215ca6533..34f08b75e7 100644
+--- a/package/libaio/libaio.mk
++++ b/package/libaio/libaio.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-LIBAIO_VERSION = 0.3.111
++LIBAIO_VERSION = 0.3.112
+ LIBAIO_SITE = https://releases.pagure.org/libaio
+ LIBAIO_INSTALL_STAGING = YES
+ LIBAIO_LICENSE = LGPL-2.1+
+-- 
+2.27.0
+

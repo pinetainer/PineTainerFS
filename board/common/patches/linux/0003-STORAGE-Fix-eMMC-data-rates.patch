@@ -1,0 +1,28 @@
+Fix eMMC data rates
+
+The eMMC controller of the Pine H64 supports HS200 and HS400 data rates, but
+that isn't advertised in the device tree. As a result, the negoatiated
+communication parameters are incorrect and some eMMC chips just barely
+probe. Fix that by adding properties to the mmc2 device tree node.
+
+Patch adapted from:
+https://forum.armbian.com/topic/12479-pine64-h64-does-not-boot-from-emmc-solved/?do=findComment&comment=98120
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+index af85b2074..fb5ca9498 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+@@ -140,8 +140,10 @@ &mmc0 {
+ &mmc2 {
+ 	vmmc-supply = <&reg_cldo1>;
+ 	vqmmc-supply = <&reg_bldo2>;
+-	non-removable;
+ 	cap-mmc-hw-reset;
++	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
++	mmc-hs400-enhanced-strobe;
+ 	bus-width = <8>;
+ 	status = "okay";
+ };

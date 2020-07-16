@@ -2,8 +2,13 @@
 
 # Script based on Buildroot's support/scripts/genimage.sh
 
+# Generates a boot.cfg genimage configuration file on the fly,
+# so that it defines a boot.vfat image with the desired boot
+# files in the appropriate places, and then runs the specified
+# specific genimage configuration
+
 # Directory for genimage temporary files.
-readonly GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
+readonly GENIMAGE_TMP="$BUILD_DIR/tmp_genimage"
 # Filename of the generated kernel image.
 readonly KERNEL_IMAGE='Image'
 # The filename of the automatically generated boot image configuration.
@@ -49,19 +54,19 @@ shift
 # Parse command line options
 while getopts 'c:' opt; do
 	case "$opt" in
-		c) GENIMAGE_CFG="$OPTARG";;
+		c) GENIMAGE_CONFIG="$OPTARG";;
+		*) break;;
 	esac
 done
 
-# We need GENIMAGE_CFG set to a filename
-[ -r "${GENIMAGE_CFG}" ] || printUsage
+# We need GENIMAGE_CONFIG set to a filename
+[ -r "${GENIMAGE_CONFIG}" ] || printUsage
 
 # Create a symbolic link to extlinux.conf in the images directory
-linkInDir "$BR2_EXTERNAL_PineTainer_PATH/board/common/extlinux.conf" "$BINARIES_DIR"
+linkInDir "$BR2_EXTERNAL_PINETAINER_PATH/board/common/extlinux.conf" "$BINARIES_DIR"
 
 # Get the generated DTB files
-dtbs="$BINARIES_DIR/*.dtb"
-for dtb in $dtbs; do
+for dtb in "$BINARIES_DIR"/*.dtb; do
 	if [ -f "$dtb" ]; then
 		if [ -z "$DTBS" ]; then
 			DTBS="$dtb"
@@ -83,14 +88,14 @@ for file in $(printf '%s\n%s\n%s' "$BINARIES_DIR/extlinux.conf" "$BINARIES_DIR/$
 
 	# Check that the file size is a number (might not be if file does not exist)
 	if [ "$currentFileSize" -eq "$currentFileSize" ] 2>/dev/null; then
-		printf 'Adding %s to boot.vfat: %d bytes\n' "$file" $currentFileSize
+		printf 'Adding %s to boot.vfat: %d bytes\n' "$file" "$currentFileSize"
 		fileBasename=$(basename "$file")
 
 		if [ "$fileBasename" = "extlinux.conf" ]; then
-			# extlinux.conf goes inside extlinux subfolder
+			# extlinux.conf goes in extlinux subfolder
 			addFileEntry "extlinux/$fileBasename" "$fileBasename"
 		elif [ -z "${fileBasename%%*.dtb}" ]; then
-			# DTBs go inside dtb/allwinner subfolder
+			# DTBs go in dtb/allwinner subfolder
 			addFileEntry "dtb/allwinner/$fileBasename" "$fileBasename"
 		else
 			# No special handling for other files
@@ -108,16 +113,16 @@ printf 'Total boot.vfat size: %d bytes (%d MiB)\n\n' $BOOT_FILES_SIZE $((BOOT_FI
 printf '\t}\n\tsize = %s\n}' "$BOOT_FILES_SIZE" >> "$BOOT_CFG"
 
 # Finally, generate the sdcard.img image
-currentPwd="$(pwd)"
+currentPwd="$PWD"
 # Temporarily change directory to binaries dir, so the generated configuration can be included
-cd "$BINARIES_DIR"
+cd "$BINARIES_DIR" || exit $?
 genimage \
 	--rootpath "${TARGET_DIR}"     \
 	--tmppath "${GENIMAGE_TMP}"    \
 	--inputpath "${BINARIES_DIR}"  \
 	--outputpath "${BINARIES_DIR}" \
-	--config "${GENIMAGE_CFG}"
-cd "$currentPwd"
+	--config "${GENIMAGE_CONFIG}"
+cd "$currentPwd" || exit $?
 
 # Delete leftovers
 rm -rf "$GENIMAGE_TMP"

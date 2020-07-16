@@ -1,107 +1,106 @@
 #!/bin/sh
 
-# El fichero de configuración del reinicio con kexec.
-readonly FICHERO_CONF='/etc/kexec.conf'
-# La configuración predeterminada a usar para kexec,
-# si no se ha encontrado el fichero de configuración.
-readonly CONF_PREDET='KERNEL=/boot/Image'
+# The kexec configuration file.
+readonly KEXEC_CONFIG_FILE='/etc/kexec.conf'
+# The default kexec configuration to use, if the
+# previous file was not found.
+readonly DEFAULT_KEXEC_CONFIG='KERNEL=/boot/Image'
 
-# Desmonta todos los sistemas de ficheros posibles,
-# remontándolos como de solo lectura si están en uso
-# o contienen ficheros necesarios.
-desmontarSistemasFicheros() {
-	if [ -z "$sistemasFicherosDesmontados" ]; then
-		sistemasFicheros=$(/bin/cat /proc/mounts)
-		IFS='
-'
-		for sistemaFicheros in $sistemasFicheros; do
-			dispositivo="${sistemaFicheros%% *}"
-			puntoMontaje="$(echo "$sistemaFicheros" | cut -f2 -d' ')"
+# Remounts all the mounted filesystems in read-only
+# mode, so that any cached write is synchronized to
+# the storage devices and a dirty unmount would have
+# no consequences.
+# Returns an error status if the remount operation failed.
+unmountFileSystems() {
+	while read -r filesystem; do
+		device="${filesystem%% *}"
+		mountpoint="$(echo "$filesystem" | cut -f2 -d' ')"
 
-			# Remontar como solo lectura. Podríamos necesitar ficheros dentro de ese sistema de ficheros
-			# (el reinicio inminente los va a desmontar completamente de todos modos... y si algo va mal, al
-			# menos es más fácil que el operador haga algo si tiene ya sistemas de ficheros montados)
-			/bin/mount -o remount,ro "$dispositivo" "$puntoMontaje" >/dev/null 2>&1
-		done
+		# Remount read-only, ignoring tmpfs filesystems
+		if [ "$device" != 'tmpfs' ] && ! /bin/mount -o remount,ro "$device" "$mountpoint" >/dev/null 2>&1; then
+			printf '! The filesystem at %s (%s) could not be remounted read-only.\n' "$mountpoint" "$device"
+			sleep 2
+			return 1
+		fi
+	done < /proc/mounts
 
-		# Sincronizar cachés a discos, por si acaso
-		/bin/sync
-
-		sistemasFicherosDesmontados=1
-	fi
+	# Make sure the cached writes are synchronized
+	/bin/sync
 }
 
-# ¿Procede hacer un reinicio con kexec?
-if [ ! -f "/run/no-kexec-reboot" ]; then
-	printf 'Reiniciando: usando llamada kexec...\n'
+# Only do actual kexec reboot if a flag file does not exist
+if ! [ -f "/run/no-kexec-reboot" ]; then
+	echo 'Restart: trying kexec call...'
 
-	# Leer parámetros desde $FICHERO_CONF, usando
-	# la configuración predeterminada si no se ha
-	# leído nada desde el fichero
-	kexec_conf=$(/bin/cat "$FICHERO_CONF" 2>/dev/null)
-	kexec_conf=${kexec_conf:-$CONF_PREDET}
+	# Read configuration parameters from KEXEC_CONFIG_FILE,
+	# falling back to $DEFAULT_KEXEC_CONFIG if that does
+	# not exist
+	config=$(/bin/cat "$KEXEC_CONFIG_FILE" 2>/dev/null)
+	config=${config:-$DEFAULT_KEXEC_CONFIG}
 
-	# Interpretar el fichero de configuración, línea por
-	# línea
-	IFS='
-'
-	for registro in $kexec_conf; do
-		case "$registro" in
-			KERNEL=*)
-				kernel="${registro#KERNEL=}"
-				break;;
-			APPEND=*)
-				append="${registro#APPEND=}"
-				break;;
-			COMMAND-LINE=*)
-				command_line="${registro#COMMAND-LINE=}"
-				break;;
-		esac
-	done
+	echo "$config" | {
+		# Parse each line (record) in the configuration file
+		while read -r record; do
+			case "$record" in
+				KERNEL=*)
+					kernel="${record#KERNEL=}"
+					break;;
+				APPEND=*)
+					append="${record#APPEND=}"
+					break;;
+				COMMAND-LINE=*)
+					command_line="${record#COMMAND-LINE=}"
+					break;;
+			esac
+		done
 
-	# Necesitamos saber qué kernel ejecutar
-	if [ -z "$kernel" ]; then
-		printf '! No se ha especificado un kernel a cargar en el archivo de configuración %s.\n' "$FICHERO_CONF"
-		exit 1
-	fi
-
-	# Cargar el kernel para kexec.
-	# --reuse-cmdline es necesario para que el kernel inicialice
-	# correctamente el mapa de memoria de la Pine (en caso de no usarse,
-	# el kernel entra en pánico nada más iniciarse por no poder
-	# reservar memoria)
-	if [ -n "$append" ]; then
-		if [ -n "$command_line" ]; then
-			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --append="$append" --command-line="$command_line"
-		else
-			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --append="$append"
+		# The kernel parameter is mandatory
+		if [ -z "$kernel" ]; then
+			echo '! The configuration file %s does not contain what kernel to boot.' "$KEXEC_CONFIG_FILE"
+			exit 1
 		fi
-	else
-		if [ -n "$command_line" ]; then
-			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline --command-line="$command_line"
-		else
-			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline
+
+		# Generate the kexec load call parameters
+		generate_parameter() {
+			initial_part="--$1="
+			shift
+			printf '%s"%s"' "$initial_part" "$@"
+		}
+
+		if [ -n "$append" ]; then
+			append="$(generate_parameter 'append' "$append")"
 		fi
-	fi
 
-	# Desmontar todos los sistemas de ficheros ahora,
-	# tras haber leído de ellos la imagen del kernel
-	desmontarSistemasFicheros
+		if [ -n "$command_line" ]; then
+			command_line="$(generate_parameter 'command-line' "$command_line")"
+		fi
 
-	# Finalmente, ejecutar el kernel cargado
-	/usr/sbin/kexec -e
+		# Do the actual load
+		do_kexec_load() {
+			# --reuse-cmdline is needed for the kernel to correctly
+			# initialize the memory map, and its absence causes a kernel
+			# panic later on
+			/usr/sbin/kexec -l "$kernel" -i --reuse-cmdline "$@"
+		}
+		do_kexec_load "$append" "$command_line" && \
 
-	# Si llegamos aquí, es porque kexec no ha funcionado
-	printf '! Ha ocurrido un error al intentar reiniciar con kexec. Se efectúa un reinicio clásico con coldreboot.\n'
-	sleep 2
+		# Now unmount all the filesystems
+		unmountFileSystems && \
+
+		# And finally reboot the loaded kernel with kexec
+		/usr/sbin/kexec -e
+
+		# If we get to execute this code, the kexec call wasn't executed
+		# or it failed
+		echo '! kexec call failed. Jumping to the rest vector instead.'
+		sleep 2
+	}
 fi
 
-printf 'Reiniciando: reinicio clásico...\n'
+echo 'Restart: jumping to reset vector...'
 
-# Desmontar todos los sistemas de ficheros
-desmontarSistemasFicheros
+# Unmount all filesystems, ignoring errors this time
+unmountFileSystems
 
-# Simplemente llamar a reboot, para hacer
-# un reinicio clásico
-/sbin/reboot $@
-exit $?
+# Passthrough to reboot executable
+/sbin/reboot "$@"

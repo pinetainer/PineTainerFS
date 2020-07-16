@@ -1,23 +1,27 @@
-# Documentación acerca del formato de este fichero disponible en:
+# The documentation for this file format is available at:
 # https://manpages.debian.org/testing/sysvinit-core/inittab.5.en.html
 
 id:2:initdefault:
 
+# Commands to run on start, for every runlevel
 pts::sysinit:/bin/mkdir -p /dev/pts
 mnt::sysinit:/bin/mount -a
 swp::sysinit:/sbin/swapon -a
+
+# Start services for runlevel 2
 rcS:2:wait:/etc/init.d/rcS
 
-# Permitir que root se conecte desde el puerto serie
+# Allow root login in ttyS0 for runlevels 1 and 2
 S0:12:respawn:/sbin/sulogin -p -e
 
-# Comandos a ejecutar cuando el sistema se apaga
+# Commands to run on shutdown and reboot
 rcK:06:wait:/etc/init.d/rcK
 swpo:06:wait:/sbin/swapoff -a
-# Al reiniciar el sistema, kexec-reboot se encargará
-# de desmontar los sistemas de ficheros
+
+# Commands to run on shutdown
+# (on reboot, kexec-reboot will handle filesystem unmounting)
 mnto:0:wait:/bin/umount -ar
 
-# Comandos a ejecutar para manejar apagado y reinicio
+# Commands for handling shutdown and reboot
 hlt:0:wait:/sbin/poweroff -h
 reb:6:wait:/sbin/kexec-reboot

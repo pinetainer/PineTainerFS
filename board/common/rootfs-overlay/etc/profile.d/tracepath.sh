@@ -1,1 +1,0 @@
-alias traceroute='tracepath'

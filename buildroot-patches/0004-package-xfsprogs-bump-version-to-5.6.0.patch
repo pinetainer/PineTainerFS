@@ -1,0 +1,42 @@
+From 6bfb20f4f23e3259100f3307a7e1907466dc0042 Mon Sep 17 00:00:00 2001
+From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Date: Wed, 15 Jul 2020 16:26:49 +0200
+Subject: [PATCH] package/xfsprogs: bump version to 5.6.0
+
+This version removes duplicate symbols that prevent
+the package from compiling with GCC 10, and introduces
+other minor fixes.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+ package/xfsprogs/xfsprogs.hash | 2 +-
+ package/xfsprogs/xfsprogs.mk   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/package/xfsprogs/xfsprogs.hash b/package/xfsprogs/xfsprogs.hash
+index 629d6fcf9d..a89d084a99 100644
+--- a/package/xfsprogs/xfsprogs.hash
++++ b/package/xfsprogs/xfsprogs.hash
+@@ -1,5 +1,5 @@
+ # From https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/sha256sums.asc
+-sha256 7b500e148cebd08f99e37cf744c7843817b37e7be2a32c4dc57d6ea16e3019ae  xfsprogs-5.2.1.tar.xz
++sha256 0aba2aac5d80d07646dde868437fc337af2c7326edadcc6d6a7c0bfd3190c1e6  xfsprogs-5.6.0.tar.xz
+ 
+ # Hash for license files
+ sha256 7ae50a5344af14d6231aff6814632a220b3127da4099aea2c6070fd79c407c1a  LICENSES/GPL-2.0
+diff --git a/package/xfsprogs/xfsprogs.mk b/package/xfsprogs/xfsprogs.mk
+index 43c921aa17..9c730043c4 100644
+--- a/package/xfsprogs/xfsprogs.mk
++++ b/package/xfsprogs/xfsprogs.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-XFSPROGS_VERSION = 5.2.1
++XFSPROGS_VERSION = 5.6.0
+ XFSPROGS_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/fs/xfs/xfsprogs
+ XFSPROGS_SOURCE = xfsprogs-$(XFSPROGS_VERSION).tar.xz
+ XFSPROGS_LICENSE = GPL-2.0, GPL-2.0+, LGPL-2.1 (libhandle, few headers)
+-- 
+2.27.0
+

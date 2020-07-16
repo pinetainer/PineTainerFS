@@ -1,13 +1,22 @@
 #!/bin/sh
-readonly PINETAINER_ROOT_DIR=/media/almacenamiento/PineH64
 
-# Set download and ccache directories for Buildroot
-export BR2_DL_DIR="$PINETAINER_ROOT_DIR/buildroot-dl"
-export BR2_CCACHE_DIR="$PINETAINER_ROOT_DIR/buildroot-ccache"
+# Wrapper around make that runs Buildroot with additional
+# useful arguments for PineTainer.
 
-# Extract OS identifier from the first argument
-os=$1
-shift
+# The directory where PineTainerFS resides
+readonly PINETAINERFS_DIR="$PWD"
 
-# Execute Buildroot makefile
-make -C "$PINETAINER_ROOT_DIR/buildroot-$os" $@
+# The directory where Buildroot resides
+readonly BUILDROOT_DIR="$PINETAINERFS_DIR/buildroot"
+
+# The directory where build artifacts reside, like
+# Buildroot external trees, downloaded files, generated
+# images, and so on
+readonly BUILD_DIR="$PINETAINERFS_DIR/build"
+
+# Customize download and ccache directories for Buildroot
+export BR2_DL_DIR="$BUILD_DIR/download"
+export BR2_CCACHE_DIR="$BUILD_DIR/ccache"
+
+# Execute Buildroot Makefile
+make -C "$BUILDROOT_DIR" O="$BUILD_DIR" BR2_EXTERNAL="$PINETAINERFS_DIR" "$@"

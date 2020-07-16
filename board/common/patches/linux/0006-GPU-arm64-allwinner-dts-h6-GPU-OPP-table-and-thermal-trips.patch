@@ -1,0 +1,162 @@
+Subject: [PATCH] arm64: allwinner: dts: h6: GPU OPP table and thermal trips
+Date: Thu, 16 Jul 2020 19:13:33 +0200
+
+This patch integrates and adapts previous work from
+https://www.mail-archive.com/linux-sunxi@googlegroups.com/msg32912.html
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+ .../boot/dts/allwinner/sun50i-h6-gpu-opp.dtsi | 87 +++++++++++++++++++
+ .../boot/dts/allwinner/sun50i-h6-pine-h64.dts |  1 +
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 22 +++++
+ 3 files changed, 110 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-h6-gpu-opp.dtsi
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-gpu-opp.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6-gpu-opp.dtsi
+new file mode 100644
+index 000000000..9dd49df87
+--- /dev/null
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-gpu-opp.dtsi
+@@ -0,0 +1,87 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++// Copyright (C) 2020 Clément Péron <peron.clem@gmail.com>
++
++/ {
++	gpu_opp_table: gpu-opp-table {
++		compatible = "operating-points-v2";
++
++		opp@216000000 {
++			opp-hz = /bits/ 64 <216000000>;
++			opp-microvolt = <810000>;
++		};
++
++		opp@264000000 {
++			opp-hz = /bits/ 64 <264000000>;
++			opp-microvolt = <810000>;
++		};
++
++		opp@312000000 {
++			opp-hz = /bits/ 64 <312000000>;
++			opp-microvolt = <810000>;
++		};
++
++		opp@336000000 {
++			opp-hz = /bits/ 64 <336000000>;
++			opp-microvolt = <810000>;
++		};
++
++		opp@360000000 {
++			opp-hz = /bits/ 64 <360000000>;
++			opp-microvolt = <820000>;
++		};
++
++		opp@384000000 {
++			opp-hz = /bits/ 64 <384000000>;
++			opp-microvolt = <830000>;
++		};
++
++		opp@408000000 {
++			opp-hz = /bits/ 64 <408000000>;
++			opp-microvolt = <840000>;
++		};
++
++		opp@420000000 {
++			opp-hz = /bits/ 64 <420000000>;
++			opp-microvolt = <850000>;
++		};
++
++		opp@432000000 {
++			opp-hz = /bits/ 64 <432000000>;
++			opp-microvolt = <860000>;
++		};
++
++		opp@456000000 {
++			opp-hz = /bits/ 64 <456000000>;
++			opp-microvolt = <870000>;
++		};
++
++		opp@504000000 {
++			opp-hz = /bits/ 64 <504000000>;
++			opp-microvolt = <890000>;
++		};
++
++		opp@540000000 {
++			opp-hz = /bits/ 64 <540000000>;
++			opp-microvolt = <910000>;
++		};
++
++		opp@576000000 {
++			opp-hz = /bits/ 64 <576000000>;
++			opp-microvolt = <930000>;
++		};
++
++		opp@624000000 {
++			opp-hz = /bits/ 64 <624000000>;
++			opp-microvolt = <950000>;
++		};
++
++		opp@756000000 {
++			opp-hz = /bits/ 64 <756000000>;
++			opp-microvolt = <1040000>;
++		};
++	};
++};
++
++&gpu {
++	operating-points-v2 = <&gpu_opp_table>;
++};
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+index af85b2074..0d73ddabb 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dts
+@@ -5,6 +5,7 @@
+ 
+ #include "sun50i-h6.dtsi"
+ #include "sun50i-h6-cpu-opp.dtsi"
++#include "sun50i-h6-gpu-opp.dtsi"
+ 
+ #include <dt-bindings/gpio/gpio.h>
+ 
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+index 78b1361df..e130c6e6c 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi
+@@ -175,6 +175,7 @@ gpu: gpu@1800000 {
+ 			clock-names = "core", "bus";
+ 			resets = <&ccu RST_BUS_GPU>;
+ 			status = "disabled";
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		crypto: crypto@1904000 {
+@@ -1012,6 +1013,27 @@ gpu-thermal {
+ 			polling-delay-passive = <0>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&ths 1>;
++
++			trips {
++				gpu_alert: gpu-alert {
++					temperature = <90000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
++				gpu-crit {
++					temperature = <100000>;
++					hysteresis = <0>;
++					type = "critical";
++				};
++			};
++
++			cooling-maps {
++				map0 {
++					trip = <&gpu_alert>;
++					cooling-device = <&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++				};
++			};
+ 		};
+ 	};
+ };
+-- 
+2.27.0
+

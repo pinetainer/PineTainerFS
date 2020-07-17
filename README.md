@@ -25,6 +25,9 @@ The next three commands work around compile errors which occur when link time op
 
 The following command replaces some executables in Buildroot's copy of the `aarch64-pinechain-linux-musl_sdk-buildroot` toolchain by wrappers that load the necessary linker plugins for LTO to work. The external toolchain should be placed in the root directory of the repository, and must be downloaded separatedly or generated with `./make.sh pinechain_defconfig && ./make.sh`.
 
-Once the toolchain is fixed, we install propietary Realtek 8723BS firmware blobs to the system, so they can be included in the resulting kernel image and Wi-Fi and Bluetooth can work. If you don't want closed source blobs in your kernel, skip this step and change the `CONFIG_EXTRA_FIRMWARE` Linux kernel configuration so that it doesn't try to include these in the image.
+Once the toolchain is fixed, we install propietary Realtek 8723BS firmware blobs to the system, so they can be included in the resulting kernel image and Wi-Fi and Bluetooth can work. If you don't want closed source blobs in your kernel, skip this step and change the `CONFIG_EXTRA_FIRMWARE` Linux kernel configuration so that it doesn't try to include these in the image. You only need to install these blobs once, unless you remove them manually.
 
 Finally, the rest of the root filesystem is built normally with `./make.sh`. Go out there and have some fun while it does its thing.
+
+## Requirements
+Apart from the package requirements imposed by Buildroot, `lzop` is also needed.

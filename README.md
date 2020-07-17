@@ -28,6 +28,3 @@ The following command replaces some executables in Buildroot's copy of the `aarc
 Once the toolchain is fixed, we install propietary Realtek 8723BS firmware blobs to the system, so they can be included in the resulting kernel image and Wi-Fi and Bluetooth can work. If you don't want closed source blobs in your kernel, skip this step and change the `CONFIG_EXTRA_FIRMWARE` Linux kernel configuration so that it doesn't try to include these in the image. You only need to install these blobs once, unless you remove them manually.
 
 Finally, the rest of the root filesystem is built normally with `./make.sh`. Go out there and have some fun while it does its thing.
-
-## Requirements
-Apart from the package requirements imposed by Buildroot, `lzop` is also needed.

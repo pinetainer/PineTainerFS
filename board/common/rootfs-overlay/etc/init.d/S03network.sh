@@ -17,7 +17,7 @@ case "$1" in
 					ip addr add 192.168.0.29/27 dev "$NETWORK_IFACE" && \
 					ip link set "$NETWORK_IFACE" up
 					then
-						# Give the network adapter a bit of time to stabilise
+						# Give the network adapter a bit of time to stabilize
 						for tick in 1 2 3 4 5 6; do
 							if [ "$((tick % 2))" -eq 0 ]; then
 								printf '.'

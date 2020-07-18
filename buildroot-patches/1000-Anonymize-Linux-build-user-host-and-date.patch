@@ -1,0 +1,38 @@
+From bfdf6c2c9b80b21e7e669b2fdd71ff939ffee970 Mon Sep 17 00:00:00 2001
+From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Date: Fri, 17 Jul 2020 15:45:39 +0200
+Subject: [PATCH] Anonymize Linux build user, host and date
+
+We use some PineTainer-specific strings that do not
+contain any personal information.
+
+Signed-off-by: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+---
+ linux/linux.mk | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/linux/linux.mk b/linux/linux.mk
+index b90b032bb9..50aa016d30 100644
+--- a/linux/linux.mk
++++ b/linux/linux.mk
+@@ -136,13 +136,13 @@ LINUX_MAKE_FLAGS = \
+ 	CROSS_COMPILE="$(TARGET_CROSS)" \
+ 	DEPMOD=$(HOST_DIR)/sbin/depmod
+ 
+-ifeq ($(BR2_REPRODUCIBLE),y)
++# Always anonymize timestamps and build user and host
++# with custom data
+ LINUX_MAKE_ENV += \
+ 	KBUILD_BUILD_VERSION=1 \
+-	KBUILD_BUILD_USER=buildroot \
+-	KBUILD_BUILD_HOST=buildroot \
++	KBUILD_BUILD_USER=build \
++	KBUILD_BUILD_HOST=pinetainer \
+ 	KBUILD_BUILD_TIMESTAMP="$(shell LC_ALL=C date -d @$(SOURCE_DATE_EPOCH))"
+-endif
+ 
+ # gcc-8 started warning about function aliases that have a
+ # non-matching prototype.  This seems rather useful in general, but it
+-- 
+2.27.0
+

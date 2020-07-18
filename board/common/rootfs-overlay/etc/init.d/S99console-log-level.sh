@@ -12,7 +12,7 @@ case "$1" in
 			printf '%s       %s' "$MESSAGE_LEVEL_THRESHOLD" "$printk_config" > /proc/sys/kernel/printk 2>/dev/null &&
 			printf 'OK\n' || \
 			printf 'ERROR\n';;
-	restart|reload)	;;
+	stop|restart|reload)	;;
 	*)		echo "Syntax: $0 {start|stop|restart|reload}"
 			exit 1
 esac

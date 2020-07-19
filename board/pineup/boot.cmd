@@ -1,6 +1,7 @@
 echo "Loading Pine H64 model B device tree..."
 if load mmc ${mmc_bootdev} ${fdt_addr_r} sun50i-h6-pine-h64-model-b.dtb; then
 	echo "Loading kernel image file..."
+
 	if load mmc ${mmc_bootdev} ${kernel_addr_r} Image; then
 		echo "Booting Linux kernel..."
 

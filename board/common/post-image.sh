@@ -12,12 +12,12 @@ readonly GENIMAGE_TMP="$BUILD_DIR/tmp_genimage"
 # Filename of the generated kernel image.
 readonly KERNEL_IMAGE='Image'
 # The filename of the automatically generated boot image configuration.
-readonly BOOT_CFG="$BINARIES_DIR/boot.cfg"
+readonly BOOT_CONFIG="$BINARIES_DIR/boot.cfg"
 
 # Prints a usage message to stdout and exits
 # with error status.
 printUsage() {
-	printf 'Usage: %s -c CONFIG_FILE\n' "$0"
+	printf 'Usage: %s -c CONFIG_FILE [ -i ADDITIONAL_FILE_IN_BINARIES_DIR ... ]\n' "$0"
 	exit 1
 }
 
@@ -26,22 +26,23 @@ printUsage() {
 # $1: the name of the file in the image.
 # $2: the image name in the input directory.
 addFileEntry() {
-	printf '\t\tfile %s {\n\t\t\timage = "%s"\n\t\t}\n' "$1" "$2" >> "$BOOT_CFG"
+	printf '\t\tfile %s {\n\t\t\timage = "%s"\n\t\t}\n' "$1" "$2" >> "$BOOT_CONFIG"
 }
 
 # Discard first argument. It confuses getopts
 shift
 
 # Parse command line options
-while getopts 'c:' opt; do
+while getopts 'c:i:' opt; do
 	case "$opt" in
-		c) GENIMAGE_CONFIG="$OPTARG";;
-		*) break;;
+		c)	GENIMAGE_CONFIG="$OPTARG";;
+		i)	ADDITIONAL_FILES="$(printf '%s\n%s' "$BINARIES_DIR/$OPTARG" "$ADDITIONAL_FILES")";;
+		*)	break;;
 	esac
 done
 
 # We need GENIMAGE_CONFIG set to a filename
-[ -r "${GENIMAGE_CONFIG}" ] || printUsage
+[ -r "$GENIMAGE_CONFIG" ] || printUsage
 
 # Get the generated DTB files
 for dtb in "$BINARIES_DIR"/*.dtb; do
@@ -49,14 +50,14 @@ for dtb in "$BINARIES_DIR"/*.dtb; do
 		if [ -z "$DTBS" ]; then
 			DTBS="$dtb"
 		else
-			DTBS=$(printf '%s\n%s' "$DTBS" "$dtb")
+			DTBS=$(printf '%s\n%s' "$dtb" "$DTBS")
 		fi
 	fi
 done
 
 # Calculate the total size of the files that will be inside the boot partition.
 # Also generate boot.vfat image script from the corresponding boot files
-printf 'image boot.vfat {\n\tvfat {\n' > "$BOOT_CFG"
+printf 'image boot.vfat {\n\tvfat {\n\t\tlabel = "BOOT_DATA"\n' > "$BOOT_CONFIG"
 BOOT_FILES_SIZE=0
 while read -r file; do
 	currentFileSize=$(wc -c "$file" 2>/dev/null)
@@ -73,13 +74,13 @@ while read -r file; do
 		BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + currentFileSize))
 	fi
 done <<CMD
-$(printf '%s\n%s\n%s' "$BINARIES_DIR/boot.scr" "$BINARIES_DIR/$KERNEL_IMAGE" "$DTBS")
+$(printf '%s\n%s\n%s\n%s' "$BINARIES_DIR/boot.scr" "$BINARIES_DIR/$KERNEL_IMAGE" "$DTBS" "$ADDITIONAL_FILES")
 CMD
 
-# Add 1 MiB to the size for filesystem and/or administrator use, and finish off the BOOT_CFG file
+# Add 1 MiB to the size for filesystem and/or administrator use, and finish off the BOOT_CONFIG file
 BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + 1048576))
 printf 'Total boot.vfat size: %d bytes (%d MiB)\n\n' $BOOT_FILES_SIZE $((BOOT_FILES_SIZE / 1048576))
-printf '\t}\n\tsize = %s\n}' "$BOOT_FILES_SIZE" >> "$BOOT_CFG"
+printf '\t}\n\tsize = %s\n}' "$BOOT_FILES_SIZE" >> "$BOOT_CONFIG"
 
 # Finally, generate the sdcard.img image
 currentPwd="$PWD"
@@ -96,4 +97,4 @@ cd "$currentPwd" || exit $?
 # Delete leftovers
 rm -rf "$GENIMAGE_TMP"
 rm "$BINARIES_DIR/boot.vfat"
-rm "$BOOT_CFG"
+rm "$BOOT_CONFIG"

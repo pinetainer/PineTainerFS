@@ -26,7 +26,7 @@ index b90b032bb9..50aa016d30 100644
  	KBUILD_BUILD_VERSION=1 \
 -	KBUILD_BUILD_USER=buildroot \
 -	KBUILD_BUILD_HOST=buildroot \
-+	KBUILD_BUILD_USER=build \
++	KBUILD_BUILD_USER=builder \
 +	KBUILD_BUILD_HOST=pinetainer \
  	KBUILD_BUILD_TIMESTAMP="$(shell LC_ALL=C date -d @$(SOURCE_DATE_EPOCH))"
 -endif

@@ -23,17 +23,18 @@ rm "${1:?}/etc/lvm/lvmlocal.conf" 2>/dev/null || true
 # Remove useless configuration file
 rm "${1:?}/etc/wgetrc" 2>/dev/null || true
 
-# Useless Dropbear executables and init scripts
-rm "${1:?}/usr/bin/dropbearkey" 2>/dev/null || true
-rm "${1:?}/usr/bin/dropbearconvert" 2>/dev/null || true
-rm "${1:?}/etc/init.d/S50dropbear" 2>/dev/null || true
+# Scripts in interpreted languages we can't run
+rm "${1:?}/usr/sbin/xfs_scrub_all" 2>/dev/null || true
+rm "${1:?}/usr/lib/libstdc++.so.6.0.28-gdb.py" 2>/dev/null || true
 
-# Save ~200 MiB in useless files
-for dri_lib in \
-armada-drm_dri.so hx8357d_dri.so ili9341_dri.so ingenic-drm_dri.so meson_dri.so \
-mxsfb-drm_dri.so pl111_dri.so rockchip_dri.so st7735r_dri.so exynos_dri.so \
-ili9225_dri.so imx-drm_dri.so mcde_dri.so mi0283qt_dri.so repaper_dri.so \
-st7586_dri.so stm_dri.so
-do
-    rm "${1:?}/usr/lib/dri/$dri_lib" || true
-done
+# Useless files from xfsprogs
+rm -rf "${1:?}/usr/lib/xfsprogs" 2>/dev/null || true
+
+# Shell scripts with bashisms
+rm "${1:?}/usr/bin/xzegrep" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzfgrep" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzcmp" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzdiff" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzgrep" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzless" 2>/dev/null || true
+rm "${1:?}/usr/bin/xzmore" 2>/dev/null || true

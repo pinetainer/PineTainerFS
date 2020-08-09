@@ -77,10 +77,13 @@ done <<CMD
 $(printf '%s\n%s\n%s\n%s' "$BINARIES_DIR/boot.scr" "$BINARIES_DIR/$KERNEL_IMAGE" "$DTBS" "$ADDITIONAL_FILES")
 CMD
 
-# Add 1 MiB to the size for filesystem and/or administrator use, and finish off the BOOT_CONFIG file
-BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + 1048576))
-printf 'Total boot.vfat size: %d bytes (%d MiB)\n\n' $BOOT_FILES_SIZE $((BOOT_FILES_SIZE / 1048576))
-printf '\t}\n\tsize = %s\n}' "$BOOT_FILES_SIZE" >> "$BOOT_CONFIG"
+# Add 2 MiB to the size for filesystem and/or administrator use, calculate the image
+# size rounded to the nearest MiB boundary, and finish off the BOOT_CONFIG file
+BOOT_FILES_SIZE=$((BOOT_FILES_SIZE + 2097152))
+BOOT_IMAGE_SIZE=$((BOOT_FILES_SIZE / 1048576))
+printf 'Total boot.vfat size: %d MiB (%d bytes in included files)\n\n' $BOOT_IMAGE_SIZE $BOOT_FILES_SIZE
+BOOT_IMAGE_SIZE=$((BOOT_IMAGE_SIZE * 1048576))
+printf '\t}\n\tsize = %s\n}' "$BOOT_IMAGE_SIZE" >> "$BOOT_CONFIG"
 
 # Finally, generate the sdcard.img image
 currentPwd="$PWD"

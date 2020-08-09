@@ -1,0 +1,50 @@
+From: Markus Mayer <markus.mayer@broadcom.com>
+Date: Wed, 17 Jun 2020 23:58:08 +0000
+Subject: [PATCH] tools/thermal: tmon: include pthread and time headers in tmon.h
+
+Include sys/time.h and pthread.h in tmon.h, so that types
+"pthread_mutex_t" and "struct timeval tv" are known when tmon.h
+references them.
+
+Without these headers, compiling tmon against musl-libc will fail with
+these errors:
+
+In file included from sysfs.c:31:0:
+tmon.h:47:8: error: unknown type name 'pthread_mutex_t'
+ extern pthread_mutex_t input_lock;
+        ^~~~~~~~~~~~~~~
+make[3]: *** [<builtin>: sysfs.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+In file included from tui.c:31:0:
+tmon.h:54:17: error: field 'tv' has incomplete type
+  struct timeval tv;
+                 ^~
+make[3]: *** [<builtin>: tui.o] Error 1
+make[2]: *** [Makefile:83: tmon] Error 2
+
+Signed-off-by: Markus Mayer <mmayer@broadcom.com>
+---
+
+The issue was discovered cross-compiling tmon for aarch64 with musl-libc.
+The build succeeds with glibc, because the required headers are included
+implicitly. This is not the case with musl-libc.
+
+ tools/thermal/tmon/tmon.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/thermal/tmon/tmon.h b/tools/thermal/tmon/tmon.h
+index c9066ec104dd..44d16d778f04 100644
+--- a/tools/thermal/tmon/tmon.h
++++ b/tools/thermal/tmon/tmon.h
+@@ -27,6 +27,9 @@
+ #define NR_LINES_TZDATA 1
+ #define TMON_LOG_FILE "/var/tmp/tmon.log"
+ 
++#include <sys/time.h>
++#include <pthread.h>
++
+ extern unsigned long ticktime;
+ extern double time_elapsed;
+ extern unsigned long target_temp_user;
+-- 
+2.17.1 

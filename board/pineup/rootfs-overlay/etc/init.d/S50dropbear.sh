@@ -21,7 +21,7 @@ start() {
 		else
 			# Otherwise, turn on another LED, signaling possible failure
 			echo 'pattern' > /sys/class/leds/pine-h64:blue:status/trigger
-			echo '255 2500 0 5000' > /sys/class/leds/pine-h64:blue:status/pattern
+			echo '255 2500 255 0 0 5000 0 0' > /sys/class/leds/pine-h64:blue:status/pattern
 			echo 'FAIL'
 			start-stop-daemon -K -q -p /var/run/dropbear.pid > /dev/null 2>&1 || true
 		fi

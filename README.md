@@ -7,7 +7,7 @@ After cloning this repository for the first time, you'll probably be interested 
 To do that, you should run the following commands, in the order that they are shown. It is assumed that their working directory is the root of this repository. A basic literacy on how to use Buildroot is also assumed. A brief explanation of what they do follows.
 
 ```console
-$ scripts/update-and-patch-buildroot.sh -yu
+$ scripts/update-and-patch-buildroot.sh -y
 $ ./make.sh pineup_defconfig
 $ ./make.sh nconfig (temporarily remove "-flto" from Toolchain -> Target Optimizations and save)
 $ ./make.sh uboot
@@ -15,6 +15,7 @@ $ ./make.sh nconfig (readd "-flto" to Toolchain -> Target Optimizations and save
 $ scripts/fix-toolchain-lto.sh
 $ cd scripts
 $ sudo ./install-firmware-blobs.sh
+$ sudo ./install-regulatory.sh
 $ cd ..
 $ ./make.sh
 ```
@@ -27,7 +28,9 @@ The following command replaces some executables in Buildroot's copy of the `aarc
 
 Once the toolchain is fixed, we install propietary Realtek 8723BS firmware blobs to the system, so they can be included in the resulting kernel image and Wi-Fi and Bluetooth can work. If you don't want closed source blobs in your kernel, skip this step and change the `CONFIG_EXTRA_FIRMWARE` Linux kernel configuration so that it doesn't try to include these in the image. You only need to install these blobs once, unless you remove them manually.
 
+Then we install the regulatory database blob, which is needed for proper Wi-Fi operation. If you skipped the previous command, you may as well skip this one.
+
 Finally, the rest of the root filesystem is built normally with `./make.sh`. Go out there and have some fun while it does its thing.
 
 ### PineTainer
-To build PineTainer follow the same instructions as above, but also remove "-fPIC" from Toolchain -> Target linker options and Toolchain -> Target Optimizations in the first partial build, and add "xen" as a objective.
+To build PineTainer follow the same instructions as above. However, keep in mind that, to generate the EDK II UEFI firmware images used by QEMU in the root filesystem overlay, you need to execute `scripts/build-edk2.sh`.

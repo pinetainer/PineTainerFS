@@ -1,0 +1,35 @@
+From d454d44178f6a172df2b0cd4015467ea8d1a95b3 Mon Sep 17 00:00:00 2001
+From: AlexTMjugador <AlexTMjugador@users.noreply.github.com>
+Date: Fri, 7 Aug 2020 15:48:27 +0200
+Subject: [PATCH] protocol.c: change window title
+
+The window title that ttyd hardcodes by default is not appropriate.
+Change it to a more appropriate one.
+---
+ src/protocol.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/protocol.c b/src/protocol.c
+index 1be0a4e..968e236 100644
+--- a/src/protocol.c
++++ b/src/protocol.c
+@@ -18,14 +18,13 @@ static char initial_cmds[] = {SET_WINDOW_TITLE, SET_PREFERENCES};
+ static int send_initial_message(struct lws *wsi, int index) {
+   unsigned char message[LWS_PRE + 1 + 4096];
+   unsigned char *p = &message[LWS_PRE];
+-  char buffer[128];
+   int n = 0;
+ 
+   char cmd = initial_cmds[index];
+   switch (cmd) {
+     case SET_WINDOW_TITLE:
+-      gethostname(buffer, sizeof(buffer) - 1);
+-      n = sprintf((char *)p, "%c%s (%s)", cmd, server->command, buffer);
++      strcpy((char *)p, "Pinetainer serial console");
++      n = sizeof("Pinetainer serial console") - 1;
+       break;
+     case SET_PREFERENCES:
+       n = sprintf((char *)p, "%c%s", cmd, server->prefs_json);
+-- 
+2.27.0
+

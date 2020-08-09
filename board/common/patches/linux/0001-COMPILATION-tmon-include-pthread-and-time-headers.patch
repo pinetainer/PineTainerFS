@@ -1,4 +1,3 @@
-From: Markus Mayer <markus.mayer@broadcom.com>
 Date: Wed, 17 Jun 2020 23:58:08 +0000
 Subject: [PATCH] tools/thermal: tmon: include pthread and time headers in tmon.h
 

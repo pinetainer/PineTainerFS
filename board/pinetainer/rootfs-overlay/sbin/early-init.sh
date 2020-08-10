@@ -24,7 +24,9 @@ readonly PATH='/bin:/sbin'
 # $1: a textual description of the task that wasn't executed successfully.
 # $2: the status code returned by the task.
 show_fatal_error() {
-	printf '\n! An error occurred while executing the following early init operation: %s\n  Status code: %s\n' "$1" "$2"
+	echo
+	echo "! An error occurred while executing the following early init operation: $1"
+	echo "  Status code: $?"
 
 	# If the LED object directory doesn't exist, that may be because
 	# sysfs is not mounted. Try to mount it
@@ -66,19 +68,19 @@ mount -t overlay \
 overlay "$OVERLAY_DIRECTORY/overlay" || show_fatal_error 'overlay mount' $?
 
 # Bind mount /dev in the overlay root, and try to umount the original devtmpfs mount
-mount --bind /dev "$DIR_OVERLAY/overlay/dev" || show_fatal_error 'bind mount /dev in overlay' $?
+mount --bind /dev "$OVERLAY_DIRECTORY/overlay/dev" || show_fatal_error 'bind mount /dev in overlay' $?
 umount /dev || echo '! Couldn'\''t umount kernel mounted devtmpfs at /dev. Continuing anyway.'
 
 # Now pivot the root directory like pivot_root(8) recommends. The current root directory
 # is moved to the "lower" directory
-cd "$DIR_OVERLAY/overlay" || show_fatal_error 'changing working directory to new root directory' $?
-pivot_root . "${DIR_OVERLAY#/}/lower" || show_fatal_error 'pivot_root call' $?
+cd "$OVERLAY_DIRECTORY/overlay" || show_fatal_error 'changing working directory to new root directory' $?
+pivot_root . "${OVERLAY_DIRECTORY#/}/lower" || show_fatal_error 'pivot_root call' $?
 
 # The mounts we have done at "overlay" and "upper" can only be accessed on the new root under
 # "lower", because they were mounted in the previous root. Delete the now useless mount points
 # for a tidier look
-bin/rmdir "${DIR_OVERLAY#/}/overlay" 2>dev/null
-bin/rmdir "${DIR_OVERLAY#/}/upper" 2>dev/null
+bin/rmdir "${OVERLAY_DIRECTORY#/}/overlay" 2>dev/null
+bin/rmdir "${OVERLAY_DIRECTORY#/}/upper" 2>dev/null
 
 # pivot_root(8) specifies that the root directory seen by current process may not change.
 # Therefore, execute chroot to make sure it is updated, and then delegate to the real init

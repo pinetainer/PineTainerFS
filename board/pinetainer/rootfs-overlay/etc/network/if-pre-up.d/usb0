@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# The gateway address of the smartphone in the tethering network.
+# It may be different for different devices, depending on their software.
+# However, the AOSP sources and a lot of phones use this address by default:
+# https://android.googlesource.com/platform/frameworks/base/+/a029ea1/services/java/com/android/server/connectivity/Tethering.java#106
+readonly TETHERING_GATEWAY_ADDRESS=192.168.42.129
+# The address that the Pine will statically assign itself for the tethering network.
+readonly TETHERING_HOST_ADDRESS=192.168.42.50
+# The network mask of the tethering network.
+readonly TETHERING_NETWORK_MASK=/24
+# The bridge that extends the physical LAN segment.
+readonly LAN_BRIDGE=br1
+
+# Prints a message to standard output only if verbosity is desired.
+# $1: the message to show.
+echo_verbose() {
+	if [ "$VERBOSITY" = '1' ]; then
+		echo "$1"
+	fi
+}
+
+# Configures networking so that the interface is used as
+# a default gateway transparently.
+start_tethering() {
+	echo_verbose "$0: starting tethering on $IFACE"
+
+	stop_tethering >/dev/null 2>&1
+
+	ifup "$LAN_BRIDGE" >/dev/null 2>&1 && \
+	ip addr add "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_BRIDGE" && \
+	ip link set "$IFACE" master "$LAN_BRIDGE" && \
+	ip route add default via "$TETHERING_GATEWAY_ADDRESS$TETHERING_NETWORK_MASK" dev "$IFACE" metric 0 && \
+	nft -f - <<NFT_COMMANDS
+table ip tethering_nat {
+	chain prerouting {
+		type nat hook prerouting priority dstnat;
+
+		# Make change in IP address transparent
+		ip iif usb0 ip daddr $TETHERING_HOST_ADDRESS dnat to 192.168.0.29
+	}
+
+	chain postrouting {
+		type nat hook postrouting priority srcnat;
+
+		# Any packet that goes out of usb0, to the Internet or the smartphone,
+		# must be from the address in the tethering network
+		ip oif usb0 ip saddr != $TETHERING_HOST_ADDRESS snat to $TETHERING_HOST_ADDRESS
+	}
+}
+NFT_COMMANDS
+}
+
+# Undoes any changes to the networking done by the
+# start_tethering function.
+stop_tethering() {
+	echo_verbose "$0: stopping tethering on $IFACE"
+
+	ip addr del "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_BRIDGE" && \
+	ip link set "$IFACE" nomaster && \
+	ip route del default via "$TETHERING_GATEWAY_ADDRESS$TETHERING_NETWORK_MASK" dev "$IFACE" && \
+	nft delete table ip tethering_nat
+}
+
+if [ "$IFACE" = 'usb0' ]; then
+	case "$PHASE" in
+		post-up) start_tethering;;
+		pre-down) stop_tethering;;
+	esac
+fi

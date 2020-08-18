@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# The bridge to put this interface on.
+readonly MASTER_BRIDGE=br1
+
+# Prints a message to standard output only if verbosity is desired.
+# $1: the message to show.
+echo_verbose() {
+	if [ "$VERBOSITY" = '1' ]; then
+		echo "$1"
+	fi
+}
+
+# Enslaves the interface to a software bridge, so that the software
+# bridge behaves like the interface is another port of the bridge.
+enslave_interface() {
+	echo_verbose "$0: setting $IFACE master to $MASTER_BRIDGE"
+
+	# Make sure that br1 is up
+	ifup "$MASTER_BRIDGE" >/dev/null 2>&1
+
+	ip link set "$IFACE" master "$MASTER_BRIDGE"
+}
+
+# Clears any master from the interface.
+liberate_interface() {
+	ip link set "$IFACE" nomaster
+}
+
+# Waits 6 seconds to give the Ethernet PHY a bit of time to setup
+# the link and configures static ARP entries, to protect us against
+# ARP spoofing and reduce network overhead a little bit.
+initialize() {
+	printf 'Waiting for Ethernet PHY to initialize link'
+
+	for tick in 1 2 3 4 5 6; do
+		if [ "$((tick % 2))" -eq 0 ]; then
+			printf '.'
+		fi
+		sleep 1
+	done
+
+	printf '\n'
+
+	echo "$0: adding static ARP entries for $MASTER_BRIDGE"
+	ip neigh add 192.168.0.1 lladdr 08:80:39:e0:16:5f nud permanent dev "$MASTER_BRIDGE"
+}
+
+if [ "$IFACE" = 'eth0' ]; then
+	case "$PHASE" in
+		pre-up) enslave_interface;;
+		post-up) initialize;;
+		down) liberate_interface;;
+	esac
+fi

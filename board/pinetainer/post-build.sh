@@ -51,3 +51,6 @@ rm "${1:?}/etc/nginx/scgi*" 2>/dev/null || true
 rm "${1:?}/etc/nginx/uwsgi*" 2>/dev/null || true
 rm "${1:?}/etc/nginx/koi*" 2>/dev/null || true
 rm "${1:?}/etc/nginx/win-*" 2>/dev/null || true
+
+# Useless ifupdown script
+rm "${1:?}/etc/network/nfs_check" 2>/dev/null || true

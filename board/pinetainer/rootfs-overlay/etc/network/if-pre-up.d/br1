@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Prints a message to standard output only if verbosity is desired.
+# $1: the message to show.
+echo_verbose() {
+	if [ "$VERBOSITY" = '1' ]; then
+		echo "$1"
+	fi
+}
+
+# Starts the WLAN bridge, creating the bridge device.
+start_wlan_bridge() {
+	echo_verbose "$0: starting $IFACE bridge"
+
+	# Stop the WLAN bridge quietly
+	stop_wlan_bridge >/dev/null 2>&1
+
+	ip link add "$IFACE" type bridge
+}
+
+# Stops the WLAN bridge, deleting the bridge device.
+stop_wlan_bridge() {
+	echo_verbose "$0: stopping bridge $IFACE"
+	ip link del "$IFACE"
+}
+
+if [ "$IFACE" = 'br1' ]; then
+	case "$PHASE" in
+		pre-up) start_wlan_bridge;;
+		post-down) stop_wlan_bridge;;
+	esac
+fi

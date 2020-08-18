@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# The number of VLAN to create for the Pinecontainer virtual machines.
+# 802.1q allows a maximum of 4094 VLAN, and we reserve the 172.16.0.0/12
+# block for virtual machine networks.
+readonly NUMBER_OF_VLANS=4
+# The number of VLAN that will have access to the physical LAN.
+# The design of the addressing and firewall rules impose a limit of 254
+# privileged VLAN, as they treat the 172.31.0.0/16 block as privileged.
+readonly NUMBER_OF_PRIVILEGED_VLANS=1
+
+# Prints a message to standard output only if verbosity is desired.
+# $1: the message to show.
+echo_verbose() {
+	if [ "$VERBOSITY" = '1' ]; then
+		echo "$1"
+	fi
+}
+
+# Converts a VLAN ID to the first host address of the network it belongs to.
+# Each VLAN ID is assigned a /24 network consecutively in the 172.16.0.0/12
+# block, such that the VLAN ID 1 belongs to 172.16.0.0/24, VLAN ID 2 to
+# 172.16.1.0/24, and so on.
+# $1: the VLAN ID to convert.
+vlan_to_first_net_addr() {
+	net_number=$(($1 - 1))
+	second_octet=$((16 + net_number / 256))
+	net_addr="$(printf '172.%s.%s.1' $second_octet $((net_number % 256)))"
+	printf '%s' "$net_addr"
+}
+
+# Adds VLAN interfaces that send Ethernet frames tagged with a VLAN ID to the
+# bridge, which essentially behaves like adding a trunk port to the bridge that
+# is connected to the Pine itself. The bridge VLAN filter is updated accordingly
+# to allow communication. The interface is also registered for proper DHCP operation
+# with dnsmasq via the /run/dnsmasq.d/vm-dhcp-ranges.conf file.
+# $1: the vlan ID to create a interface for.
+add_bridge_vlan_interface() {
+	echo_verbose "$0: creating $IFACE.$1 VLAN interface for $IFACE"
+
+	net_addr_no_mask="$(vlan_to_first_net_addr "$1")"
+	net_addr_with_mask="$net_addr_no_mask/24"
+	echo_verbose "$0: computed first network address with mask $net_addr_with_mask for VLAN ID $1"
+
+	ip link add link "$IFACE" name "$IFACE.$1" type vlan id "$1" && \
+	ip addr add "$net_addr_with_mask" dev "$IFACE.$1" && \
+	bridge vlan add vid "$1" dev "$IFACE" self && \
+	ip link set "$IFACE.$1" up && \
+	echo_verbose "$0: appending to /run/dnsmasq.d/vm-dhcp-ranges.conf dnsmasq configuration file" && \
+	{ mkdir /run/dnsmasq.d || true; } >/dev/null 2>&1 && \
+	printf 'dhcp-range=set:%s,%s,%s,24h\n' \
+	"$IFACE.$1" "${net_addr_no_mask%.1}.2" "${net_addr_no_mask%.1}.254" >> /run/dnsmasq.d/vm-dhcp-ranges.conf
+}
+
+# Starts the VM bridge, creating the bridge device and its associated VLAN interfaces.
+# VLAN filtering is configured to allow the bridge to accept VLAN-tagged frames from
+# the VLAN interfaces available to the Pine. STP is disabled to prevent rogue BPDU
+# from compromising the availability of the network. See:
+# https://www.stigviewer.com/stig/layer_2_switch_security_requirements_guide/2019-01-07/finding/V-62175
+start_vm_bridge() {
+	echo_verbose "$0: starting $IFACE bridge"
+
+	# Stop the VM bridge quietly
+	stop_vm_bridge >/dev/null 2>&1
+
+	ip link add "$IFACE" type bridge vlan_filtering 1 stp_state 0 && \
+	ip link set "$IFACE" up && \
+	bridge vlan del vid "$(cat "/sys/class/net/$IFACE/bridge/default_pvid" 2>/dev/null)" dev "$IFACE" self && \
+	pvid=1 && \
+	while [ $pvid -le $NUMBER_OF_VLANS ]; do
+		echo_verbose "$0: configuring VLAN ID $pvid for bridge $IFACE"
+
+		if ! add_bridge_vlan_interface $pvid; then
+			return $?
+		fi
+
+		pvid=$((pvid + 1))
+	done && \
+	pvid=4094 && \
+	minimum_privileged_pvid=$((pvid - NUMBER_OF_PRIVILEGED_VLANS)) && \
+	while [ $pvid -gt $minimum_privileged_pvid ]; do
+		echo_verbose "$0: configuring privileged VLAN ID $pvid for bridge $IFACE"
+
+		if ! add_bridge_vlan_interface $pvid; then
+			return $?
+		fi
+
+		pvid=$((pvid - 1))
+	done
+}
+
+# Stops the VM bridge, deleting the bridge device, its associated VLAN interfaces and
+# the related dnsmasq configuration.
+stop_vm_bridge() {
+	echo_verbose "$0: stopping bridge $IFACE"
+
+	ip link del "$IFACE" && \
+	rm -f /run/dnsmasq.d/vm-dhcp-ranges.conf && \
+	{ rmdir /run/dnsmasq.d || true; } >/dev/null 2>&1
+}
+
+if [ "$IFACE" = 'br0' ]; then
+	case "$PHASE" in
+		pre-up) start_vm_bridge;;
+		post-down) stop_vm_bridge;;
+	esac
+fi

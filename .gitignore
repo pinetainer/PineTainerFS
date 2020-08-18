@@ -99,3 +99,6 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 
 # EDK II UEFI firmware pflash images
 /board/pinetainer/rootfs-overlay/usr/share/edk2.git/*-pflash.raw
+
+# See /board/pinetainer/rootfs-overlay/etc/dnsmasq.conf
+/board/pinetainer/rootfs-overlay/etc/dnsmasq.d/forced-dns-servers.conf

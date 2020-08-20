@@ -6,7 +6,8 @@
 readonly NUMBER_OF_VLANS=4
 # The number of VLAN that will have access to the physical LAN.
 # The design of the addressing and firewall rules impose a limit of 254
-# privileged VLAN, as they treat the 172.31.0.0/16 block as privileged.
+# privileged VLAN, as they treat the 172.31.0.0/16 block as privileged
+# (the last two networks are unused due to the maximum of 4094 VLAN).
 readonly NUMBER_OF_PRIVILEGED_VLANS=1
 
 # Prints a message to standard output only if verbosity is desired.

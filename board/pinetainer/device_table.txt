@@ -1,0 +1,12 @@
+# See package/makedevs/README for details
+#
+# This device table is used to assign proper ownership and permissions
+# on various files. It doesn't create any device file, as it is used
+# in both static device configurations (where /dev/ is static) and in
+# dynamic configurations (where devtmpfs, mdev or udev are used).
+#
+# <name>							<type>	<mode>	<uid>	<gid>	<major>	<minor>	<start>	<inc>	<count>
+/etc/hostapd.eap_user				f		660		0		99		-		-		-		-		-
+/etc/hostapd.radius_clients			f		660		0		99		-		-		-		-		-
+/etc/hostapd.pkey.pem				f		660		0		99		-		-		-		-		-
+/etc/hostapd.server_cert.pem		f		660		0		99		-		-		-		-		-

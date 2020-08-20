@@ -102,3 +102,13 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 
 # See /board/pinetainer/rootfs-overlay/etc/dnsmasq.conf
 /board/pinetainer/rootfs-overlay/etc/dnsmasq.d/forced-dns-servers.conf
+
+# Database of users for EAP authentication
+/board/pinetainer/rootfs-overlay/etc/hostapd.eap_user
+
+# Database of RADIUS clients
+/board/pinetainer/rootfs-overlay/etc/hostapd.radius_clients
+
+# Public server certificates and private keys
+/board/pinetainer/rootfs-overlay/etc/hostapd.server_cert.pem
+/board/pinetainer/rootfs-overlay/etc/hostapd.pkey.pem

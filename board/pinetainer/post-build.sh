@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Tweak network, dnsmasq and udev start order
+mv "${1:?}/etc/init.d/S40network" "${1:?}/etc/init.d/S03network.sh" 2>/dev/null || true
+mv "${1:?}/etc/init.d/S80dnsmasq" "${1:?}/etc/init.d/S04dnsmasq.sh" 2>/dev/null || true
+mv "${1:?}/etc/init.d/S10udev" "${1:?}/etc/init.d/S90udev.sh" 2>/dev/null || true
+
 # Useless Dropbear executables and init scripts
 rm "${1:?}/usr/bin/dropbearkey" 2>/dev/null || true
 rm "${1:?}/usr/bin/dropbearconvert" 2>/dev/null || true
@@ -23,6 +28,9 @@ rm "${1:?}/usr/share/qemu/efi-*" 2>/dev/null || true
 rm "${1:?}/usr/share/qemu/pxe*" 2>/dev/null || true
 rm "${1:?}/usr/share/qemu/s390*" 2>/dev/null || true
 rm "${1:?}/usr/share/qemu/*.fd" 2>/dev/null || true
+
+# iputils cruft
+rm "${1:?}/etc/init.d/ninfod.sh" 2>/dev/null || true
 
 # Scripts in interpreted languages we can't run
 rm "${1:?}/usr/bin/stunnel3" 2>/dev/null || true

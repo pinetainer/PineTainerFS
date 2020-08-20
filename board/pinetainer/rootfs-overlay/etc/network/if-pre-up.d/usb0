@@ -9,8 +9,8 @@ readonly TETHERING_GATEWAY_ADDRESS=192.168.42.129
 readonly TETHERING_HOST_ADDRESS=192.168.42.50
 # The network mask of the tethering network.
 readonly TETHERING_NETWORK_MASK=/24
-# The bridge that extends the physical LAN segment.
-readonly LAN_BRIDGE=br1
+# The interface that is connected to the physical LAN segment.
+readonly LAN_IFACE=eth0
 
 # Prints a message to standard output only if verbosity is desired.
 # $1: the message to show.
@@ -27,9 +27,8 @@ start_tethering() {
 
 	stop_tethering >/dev/null 2>&1
 
-	ifup "$LAN_BRIDGE" >/dev/null 2>&1 && \
-	ip addr add "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_BRIDGE" && \
-	ip link set "$IFACE" master "$LAN_BRIDGE" && \
+	ifup "$LAN_IFACE" >/dev/null 2>&1 && \
+	ip addr add "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_IFACE" && \
 	ip route add default via "$TETHERING_GATEWAY_ADDRESS$TETHERING_NETWORK_MASK" dev "$IFACE" metric 0 && \
 	nft -f - <<NFT_COMMANDS
 table ip tethering_nat {
@@ -56,8 +55,7 @@ NFT_COMMANDS
 stop_tethering() {
 	echo_verbose "$0: stopping tethering on $IFACE"
 
-	ip addr del "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_BRIDGE" && \
-	ip link set "$IFACE" nomaster && \
+	ip addr del "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_IFACE" && \
 	ip route del default via "$TETHERING_GATEWAY_ADDRESS$TETHERING_NETWORK_MASK" dev "$IFACE" && \
 	nft delete table ip tethering_nat
 }

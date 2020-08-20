@@ -1,1 +1,26 @@
-/etc/network/if-pre-up.d/eth0
+#!/bin/sh
+
+# Waits 6 seconds to give the Ethernet PHY a bit of time to setup
+# the link and configures static ARP entries, to protect us against
+# ARP spoofing and reduce network overhead a little bit.
+initialize() {
+	printf '%s: Waiting for Ethernet PHY to initialize link' "$0"
+
+	for tick in 1 2 3 4 5 6; do
+		if [ "$((tick % 2))" -eq 0 ]; then
+			printf '.'
+		fi
+		sleep 1
+	done
+
+	printf '\n'
+
+	echo "$0: adding static ARP entries for $IFACE"
+	ip neigh add 192.168.0.1 lladdr 08:80:39:e0:16:5f nud permanent dev "$IFACE"
+}
+
+if [ "$IFACE" = 'eth0' ]; then
+	case "$PHASE" in
+		post-up) initialize;;
+	esac
+fi

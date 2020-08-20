@@ -14,6 +14,11 @@ initialize() {
 			printf '.'
 		fi
 
+		if [ $tick -ge 144 ]; then
+			echo "$0: we have been waiting for the PHY to initialize for 36 seconds, which is too much. Bailing" >&2
+			return 1
+		fi
+
 		tick=$((tick + 1))
 	done
 

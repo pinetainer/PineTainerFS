@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Runs executable files in the /etc/firewall directory to set up the firewall.
+setup_firewall() {
+	echo "$0: configuring the firewall"
+
+	if [ "$VERBOSITY" = '1' ]; then
+		verbose_flag=-v
+	fi
+
+	run-parts $verbose_flag --exit-on-error /etc/firewall
+}
+
+# Use default values to allow this script to run outside of ifupdown
+IFACE=${IFACE:---all}
+PHASE=${PHASE:-post-up}
+
+if [ "$IFACE" = '--all' ]; then
+	case "$PHASE" in
+		post-up) setup_firewall;;
+	esac
+fi

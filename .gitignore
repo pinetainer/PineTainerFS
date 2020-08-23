@@ -112,3 +112,9 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 # Public server certificates and private keys
 /board/pinetainer/rootfs-overlay/etc/hostapd.server_cert.pem
 /board/pinetainer/rootfs-overlay/etc/hostapd.pkey.pem
+
+# Port knocking nftables rules
+/board/pinetainer/rootfs-overlay/etc/firewall/port-knocking/rules
+
+# DNAT rules for VMs
+/board/pinetainer/rootfs-overlay/etc/firewall/02vm-dnat

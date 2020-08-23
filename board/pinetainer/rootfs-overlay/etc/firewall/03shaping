@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# The interface that will be used to send and receive packets from Internet.
+readonly LAN_INTERFACE=eth0
+# The Intermediate Functional Block to use for ingress shaping in LAN_INTERFACE.
+readonly LAN_INTERFACE_IFB=ifb0
+
+# Try to delete root qdiscs from affected interfaces
+tc qdisc del dev "$LAN_INTERFACE" root >/dev/null 2>&1
+tc qdisc del dev "$LAN_INTERFACE" handle ffff:0 ingress >/dev/null 2>&1
+tc qdisc del dev "$LAN_INTERFACE_IFB" root >/dev/null 2>&1
+
+# Egress traffic shaping
+tc qdisc add dev "$LAN_INTERFACE" root handle 1:0 htb default 1 && \
+# Non-Internet traffic is effectively non-shaped
+tc class add dev "$LAN_INTERFACE" parent 1:0 classid 1:1 htb rate 100% && \
+tc qdisc add dev "$LAN_INTERFACE" parent 1:1 handle 10:0 fq_codel && \
+# Maximum upload rate, distributed between the children of this class
+tc class add dev "$LAN_INTERFACE" parent 1:0 classid 1:10 htb rate 8464kbit burst 26000 cburst 26000 && \
+# Class for VM traffic to the Internet
+tc class add dev "$LAN_INTERFACE" parent 1:10 classid 1:20 htb rate 7464kbit ceil 8464kbit burst 26000 cburst 26000 && \
+tc qdisc add dev "$LAN_INTERFACE" parent 1:20 handle 20:0 fq_codel && \
+# Change the hash algorithm so that many connections from a single VM share the same flow
+tc filter add dev "$LAN_INTERFACE" parent 20:0 handle 1 protocol all flow map key nfct-src && \
+# Class for local traffic to the Internet
+tc class add dev "$LAN_INTERFACE" parent 1:10 classid 1:30 htb rate 1464kbit ceil 8464kbit burst 26000 cburst 26000 && \
+tc qdisc add dev "$LAN_INTERFACE" parent 1:30 handle 30:0 fq_codel && \
+# Classify traffic according to its fwmark
+tc filter add dev "$LAN_INTERFACE" parent 1:0 protocol all prio 100 handle 0x10 fw classid 1:20 && \
+tc filter add dev "$LAN_INTERFACE" parent 1:0 protocol all prio 200 handle 0x20 fw classid 1:30 && \
+# Ingress traffic shaping
+ip link set dev "$LAN_INTERFACE_IFB" up && \
+ip link set "$LAN_INTERFACE_IFB" txqueuelen 100 && \
+tc qdisc add dev "$LAN_INTERFACE" handle ffff:0 ingress && \
+tc filter add dev "$LAN_INTERFACE" parent ffff:0 protocol all matchall action connmark action mirred egress redirect dev "$LAN_INTERFACE_IFB" && \
+tc qdisc add dev "$LAN_INTERFACE_IFB" root handle 1:0 htb default 1 && \
+# Non-Internet traffic is effectively non-shaped.
+# ifb interfaces don't support the speed sysfs attribute, and tc uses it internally when
+# specifying a rate, so we borrow an appropriate value from $LAN_INTERFACE
+tc class add dev "$LAN_INTERFACE_IFB" parent 1:0 classid 1:1 htb rate "$(cat "/sys/class/net/$LAN_INTERFACE/speed")mbit" && \
+tc qdisc add dev "$LAN_INTERFACE_IFB" parent 1:1 handle 10:0 fq_codel && \
+# Maximum download rate, distributed between the children of this class
+tc class add dev "$LAN_INTERFACE_IFB" parent 1:0 classid 1:10 htb rate 96mbit burst 320000 cburst 320000 && \
+# Class for VM traffic from the Internet
+tc class add dev "$LAN_INTERFACE_IFB" parent 1:10 classid 1:20 htb rate 92mbit ceil 96mbit burst 320000 cburst 320000 && \
+tc qdisc add dev "$LAN_INTERFACE_IFB" parent 1:20 handle 20:0 fq_codel target 3ms && \
+# Change the hash algorithm so that many connections to a single VM share the same flow
+tc filter add dev "$LAN_INTERFACE_IFB" parent 20:0 handle 1 protocol all flow map key nfct-dst && \
+# Class for local traffic from the Internet
+tc class add dev "$LAN_INTERFACE_IFB" parent 1:10 classid 1:30 htb rate 4mbit ceil 96mbit burst 320000 cburst 320000 && \
+tc qdisc add dev "$LAN_INTERFACE_IFB" parent 1:30 handle 30:0 fq_codel target 3ms && \
+# Classify traffic according to its fwmark
+tc filter add dev "$LAN_INTERFACE_IFB" parent 1:0 protocol all prio 100 handle 0x10 fw classid 1:20 && \
+tc filter add dev "$LAN_INTERFACE_IFB" parent 1:0 protocol all prio 200 handle 0x20 fw classid 1:30

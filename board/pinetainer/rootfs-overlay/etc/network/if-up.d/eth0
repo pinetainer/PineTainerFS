@@ -1,21 +1,21 @@
 #!/bin/sh
 
 # Waits until a ICMP ECHO request has been successfully sent to the
-# defaulta gateway, in order to wait until the PHY has setup the link,
+# default gateway, in order to wait until the PHY has setup the link,
 # and configures static ARP entries, to protect us against ARP spoofing
-# and reduce network overhead a little bit.
+# later on and reduce network overhead a little bit.
 initialize() {
-	printf '%s: Waiting for Ethernet PHY to initialize link' "$0"
+	printf '%s: waiting for the Ethernet PHY to initialize link' "$0"
 
 	# Try to ping the gateway until it responds
 	tick=1
 	while ! ping -c 1 -q -W 0.25 192.168.0.1 >/dev/null 2>&1; do
-		if [ "$((tick % 8))" -eq 0 ]; then
+		if [ "$((tick % 4))" -eq 0 ]; then
 			printf '.'
 		fi
 
 		if [ $tick -ge 144 ]; then
-			echo "$0: we have been waiting for the PHY to initialize for 36 seconds, which is too much. Bailing" >&2
+			printf "\n%s: we have been waiting for the PHY to initialize for 36 seconds, which is too much. Bailing\n" "$0" >&2
 			return 1
 		fi
 
@@ -24,8 +24,8 @@ initialize() {
 
 	printf '\n'
 
-	echo "$0: adding static ARP entries for $IFACE"
-	ip neigh add 192.168.0.1 lladdr 08:80:39:e0:16:5f nud permanent dev "$IFACE"
+	echo "$0: making gateway ARP entry static for $IFACE"
+	ip neigh replace 192.168.0.1 nud permanent dev "$IFACE"
 }
 
 if [ "$IFACE" = 'eth0' ]; then

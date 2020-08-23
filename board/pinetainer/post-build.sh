@@ -2,7 +2,7 @@
 
 # Tweak network, dnsmasq and udev start order
 mv "${1:?}/etc/init.d/S40network" "${1:?}/etc/init.d/S03network.sh" 2>/dev/null || true
-mv "${1:?}/etc/init.d/S80dnsmasq" "${1:?}/etc/init.d/S04dnsmasq.sh" 2>/dev/null || true
+mv "${1:?}/etc/init.d/S80dnsmasq" "${1:?}/etc/init.d/S10dnsmasq.sh" 2>/dev/null || true
 mv "${1:?}/etc/init.d/S10udev" "${1:?}/etc/init.d/S90udev.sh" 2>/dev/null || true
 
 # Useless Dropbear executables and init scripts

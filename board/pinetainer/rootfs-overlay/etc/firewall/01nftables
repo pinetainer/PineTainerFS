@@ -1,0 +1,116 @@
+#!/usr/sbin/nft -f
+
+# ######### #
+# CONSTANTS #
+# ######### #
+
+define LAN = 192.168.0.0/27
+define LAN_IP = 192.168.0.29
+define LAN_IFACE = eth0
+define VM_NET = 172.16.0.0/12
+define PRIVILEGED_VM_NET = 172.31.0.0/16
+define GATEWAY = 192.168.0.1
+
+# Cleanup
+flush ruleset
+
+# ################# #
+# TABLES AND CHAINS #
+# ################# #
+
+# The default policy for the input, forward and output chains is to drop every packet.
+create table ip filter
+create chain ip filter portknocking { type filter hook input priority filter - 1; }
+create chain ip filter input { type filter hook input priority filter; policy drop; }
+create chain ip filter output { type filter hook output priority filter; policy drop; }
+create chain ip filter forward { type filter hook forward priority filter; policy drop; }
+
+create table ip nat
+create chain ip nat postrouting { type nat hook postrouting priority srcnat; }
+create chain ip nat prerouting { type nat hook prerouting priority dstnat; }
+
+create table ip mangle
+create chain ip mangle input { type filter hook input priority mangle; }
+create chain ip mangle output { type filter hook output priority mangle; }
+create chain ip mangle forward { type filter hook forward priority mangle; }
+
+# ########### #
+# INPUT RULES #
+# ########### #
+
+add rule ip filter input ct state established,related accept comment "Accept incoming packets in response to outgoing packets"
+add rule ip filter input icmp type { echo-request, timestamp-request } accept comment "Accept useful ICMP packets"
+
+# ---------------------------
+# Network service allow rules
+# ---------------------------
+add rule ip filter input ip saddr { $LAN, $VM_NET } udp dport { 53, 67 } accept comment "Accept DNS and DHCP packets over UDP (dnsmasq)"
+add rule ip filter input ip saddr { $LAN, $VM_NET } tcp dport 53 accept comment "Accept DNS packets over TCP (dnsmasq)" # Needed for i.e. zone transfers
+
+# NOTE: iif is important, because a host in a network may send packets to an IP address
+# that the Pine has in a different network and be answered. That is not considered forwarding,
+# because an extra hop is not needed to deliver the packet; instead, the packet goes directly
+# to the input hook. However, if the rogue host is in a different subnet than the Pine expects,
+# RP filtering seems to kick in and drop the packet.
+add rule ip filter input iif $LAN_IFACE ip daddr $LAN_IP tcp dport 22 accept comment "Accept SSH packets (openssh)"
+
+add rule ip filter input ip saddr $GATEWAY ip daddr $LAN_IP udp dport 1812 accept comment "Accept RADIUS requests from the gateway (hostapd)"
+
+add rule ip filter input iif $LAN_IFACE ip daddr $LAN_IP tcp dport 443 accept comment "Accept SSL packets (nginx, stunnel)"
+# ----------------------------------
+# End of network service allow rules
+# ----------------------------------
+
+add rule ip filter input ip saddr { $LAN, $VM_NET } reject with icmp type admin-prohibited comment "Reject non-Internet packets which were not accepted"
+
+# ############ #
+# OUTPUT RULES #
+# ############ #
+
+add rule ip filter output ip daddr != { $LAN, $VM_NET } accept comment "Allow sending packets to the Internet"
+add rule ip filter output ct state established,related accept comment "Allow sending packets in response to accepted or rejected incoming packets"
+add rule ip filter output ip daddr $GATEWAY icmp type echo-request comment "Allow sending ICMP echo requests to the gateway for troubleshooting"
+add rule ip filter output oif lo accept comment "Accept loopback communication"
+
+# ############# #
+# FORWARD RULES #
+# ############# #
+
+# NOTE: these rules assume that reverse path filtering is enabled, and therefore the
+# source address is authentic. If it is not authentic, then the reverse path filtering
+# would detect that and not forward the packet anyway. If the source address is not
+# authentic and RPF is not enabled, an attacker is then able to send packets to unintended
+# destinations by spoofing the source address to another that has more permissions.
+add rule ip filter forward ip saddr $VM_NET ip daddr != { $LAN, $VM_NET } accept comment "Allow VM -> Internet forwarding"
+add rule ip filter forward ip saddr != { $LAN, $VM_NET } ip daddr $VM_NET accept comment "Allow Internet -> VM forwarding"
+add rule ip filter forward ip saddr $PRIVILEGED_VM_NET ip daddr $LAN accept comment "Allow privileged VM -> LAN forwarding"
+add rule ip filter forward ip saddr $LAN ip daddr $PRIVILEGED_VM_NET accept comment "Allow LAN -> privileged VM forwarding"
+
+# ########## #
+# SNAT RULES #
+# ########## #
+add rule ip nat postrouting ip saddr != $LAN rt nexthop $GATEWAY masquerade fully-random comment "SNAT packets that will be routed by a gateway whose routing tables are not configurable"
+
+# ############## #
+# MANGLING RULES #
+# ############## #
+
+# NOTE: again, we assume that reverse path filtering is active, and therefore addresses are trustworthy.
+# These marks are used by TC filters to shape some flows of ingress and egress traffic.
+add rule ip mangle forward ip saddr $VM_NET ip daddr != { $LAN, $VM_NET } mark set 0x10 comment "Mark VM -> Internet packets"
+add rule ip mangle forward ip saddr != { $LAN, $VM_NET } ip daddr $VM_NET ct mark set 0x10 comment "Mark Internet -> VM packets"
+add rule ip mangle input ip saddr != { $LAN, $VM_NET } ct mark set 0x20 comment "Mark packets received from the Internet to the Pine"
+add rule ip mangle output ip daddr != { $LAN, $VM_NET } mark set 0x20 comment "Mark packets sent by the Pine to the Internet"
+
+# ################### #
+# PORT KNOCKING RULES #
+# ################### #
+
+# These rules are based on the examples available at
+# https://wiki.nftables.org/wiki-nftables/index.php/Port_knocking_example
+# The actual rules are not included in the repository to make port knocking
+# a bit more effective, as a part of a defense in depth strategy that does not
+# substitute proper authentication checks and security in the hidden applications,
+# but helps reducing log sizes from failed login attempts made by stupid
+# botnets on the Internet.
+include "/etc/firewall/port-knocking/rules"

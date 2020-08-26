@@ -12,7 +12,7 @@ readonly GATEWAY_ADDRESS=192.168.0.1
 
 case "$1" in
 	start)			printf 'Configuring network: '
-					if nft -f - <<NFT_COMMANDS &&
+					if nft -f /proc/self/fd/0 <<NFT_COMMANDS &&
 table ip filter {
 	chain input {
 		type filter hook input priority filter; policy drop;

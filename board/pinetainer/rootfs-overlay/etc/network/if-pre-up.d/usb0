@@ -30,7 +30,7 @@ start_tethering() {
 	ifup "$LAN_IFACE" >/dev/null 2>&1 && \
 	ip addr add "$TETHERING_HOST_ADDRESS$TETHERING_NETWORK_MASK" dev "$LAN_IFACE" && \
 	ip route add default via "$TETHERING_GATEWAY_ADDRESS$TETHERING_NETWORK_MASK" dev "$IFACE" metric 0 && \
-	nft -f - <<NFT_COMMANDS
+	nft -f /proc/self/fd/0 <<NFT_COMMANDS
 table ip tethering_nat {
 	chain prerouting {
 		type nat hook prerouting priority dstnat;

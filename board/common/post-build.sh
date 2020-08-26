@@ -24,11 +24,7 @@ rm "${1:?}/etc/lvm/lvmlocal.conf" 2>/dev/null || true
 rm "${1:?}/etc/wgetrc" 2>/dev/null || true
 
 # Scripts in interpreted languages we can't run
-rm "${1:?}/usr/sbin/xfs_scrub_all" 2>/dev/null || true
 rm "${1:?}/usr/lib/libstdc++.so.6.0.28-gdb.py" 2>/dev/null || true
-
-# Useless files from xfsprogs
-rm -rf "${1:?}/usr/lib/xfsprogs" 2>/dev/null || true
 
 # Shell scripts with bashisms
 rm "${1:?}/usr/bin/xzegrep" 2>/dev/null || true
@@ -38,3 +34,8 @@ rm "${1:?}/usr/bin/xzdiff" 2>/dev/null || true
 rm "${1:?}/usr/bin/xzgrep" 2>/dev/null || true
 rm "${1:?}/usr/bin/xzless" 2>/dev/null || true
 rm "${1:?}/usr/bin/xzmore" 2>/dev/null || true
+
+# Files in directories on which a RAM filesystem will be mounted
+rm -rf "${1:?}"/dev/* 2>/dev/null || true
+rm -rf "${1:?}"/run/* 2>/dev/null || true
+rm -rf "${1:?}"/tmp/* 2>/dev/null || true

@@ -60,11 +60,5 @@ rm "${1:?}"/etc/nginx/win-* 2>/dev/null || true
 # Useless ifupdown script
 rm "${1:?}/etc/network/nfs_check" 2>/dev/null || true
 
-# Useless sudo runtime directory
-rmdir "${1:?}/run/sudo" 2>/dev/null || true
-
-# Useless files in /tmp
-rm -rf "${1:?}"/tmp/* 2>/dev/null || true
-
 # PCI ID list pulled in by mdev that won't be used
 rm "${1:?}/usr/share/pci.ids.gz" 2>/dev/null || true

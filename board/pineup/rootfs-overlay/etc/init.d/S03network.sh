@@ -5,16 +5,31 @@
 # administration computer and the Internet only.
 
 readonly NETWORK_IFACE=eth0
+readonly LAN=192.168.0.0/27
+readonly NETWORK_ADDRESS=192.168.0.29/27
+readonly CONFIGURATION_HOST_ADDRESS=192.168.0.30
+readonly GATEWAY_ADDRESS=192.168.0.1
 
 case "$1" in
 	start)			printf 'Configuring network: '
-					if iptables -P INPUT DROP && \
-					iptables -A INPUT -s 192.168.0.30 -j ACCEPT && \
-					iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT && \
-					iptables -P OUTPUT DROP && \
-					iptables -A OUTPUT -d 192.168.0.30 -j ACCEPT && \
-					iptables -A OUTPUT ! -d 192.168.0.0/27 -j ACCEPT && \
-					ip addr add 192.168.0.29/27 dev "$NETWORK_IFACE" && \
+					if nft -f - <<NFT_COMMANDS &&
+table ip filter {
+	chain input {
+		type filter hook input priority filter; policy drop;
+
+		ip saddr $CONFIGURATION_HOST_ADDRESS accept comment "Accept packets from configuration host"
+		ct state established accept comment "Accept packets from established connections"
+	}
+
+	chain output {
+		type filter hook output priority filter; policy drop;
+
+		ip daddr $CONFIGURATION_HOST_ADDRESS accept comment "Allow outgoing packets to the configuration host"
+		ip daddr != $LAN accept comment "Allow outgoing packets to the Internet"
+	}
+}
+NFT_COMMANDS
+					ip addr add "$NETWORK_ADDRESS" dev "$NETWORK_IFACE" && \
 					ip link set "$NETWORK_IFACE" up
 					then
 						# Give the network adapter a bit of time to stabilize
@@ -25,7 +40,7 @@ case "$1" in
 							sleep 1
 						done
 
-						if ip route add default via 192.168.0.1 dev "$NETWORK_IFACE"; then
+						if ip route add default via "$GATEWAY_ADDRESS" dev "$NETWORK_IFACE"; then
 							echo ' OK'
 						else
 							echo ' ERROR'
@@ -35,11 +50,8 @@ case "$1" in
 					fi;;
 
 	stop)			printf 'Stopping network: '
-					if iptables -P INPUT ACCEPT && \
-					iptables -F INPUT && \
-					iptables -P OUTPUT ACCEPT && \
-					iptables -F OUTPUT && \
-					ip addr del 192.168.0.29/27 dev "$NETWORK_IFACE" && \
+					if nft flush ruleset && \
+					ip addr del "$NETWORK_ADDRESS" dev "$NETWORK_IFACE" && \
 					ip link set "$NETWORK_IFACE" down
 					then
 						echo 'OK'

@@ -50,9 +50,9 @@ NFT_COMMANDS
 					fi;;
 
 	stop)			printf 'Stopping network: '
-					if nft flush ruleset && \
+					if ip link set "$NETWORK_IFACE" down && \
 					ip addr del "$NETWORK_ADDRESS" dev "$NETWORK_IFACE" && \
-					ip link set "$NETWORK_IFACE" down
+					nft flush ruleset
 					then
 						echo 'OK'
 					else

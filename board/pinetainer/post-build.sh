@@ -6,16 +6,12 @@ mv "${1:?}/etc/init.d/S80dnsmasq" "${1:?}/etc/init.d/S10dnsmasq.sh" 2>/dev/null 
 mv "${1:?}/etc/init.d/S10udev" "${1:?}/etc/init.d/S90udev.sh" 2>/dev/null || true
 mv "${1:?}/etc/init.d/S21haveged" "${1:?}/etc/init.d/S01haveged.sh" 2>/dev/null || true
 
-# Useless Dropbear executables and init scripts
-rm "${1:?}/usr/bin/dropbearkey" 2>/dev/null || true
-rm "${1:?}/usr/bin/dropbearconvert" 2>/dev/null || true
-rm "${1:?}/etc/init.d/S50dropbear" 2>/dev/null || true
-
-# Useless desktop integration (currently created by htop and qemu)
+# Useless desktop integration (currently created by htop, qemu and latencytop)
 rm -rf "${1:?}/usr/share/applications" 2>/dev/null || true
 rm -rf "${1:?}/usr/share/pixmaps" 2>/dev/null || true
 rm -rf "${1:?}/usr/share/icons" 2>/dev/null || true
 rm -rf "${1:?}/usr/share/qemu/qemu-nsis.bmp" 2>/dev/null || true
+rm -rf "${1:?}/usr/share/latencytop" 2>/dev/null || true
 
 # Remove nginx default pages
 rm -rf "${1:?}/usr/share/html" 2>/dev/null || true

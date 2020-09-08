@@ -39,12 +39,6 @@ rm "${1:?}/usr/sbin/exiqgrep" 2>/dev/null || true
 rm "${1:?}/usr/sbin/exiqsumm" 2>/dev/null || true
 rm "${1:?}/etc/ssl/misc/tsget.pl" 2>/dev/null || true
 
-# Build configuration for Dovecot. Contains possibly sensitive data,
-# like full paths in the build host. Who in the Dovecot development
-# team thought this would be a good idea, not worth of being disabled
-# in a configure option? :(
-rm "${1:?}/usr/lib/dovecot-config" 2>/dev/null || true
-
 # Empty directories created by gnuplot
 rmdir "${1:?}/usr/libexec/gnuplot/5.2" 2>/dev/null || true
 rmdir "${1:?}/usr/libexec/gnuplot" 2>/dev/null || true

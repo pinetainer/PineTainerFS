@@ -27,7 +27,7 @@ readonly MINIMUM_SYSTEM_IOPS_ALLOCATION=10
 # high memory pressure when only less than the 25% of this memory is available
 readonly MAXIMUM_SYSTEM_MEMORY=192M
 
-# Limit the maximum number of processes that processes in the system cgroup can spawn.
+# Limit the maximum number of processes that processes in the system cgroup can spawn
 readonly MAXIMUM_SYSTEM_PIDS=512
 
 # The file that represents high-level status information about the cgroups configuration
@@ -78,7 +78,7 @@ stop() {
 			echo "$pid" > "$CGROUP_HIERARCHY_MOUNTPOINT/cgroup.procs" || true
 		done && \
 		# Remove all children cgroups
-		find "$CGROUP_HIERARCHY_MOUNTPOINT"/* -type d -exec rm {} \; && \
+		find "$CGROUP_HIERARCHY_MOUNTPOINT"/* -type d -depth -exec rm {} \; && \
 		# Remove all the controllers. This also resets their configuration
 		shell_options_restore_cmds="$(set +o)" && \
 		set -f && \

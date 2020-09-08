@@ -31,12 +31,6 @@ rm "${1:?}/etc/init.d/ninfod.sh" 2>/dev/null || true
 
 # Scripts in interpreted languages we can't run
 rm "${1:?}/usr/bin/stunnel3" 2>/dev/null || true
-rm "${1:?}/usr/bin/smime_keys" 2>/dev/null || true
-rm "${1:?}/usr/sbin/exigrep" 2>/dev/null || true
-rm "${1:?}/usr/sbin/eximstats" 2>/dev/null || true
-rm "${1:?}/usr/sbin/exipick" 2>/dev/null || true
-rm "${1:?}/usr/sbin/exiqgrep" 2>/dev/null || true
-rm "${1:?}/usr/sbin/exiqsumm" 2>/dev/null || true
 rm "${1:?}/etc/ssl/misc/tsget.pl" 2>/dev/null || true
 
 # Empty directories created by gnuplot

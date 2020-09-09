@@ -78,7 +78,7 @@ stop() {
 			echo "$pid" > "$CGROUP_HIERARCHY_MOUNTPOINT/cgroup.procs" || true
 		done && \
 		# Remove all children cgroups
-		find "$CGROUP_HIERARCHY_MOUNTPOINT"/* -type d -depth -exec rm {} \; && \
+		find "$CGROUP_HIERARCHY_MOUNTPOINT"/* -type d -depth -exec rmdir {} \; && \
 		# Remove all the controllers. This also resets their configuration
 		shell_options_restore_cmds="$(set +o)" && \
 		set -f && \

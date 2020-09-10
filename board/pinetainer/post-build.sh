@@ -34,7 +34,7 @@ rm "${1:?}/usr/bin/stunnel3" 2>/dev/null || true
 rm "${1:?}/etc/ssl/misc/tsget.pl" 2>/dev/null || true
 
 # Empty directories created by gnuplot
-rmdir "${1:?}/usr/libexec/gnuplot/5.2" 2>/dev/null || true
+rmdir "${1:?}/usr/libexec/gnuplot/5.4" 2>/dev/null || true
 rmdir "${1:?}/usr/libexec/gnuplot" 2>/dev/null || true
 
 # Configuration files irrelevant to nginx due

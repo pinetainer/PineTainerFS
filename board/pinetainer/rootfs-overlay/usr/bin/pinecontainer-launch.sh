@@ -253,7 +253,7 @@ if ! mkdir "$CGROUP_HIERARCHY_MOUNTPOINT/$PINECONTAINER_NAME"; then
 	exit 12
 fi
 
-# The directory where VM control sockets shall be created.
+# The directory where VM control sockets shall be created
 export CONTROL_SOCKET_DIR="$RUNTIME_DATA_DIR/$PINECONTAINER_NAME"
 
 # Create the directories for runtime data

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The directory where the cgroup2 hierarchy will be mounted
-readonly CGROUP_HIERARCHY_MOUNTPOINT=/sys/fs/cgroup
+export readonly CGROUP_HIERARCHY_MOUNTPOINT=/sys/fs/cgroup
 
 # The cgroup por system (i.e. non VM) processes
 readonly SYSTEM_CGROUP=system

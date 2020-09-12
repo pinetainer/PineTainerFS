@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Tweak urandom service start order
-mv "${1:?}/etc/init.d/S20urandom" "${1:?}/etc/init.d/S01urandom" 2>/dev/null || true
-
 # Remove chrony service file, as we use our own
 rm "${1:?}/etc/init.d/S49chrony" 2>/dev/null || true
 

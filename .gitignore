@@ -118,3 +118,6 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 
 # DNAT rules for VMs
 /board/pinetainer/rootfs-overlay/etc/firewall/02vm-dnat
+
+# Private part of SSH banner
+/board/pinetainer/rootfs-overlay/etc/ssh/banner_private

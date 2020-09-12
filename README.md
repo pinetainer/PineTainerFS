@@ -33,4 +33,4 @@ Then we install the regulatory database blob, which is needed for proper Wi-Fi o
 Finally, the rest of the root filesystem is built normally with `./make.sh`. Go out there and have some fun while it does its thing.
 
 ### PineTainer
-To build PineTainer follow the same instructions as above. However, keep in mind that, to generate the EDK II UEFI firmware images used by QEMU in the root filesystem overlay, you need to execute `scripts/build-edk2.sh`.
+To build PineTainer follow the same instructions as above. However, keep in mind that, to generate the EDK II UEFI firmware images used by QEMU in the root filesystem overlay, you need to execute `scripts/build-edk2.sh`. You will also need to provide your own version of some files that are explicitly excluded from version control (see `.gitignore`). Also, if you want to be able to login with the `admin` user via SSH, you have to manually set a password for it.

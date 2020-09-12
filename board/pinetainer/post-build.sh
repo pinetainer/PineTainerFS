@@ -50,3 +50,17 @@ rm "${1:?}/etc/network/nfs_check" 2>/dev/null || true
 
 # PCI ID list pulled in by mdev that won't be used
 rm "${1:?}/usr/share/pci.ids.gz" 2>/dev/null || true
+
+# Remove default sshd init.d script, as we want to tweak it
+rm "${1:?}/etc/init.d/S50sshd" 2>/dev/null || true
+
+# Append private SSH banner part to the public one, and
+# remove the now merged private part
+{
+	cat "${1:?}/etc/ssh/banner" "${1:?}/etc/ssh/banner_private" >"${1:?}/etc/ssh/banner_new" && \
+	mv "${1:?}/etc/ssh/banner_new" "${1:?}/etc/ssh/banner" && \
+	rm "${1:?}/etc/ssh/banner_private"
+} 2>/dev/null || true
+
+# OpenSSH cruft (we use the internal SFTP implementation)
+rm "${1:?}/usr/libexec/sftp-server" 2>/dev/null || true

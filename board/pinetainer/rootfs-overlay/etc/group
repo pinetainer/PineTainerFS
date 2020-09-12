@@ -4,3 +4,4 @@ bin:x:2:
 pinecontainer:x:98:
 hostapd:x:99:
 nogroup:x:65534:
+admin:x:1000:

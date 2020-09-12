@@ -1,0 +1,58 @@
+## sudoers file.
+##
+## This file MUST be edited with the 'visudo' command as root.
+## Failure to use 'visudo' may result in syntax or file permission errors
+## that prevent sudo from running.
+##
+## See the sudoers man page for the details on how to write a sudoers file.
+
+##
+## Host alias specification
+##
+## Groups of machines. These may include host names (optionally with wildcards),
+## IP addresses, network numbers or netgroups.
+
+##
+## User alias specification
+##
+## Groups of users.  These may consist of user names, uids, Unix groups,
+## or netgroups.
+
+##
+## Cmnd alias specification
+##
+## Groups of commands.  Often used to group related commands together.
+
+##
+## Defaults specification
+##
+
+# Keep locale settings
+Defaults env_keep += "LANG LANGUAGE LINGUAS LC_* _XKB_CHARSET"
+
+# Change password prompt to reveal a bit less of information
+# (not that it slows down nasty users much, though)
+Defaults passprompt = "[sudo] password: "
+
+# Require the successful write of audit log entries for sudoing
+Defaults !ignore_audit_errors
+
+# Use this PATH instead of user's
+Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# No sendmail, so no mail. These errors still get logged to syslog, though
+Defaults !mail_all_cmnds, !mail_always, !mail_badpass, !mail_no_host, !mail_no_perms, !mail_no_user
+
+# Some fun allowed :)
+Defaults insults
+
+##
+## Runas alias specification
+##
+
+##
+## User privilege specification
+##
+
+# Members of the sudo group may execute any command as any user
+%sudo ALL=(ALL) ALL

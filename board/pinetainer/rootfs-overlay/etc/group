@@ -1,6 +1,7 @@
 root:x:0:
 daemon:x:1:
 bin:x:2:
+sudo:x:27:admin
 pinecontainer:x:98:
 hostapd:x:99:
 nogroup:x:65534:

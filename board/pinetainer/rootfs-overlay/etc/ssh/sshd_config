@@ -22,8 +22,8 @@ AuthorizedKeysFile .ssh/authorized_keys
 
 # Authentication methods
 AuthenticationMethods publickey,password
-PasswordAuthentication yes
 PubkeyAuthentication yes
+PasswordAuthentication yes
 KbdInteractiveAuthentication no
 ChallengeResponseAuthentication no
 HostbasedAuthentication no

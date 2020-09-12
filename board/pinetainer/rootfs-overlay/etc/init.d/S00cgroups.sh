@@ -62,6 +62,7 @@ start() {
 		echo 'OK'
 	else
 		echo 'FAIL'
+		return 1
 	fi
 }
 
@@ -92,6 +93,7 @@ stop() {
 		echo 'OK'
 	else
 		echo 'FAIL'
+		return 1
 	fi
 }
 

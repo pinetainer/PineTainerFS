@@ -7,7 +7,9 @@ start() {
 	-- -B -P /run/hostapd.pid /etc/hostapd.conf; then
 		echo 'OK'
 	else
+		exit_code=$?
 		echo 'FAIL'
+		return $exit_code
 	fi
 }
 
@@ -17,13 +19,14 @@ stop() {
 	if start-stop-daemon -p /run/hostapd.pid -x /usr/sbin/hostapd -o -q -K; then
 		echo 'OK'
 	else
+		exit_code=$?
 		echo 'FAIL'
+		return $exit_code
 	fi
 }
 
 restart() {
-	stop
-	start
+	stop && start
 }
 
 case "$1" in

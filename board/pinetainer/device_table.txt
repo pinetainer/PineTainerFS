@@ -10,4 +10,5 @@
 /etc/hostapd.radius_clients			f		660		0		99		-		-		-		-		-
 /etc/hostapd.pkey.pem				f		660		0		99		-		-		-		-		-
 /etc/hostapd.server_cert.pem		f		660		0		99		-		-		-		-		-
+/etc/msmtprc						f		660		0		0		-		-		-		-		-
 /home/admin							d		700		1000	1000	-		-		-		-		-

@@ -127,3 +127,6 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 
 # E-mail configuration and accounts
 /board/pinetainer/rootfs-overlay/etc/msmtprc
+
+# Dynamic DNS client configuration
+/board/pinetainer/rootfs-overlay/etc/inadyn.conf

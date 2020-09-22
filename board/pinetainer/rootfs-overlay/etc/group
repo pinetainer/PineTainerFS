@@ -4,5 +4,6 @@ bin:x:2:
 sudo:x:27:admin
 pinecontainer:x:98:
 hostapd:x:99:
+inadyn:x:100:
 nogroup:x:65534:
 admin:x:1000:

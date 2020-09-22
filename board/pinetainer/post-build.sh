@@ -67,3 +67,6 @@ rm "${1:?}/usr/libexec/sftp-server" 2>/dev/null || true
 
 # Remove not needed nftables files
 rm -rf "${1:?}/etc/nftables" 2>/dev/null || true
+
+# Remove default inadyn init.d script, as we want to tweak it
+rm "${1:?}/etc/init.d/S70inadyn" 2>/dev/null || true

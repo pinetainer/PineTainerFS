@@ -100,6 +100,9 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 # EDK II UEFI firmware pflash images
 /board/pinetainer/rootfs-overlay/usr/share/edk2.git/*-pflash.raw
 
+## FILES WHOSE CONTENT IS NOT MEANT TO BE PUBLIC ##
+# You should use your own version of these files instead
+
 # See /board/pinetainer/rootfs-overlay/etc/dnsmasq.conf
 /board/pinetainer/rootfs-overlay/etc/dnsmasq.d/forced-dns-servers.conf
 
@@ -121,3 +124,6 @@ aarch64-pinechain-linux-musl_sdk-buildroot.tar.gz
 
 # Private part of SSH banner
 /board/pinetainer/rootfs-overlay/etc/ssh/banner_private
+
+# E-mail configuration and accounts
+/board/pinetainer/rootfs-overlay/etc/msmtprc

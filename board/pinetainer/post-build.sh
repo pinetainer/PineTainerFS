@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# Tweak network, dnsmasq, udev and haveged start order
+# Tweak network, dnsmasq, udev, haveged and urandom seed storage start order
 mv "${1:?}/etc/init.d/S40network" "${1:?}/etc/init.d/S03network.sh" 2>/dev/null || true
+mv "${1:?}/etc/init.d/S20urandom" "${1:?}/etc/init.d/S01urandom.sh" 2>/dev/null || true
 mv "${1:?}/etc/init.d/S80dnsmasq" "${1:?}/etc/init.d/S10dnsmasq.sh" 2>/dev/null || true
 mv "${1:?}/etc/init.d/S10udev" "${1:?}/etc/init.d/S90udev.sh" 2>/dev/null || true
 mv "${1:?}/etc/init.d/S21haveged" "${1:?}/etc/init.d/S01haveged.sh" 2>/dev/null || true
